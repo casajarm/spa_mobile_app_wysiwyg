@@ -1,0 +1,20 @@
+{
+    "results": [
+        {
+            "objectId": "KWM779zYRW",
+            "organizationID": "j7Upfb6fEo",
+            "tabBar": "#183167",
+            "tabBarSelected": "#34FF56",
+            "generalColor": "#1B3774",
+            "generalTextColor": "#34FF56",
+            "categoryTextColor": "#FFFFFF",
+            "navButtonColor": "#183167",
+            "starColor": "#183167",
+            "font": "Avenir-Next",
+            "fontSize": "16",
+            "fontCategorySize": "Large",
+            "createdAt": "2019-01-09T23:42:13.664Z",
+            "updatedAt": "2019-01-09T23:42:13.664Z"
+        }
+    ]
+}
