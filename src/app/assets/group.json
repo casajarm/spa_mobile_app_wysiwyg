@@ -1,0 +1,247 @@
+{
+    "results": [
+        {
+            "objectId": "vDYmIGwEYx",
+            "likemojis": [
+                "Z3gX6gVqp9",
+                "d9CZxHEWh2",
+                "GjtuPH5WG4"
+            ],
+            "names": {
+                "en": "Main Category"
+            },
+            "descriptions": {},
+            "callOuts": {
+                "en": "Connect with us!"
+            },
+            "name": "Main Category",
+            "type": "school",
+            "organization": "Greg3",
+            "organizationID": "j7Upfb6fEo",
+            "groupImage": null,
+            "headerImage": null,
+            "comments": "1",
+            "displayName": "Main",
+            "disable": 0,
+            "longDescription": "",
+            "main": 1,
+            "stroke": null,
+            "strokeColor": null,
+            "order": 0,
+            "newHeader": {
+                "__type": "File",
+                "name": "3500972b0009c8c7127e65445106bf89_header.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/3500972b0009c8c7127e65445106bf89_header.jpg"
+            },
+            "createdAt": "2019-01-09T23:42:13.474Z",
+            "updatedAt": "2019-01-20T23:13:51.083Z"
+        },
+        {
+            "objectId": "T8lWX4jJMF",
+            "likemojis": [
+                "7vs9EaXe2m",
+                "TGed7qUvwQ",
+                "LHxOBdi66s",
+                "LtRXZWOVXz",
+                "332qWpEOWo",
+                "DFqcdJHxbV",
+                "p2075BDAmG",
+                "ZlNJAXlrmr",
+                "TIrtKV5N4N",
+                "XgZqbvHeGK",
+                "A8v2QwtYTF",
+                "b5PGC8RRAb",
+                "ts4GcStYm1"
+            ],
+            "names": {
+                "en": "Pre-K to 8th"
+            },
+            "descriptions": {},
+            "callOuts": {
+                "en": "Pre-K to 8th"
+            },
+            "name": "Pre-K to 8th",
+            "type": "school",
+            "organization": "Greg3",
+            "organizationID": "j7Upfb6fEo",
+            "groupImage": "organizations/tahoe-expedition-academy/pre-k-8th-grade-category.jpg",
+            "headerImage": "organizations/tahoe-expedition-academy/pre-k-8th-grade-category-header.jpg",
+            "comments": "1",
+            "displayName": "Pre-K to 8th",
+            "disable": 0,
+            "longDescription": "",
+            "main": 2,
+            "stroke": null,
+            "strokeColor": null,
+            "order": 4,
+            "newHeader": {
+                "__type": "File",
+                "name": "9376d49a5991f7cfad1570dd1b5d9e73_header.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/9376d49a5991f7cfad1570dd1b5d9e73_header.jpg"
+            },
+            "newCategoryImage": {
+                "__type": "File",
+                "name": "b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg"
+            },
+            "createdAt": "2019-01-09T23:42:13.475Z",
+            "updatedAt": "2019-01-20T23:13:51.086Z"
+        },
+        {
+            "objectId": "JrG4u3FQP2",
+            "likemojis": [
+                "p2075BDAmG",
+                "TGed7qUvwQ",
+                "332qWpEOWo",
+                "ts4GcStYm1",
+                "LtRXZWOVXz",
+                "TIrtKV5N4N",
+                "LHxOBdi66s",
+                "A8v2QwtYTF",
+                "ZlNJAXlrmr",
+                "DFqcdJHxbV",
+                "b5PGC8RRAb",
+                "7vs9EaXe2m",
+                "Z3gX6gVqp9",
+                "d9CZxHEWh2",
+                "GjtuPH5WG4",
+                "XgZqbvHeGK",
+                "NiHvhcGIx8"
+            ],
+            "names": {
+                "en": "High School"
+            },
+            "descriptions": {
+                "en": "Our students are intellectually curious, with aspirations that aren't just about getting into the best colleges and universities, but are also about proving what they can do by making a positive impact on the world."
+            },
+            "callOuts": {
+                "en": "High School"
+            },
+            "name": "High School",
+            "type": "school",
+            "organization": "Greg3",
+            "organizationID": "j7Upfb6fEo",
+            "groupImage": "organizations/tahoe-expedition-academy/high-school-category.jpg",
+            "headerImage": "organizations/tahoe-expedition-academy/high-school-category-header.jpg",
+            "comments": "1",
+            "displayName": "High School",
+            "disable": 0,
+            "longDescription": "Our students are intellectually curious, with aspirations that aren't just about getting into the best colleges and universities, but are also about proving what they can do by making a positive impact on the world.",
+            "main": 2,
+            "stroke": null,
+            "strokeColor": null,
+            "order": 2,
+            "newHeader": {
+                "__type": "File",
+                "name": "28f61e11293ee2779bac1da9fd5a33c8_header.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/28f61e11293ee2779bac1da9fd5a33c8_header.jpg"
+            },
+            "newCategoryImage": {
+                "__type": "File",
+                "name": "75bf2bc682605d0d5e90212b56942917_high-school-category.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/75bf2bc682605d0d5e90212b56942917_high-school-category.jpg"
+            },
+            "createdAt": "2019-01-09T23:42:13.476Z",
+            "updatedAt": "2019-01-20T23:13:51.094Z"
+        },
+        {
+            "objectId": "xw7v2Vwfxo",
+            "likemojis": [
+                "332qWpEOWo",
+                "ZlNJAXlrmr",
+                "ts4GcStYm1",
+                "l9PiYA1lGH",
+                "CPHb5vJI2z",
+                "GAkOnuvCSL",
+                "y3o87WNdNS",
+                "UBHgT7GaYb",
+                "XgZqbvHeGK"
+            ],
+            "names": {
+                "en": "Co-Curricular"
+            },
+            "descriptions": {},
+            "callOuts": {
+                "en": "Co-Curricular"
+            },
+            "name": "Co-Curricular",
+            "type": "school",
+            "organization": "Greg3",
+            "organizationID": "j7Upfb6fEo",
+            "groupImage": "organizations/tahoe-expedition-academy/co-curricular-category.jpg",
+            "headerImage": "organizations/tahoe-expedition-academy/co-curricular-category-header.jpg",
+            "comments": "1",
+            "displayName": "Co-Curricular",
+            "disable": 0,
+            "longDescription": "",
+            "main": 2,
+            "stroke": null,
+            "strokeColor": null,
+            "order": 1,
+            "newHeader": {
+                "__type": "File",
+                "name": "f8f773290587ed4e9175f005355631ed_header.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/f8f773290587ed4e9175f005355631ed_header.jpg"
+            },
+            "newCategoryImage": {
+                "__type": "File",
+                "name": "1dce67c95341345a715384ba783f875b_co-curricular-category.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/1dce67c95341345a715384ba783f875b_co-curricular-category.jpg"
+            },
+            "createdAt": "2019-01-09T23:42:13.478Z",
+            "updatedAt": "2019-01-20T23:13:51.092Z"
+        },
+        {
+            "objectId": "iThZua0A3b",
+            "likemojis": [
+                "dvrOi5AE0y",
+                "0SXglMNWCq",
+                "RxoJlKn4GS",
+                "SYHxooRCWA",
+                "332qWpEOWo",
+                "tm4MMNjd8c",
+                "SpKPUOWSLB",
+                "oGDCZb3pBW",
+                "AxPQOqlgbf",
+                "MUXcXoPh8C",
+                "4Ws1EeuiBl",
+                "WIqP4VvAw1",
+                "xo0hgJW1ba",
+                "7TppzDfvCT"
+            ],
+            "names": {
+                "en": "Operations"
+            },
+            "descriptions": {},
+            "callOuts": {
+                "en": "Operations"
+            },
+            "name": "Operations",
+            "type": "school",
+            "organization": "Greg3",
+            "organizationID": "j7Upfb6fEo",
+            "groupImage": "organizations/tahoe-expedition-academy/operations-category.jpg",
+            "headerImage": "organizations/tahoe-expedition-academy/operations-category-header.jpg",
+            "comments": "1",
+            "displayName": "Operations",
+            "disable": 1,
+            "longDescription": "",
+            "main": 2,
+            "stroke": null,
+            "strokeColor": null,
+            "order": 3,
+            "newHeader": {
+                "__type": "File",
+                "name": "80585703ed6bb91d34773dd39c86bf4a_header.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/80585703ed6bb91d34773dd39c86bf4a_header.jpg"
+            },
+            "newCategoryImage": {
+                "__type": "File",
+                "name": "31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg",
+                "url": "https://likemoji-main-stage.s3.amazonaws.com/31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg"
+            },
+            "createdAt": "2019-01-09T23:42:13.478Z",
+            "updatedAt": "2019-01-20T23:13:51.096Z"
+        }
+    ]
+}
