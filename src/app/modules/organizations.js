@@ -26,6 +26,8 @@ async function getOrganization(orgId) {
 
 function saveChannelToOrg() {
     // should rename groups to channels..?
+    let organization = new Organization(); // new organization being created
+
     editors.push(currentUser.id);
 
     organization.set("groups", groupsIDs);
