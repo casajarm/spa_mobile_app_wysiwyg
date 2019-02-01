@@ -1,3 +1,25 @@
+##likemoji
+ExpressJS based Node app with a SPA front end
+Uses Parse platform
+
+Currently only capable of logging in user via Parse Platform 
+Using the workspace created by Alex 
+To Use:
+1. Clone repository
+2. Open sommand prompt in root directory of repository
+3. run: "npm install" to install dependencies (express, parse and related subdependencies)
+4. Change directory to /src
+5. run: node login.js
+6. confirm output contains user id and session token
+
+**To run any Parse SDK code in node you need at least this minimum:**
+const Parse = require('parse/node');
+Parse.initialize("fg8ZXCHKfBOWme42LGPA");
+Parse.serverURL = 'https://lmx-stage-alex.herokuapp.com/parse'
+
+
+
+
 **Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
 
 When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
