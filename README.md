@@ -6,11 +6,20 @@ Currently only capable of logging in user via Parse Platform
 Using the workspace created by Alex 
 To Use:
 1. Clone repository
-2. Open sommand prompt in root directory of repository
+2. Open command prompt in root directory of repository
 3. run: "npm install" to install dependencies (express, parse and related subdependencies)
-4. Change directory to /src
-5. run: node login.js
-6. confirm output contains user id and session token
+4. Change directory to root
+5. run in command prompt: npm start
+6. User Postman or equivalent to send the following
+{
+    "headers": "content-type: application/x-www-form-urlencoded",
+    "method": "POST",
+    "payload": "username=greg3@sqlprompt.net&password=greg3",
+    "url": "http://127.0.0.1:3000/login",
+}
+7. Confirm response from Post operation includes a session token
+    eg parse.session=%7B%22sessionToken%22%3A%22r%3Aa04d0ca1da3efef9db501b03171df76a%22%7D; 
+    Note the first run takes time to spin up the Heroku instance
 
 **To run any Parse SDK code in node you need at least this minimum:**
 const Parse = require('parse/node');
