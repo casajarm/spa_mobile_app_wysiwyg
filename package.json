@@ -2,7 +2,7 @@
   "name": "likemoji_20",
   "version": "1.0.0",
   "description": "likemoji builder app",
-  "main": "./src/login.js",
+  "main": "app.js",
   "scripts": {
     "start": "node ./bin/www"
   },
