@@ -1,3 +1,4 @@
+//'use strict';
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -5,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var debug = require('debug')('likemoji:server');
 const Parse = require('parse/node');
-
+const auth = require('./routes/auth');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +20,7 @@ Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = 'https://lmx-stage-alex.herokuapp.com/parse'
 // Alex's test environment
 
+app.use('/api/*', auth(parseConfig));
 
 
 // view engine setup
