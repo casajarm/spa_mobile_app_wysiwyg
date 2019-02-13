@@ -1,8 +1,24 @@
 // organizations.js 
 //prototype object for Organization class from Parse
-const Organization = Parse
-				.Object
-                .extend("Organization");
+
+/* A "standard" Parse object extend format 
+var MyClass = Parse.Object.extend("MyClass", {
+        Instance methods,
+        initialize: function(attrs, options) {
+            this.someInstanceProperty = [],
+            Other instance properties
+        }
+    }, {
+        Class properties
+    });
+ */
+
+var Organization = Parse.Object.extend("Organization", {
+	saveChannelToOrg: () => {saveChannelToOrg()}
+  , getOrganization: (orgId) => {getOrganization(orgId)} 
+});
+//TODO don't we want paramters for saveChannelToOrg?
+
 
 //TODO extend or delegate from base class not Parse                
 var returnedOrg = Parse
@@ -49,5 +65,4 @@ function saveChannelToOrg() {
         });
 }
 
-
-
+export default Organization;

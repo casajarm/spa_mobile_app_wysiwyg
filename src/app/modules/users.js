@@ -1,7 +1,25 @@
 //users.js returns list of channels for current user
 
-async function getUserChannels() {
+/* A "standard" Parse object extend format 
+var MyClass = Parse.Object.extend("MyClass", {
+        Instance methods,
+        initialize: function(attrs, options) {
+            this.someInstanceProperty = [],
+            Other instance properties
+        }
+    }, {
+        Class properties
+    });
+ */
 
+var User = Parse.Object.extend("User", {
+    logout: () => {saveChannelToOrg()}
+  , login: (username, password) => {login(username, password)}
+  , newUser: (email, username, password) => {newUser(email, username, password)} 
+  , getUserChannels: () => {getUserChannels()} 
+});
+
+async function getUserChannels() {
     const query = new Parse.Query(Organization);
     query.equalTo("editors", currentUser.id);
 
@@ -99,3 +117,5 @@ async function logout() {
             }
         });
 }
+
+export  {User, userLogin};

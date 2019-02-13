@@ -1,9 +1,22 @@
-const Group = Parse
-		.Object
-		.extend("Group");
+/* A "standard" Parse object extend format 
+var MyClass = Parse.Object.extend("MyClass", {
+        Instance methods,
+        initialize: function(attrs, options) {
+            this.someInstanceProperty = [],
+            Other instance properties
+        }
+    }, {
+        Class properties
+    });
+ */
+
+var Group = Parse.Object.extend("Group", {
+	saveNewGroups: () => {saveNewGroups()}
+  , getGroups: (orgId) => {getGroups(orgId)} 
+});
+
 
 // return groups associated with an org
-
 async function getGroups(orgId) {
 
 		const query = new Parse.Query(Group);
@@ -86,3 +99,4 @@ function setNewGroupOrder() {
 				});
 
 }
+export default Group;

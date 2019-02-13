@@ -1,6 +1,8 @@
 //likemojis.js
+//const Likemoji = Parse.Object.extend("Likemoji");
+//var likemoji = Parse.Object.extend("Likemoji");
 
-/*
+/* A "standard" Parse object extend format 
 var MyClass = Parse.Object.extend("MyClass", {
         Instance methods,
         initialize: function(attrs, options) {
@@ -12,8 +14,11 @@ var MyClass = Parse.Object.extend("MyClass", {
     });
  */
 
-const Likemoji = Parse.Object.extend("Likemoji");
-var likemoji = Parse.Object.extend("Likemoji");
+var Likemoji = Parse.Object.extend("Likemoji", {
+      cloneMojies: (mojies) => {cloneLikemojies(mojies)}
+    , getLikemojis: (orgId) => {getLikemojis(orgId)} 
+});
+
 
 //copies given Likemojis to current Likemoji set
 async function cloneLikemojis(mojies) {
@@ -80,3 +85,5 @@ async function getLikemojis(orgId) {
 async function sortMojisByName(mojis) {
   return mojis.sort(SortByName);
 }
+
+export default Likemoji;
