@@ -126,7 +126,6 @@ async function getGroups(orgId) {
 }
 
 // return styles associated with an org
-
 async function getStyle(orgId) {
 
 				var query = new Parse.Query(ChannelStyle);
@@ -439,18 +438,14 @@ function displayCollectionLikemojis() {
 // sorts groups to correct order
 
 async function sortCategories() {
-
-				groups
-								.sort(function (a, b) {
-												return a.attributes.order - b.attributes.order
-								});
-				return groups;
+	groups.sort(function (a, b) {
+		return a.attributes.order - b.attributes.order
+	});
+	return groups;
 }
 
 async function sortImportedLikemojisByName() {
-
-				importedLikemojis.sort(SortByName);
-
+	importedLikemojis.sort(SortByName);
 }
 
 function SortByName(a, b) {
@@ -887,7 +882,8 @@ $(".channelSelectButton").click(function (event) {
 				console.log("selected channel " + selectedChannelID)
 				switch (selectedChannelID) {
 								case "7":
-												console.log("I'm here!")$("#build").show();
+												console.log("I'm here!")
+												$("#build").show();
 												$("#startSelectorPage").hide();
 												selectedChannelID = "0"
 												break;
@@ -1008,10 +1004,14 @@ function singleMultiToggle(id) {
 
 				switch (id) {
 								case "#singlePageSelect":
-												$(".categories").hide()$("#categoryEditorButton").hide()break;
+												$(".categories").hide();
+												$("#categoryEditorButton").hide();
+												break;
 
 								case "#multiPageSelect":
-												$(".categories").fadeIn()$("#categoryEditorButton").fadeIn()break;
+												$(".categories").fadeIn();
+												$("#categoryEditorButton").fadeIn();
+												break;
 				}
 
 				$(".singleMultiSwitch").removeClass("active");
