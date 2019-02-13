@@ -1,4 +1,17 @@
 ##likemoji
+SPA using modules, arrow functions, asynch/await and some other modern stuff
+Must be served over http ... file:// protocol will result in CORS error when importing external libraries
+
+To Use:
+
+Clone git repo
+Turn on server (node will work fine but I use Live Server extension in VS Code)
+Point browser (Chrome or Firefox are working) at URL = http://ipaddress:port/src/app/buildChannel.html
+
+Once we get Webpack running for older browsers will move code into a dist directory
+
+
+## We may revisit all this node stuff...it should work still
 ExpressJS based Node app with a SPA front end
 Uses Parse platform
 
