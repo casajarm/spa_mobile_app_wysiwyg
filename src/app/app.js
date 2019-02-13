@@ -1,12 +1,11 @@
 import Group from "./modules/groups.js";
 import Likemoji from "./modules/likemojis.js";
-import Organization from "./modules/organizations.js";
 import getStartSelectors from "./modules/startselector.js";
 //import Startselector from "./modules/startselector.js";
 import {ChannelStyle, saveNewStyle, getStyle} from "./modules/styles.js";
-import {User, userLogin} from "./modules/users.js";
+import User from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
-
+import Organization from "./modules/organizations.js";
 //import page from 'https://unpkg.com/page/page.js';
 // this has to go in html page
 
@@ -17,6 +16,8 @@ Parse.serverURL = 'https://lmx-stage-alex.herokuapp.com/parse'
 
 // imported objects var importedLikemojis = [] // array of likemojis for
 // imported organization
+var user = new User();
+
 var styles = new ChannelStyle();
 var groups = [] //array of groups for imported organization - unsorted
 var categoriesSorted = [] //array of groups for imported organization - sorted by "order" using sortCategories() function
@@ -1075,10 +1076,29 @@ $("#signUpUser2")
 
 //listens for login Submit button
 
-$("#loginUser").click(function (event) {
-
-				userLogin();
-
+$("#loginUser").click(async function (event) {
+	var user_password = $("#loginPassword").val();
+	var user_email = $("#loginEmail").val();
+	
+	console.log(`logIn call with user: ${user_email} and pwd: ${user_password}`);
+	user.login(user_email, user_password)
+	.then(user => {
+		if (user.current()) {
+			//TODO move this to routes
+				userChannels = user.getUserChannels().then(channels => displayUserChannelList());
+				$("#loginForm").hide();
+				$("#loginChoice").show();
+				$("#login").hide();
+				$("#signup").hide();
+				$("#logout").show();
+				// 		$("#loginForm").show();
+		
+				console.log("loggedin")
+			} else {
+				console.log("loggedout")
+			}
+	})
+	.catch(err => alert(err));	
 });
 
 $("#startBuild").click(function (event) {

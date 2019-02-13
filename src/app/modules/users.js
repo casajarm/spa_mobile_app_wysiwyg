@@ -14,7 +14,7 @@ var MyClass = Parse.Object.extend("MyClass", {
 
 var User = Parse.Object.extend("User", {
     logout: () => {saveChannelToOrg()}
-  , login: (username, password) => {login(username, password)}
+  , login: (username, password, options ) => {Parse.User.logIn(username, password, options)}
   , newUser: (email, username, password) => {newUser(email, username, password)} 
   , getUserChannels: () => {getUserChannels()} 
 });
@@ -24,9 +24,7 @@ async function getUserChannels() {
     query.equalTo("editors", currentUser.id);
 
     try {
-
         return await query.find();
-
     } catch (err) {
         // TypeError: failed to fetch
         alert(err);
@@ -38,12 +36,14 @@ async function newUser (email, username, password) {
     // TODO handle user already exists first
     console.log("function called")
 
-    //var user_password = $("#inputPassword").val();
-    //var user_email = $("#inputEmail").val();
+
 
     console.log(email + " " + password)
 
-    var user = new Parse.User();
+    var user = new Parse.User(); 
+    //TODO I think here we use the outer User object this method is called from
+    // in other words "this"
+    
     user.set("username", email);
     user.set("password", password);
     user.set("email", email);
@@ -72,31 +72,16 @@ async function newUser (email, username, password) {
 
 //logs user in
 async function userLogin (email, password)  {
-//    var user_password = $("#loginPassword").val();
-//    var user_email = $("#loginEmail").val();
+    
+    /*
     const user = await Parse
         .User
         .logIn(email, password);
+    */
+    this.logIn(email, password)
+        .then(user => {return user})
+        .catch(error => {alert(error)});
 
-    currentUser = Parse
-        .User
-        .current();
-    if (currentUser) {
-    //TODO move this to routes
-        userChannels = await getUserChannels();
-        displayUserChannelList();
-
-        $("#loginForm").hide();
-        $("#loginChoice").show();
-        $("#login").hide();
-        $("#signup").hide();
-        $("#logout").show();
-        // 		$("#loginForm").show();
-
-        console.log("loggedin")
-    } else {
-        console.log("loggedout")
-    }
 }
 
 async function logout() {
@@ -118,4 +103,4 @@ async function logout() {
         });
 }
 
-export  {User, userLogin};
+export default User;
