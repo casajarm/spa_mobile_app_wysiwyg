@@ -14,12 +14,6 @@ var newGroupsLikemojis = [] //array of arrays likemoji obj ids for groups of new
 // sets class types and vars to represent parse objects
 
 
-const ChannelStyle = Parse
-				.Object
-				.extend("ChannelStyle");
-const Likemoji = Parse
-				.Object
-				.extend("Likemoji");
 var likemoji = Parse
 				.Object
 				.extend("Likemoji");
@@ -56,3 +50,5 @@ async function cloneChannel(channelId) {
 
 	// console.log("done")
 }
+
+export default cloneChannel;
