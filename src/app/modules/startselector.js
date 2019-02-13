@@ -12,3 +12,5 @@ async function getStartSelectors() {
         alert(err);
     }
 }
+
+export default getStartSelectors;

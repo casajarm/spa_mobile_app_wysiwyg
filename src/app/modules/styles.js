@@ -1,4 +1,7 @@
-//styles.js clone style
+//channelstyles.js  styles
+const ChannelStyle = Parse
+				.Object
+				.extend("ChannelStyle");
 
 function saveNewStyle() {
 
@@ -35,3 +38,5 @@ async function getStyle(orgId) {
 
     }
 }
+
+export {ChannelStyle, saveNewStyle, getStyle};
