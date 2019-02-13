@@ -35,7 +35,6 @@ async function testLogin(){
     console.log('session token', sessionID);
 }
 
-/*
 app.post('/login', function(req, res) {
     Parse.User.logIn(req.body.username, req.body.password).then(function(user) {
         var val = JSON.stringify({sessionToken: user.getSessionToken()});
@@ -47,4 +46,3 @@ app.post('/login', function(req, res) {
         ;
     });
 });
-*/
