@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<head>
+	<title>Channel Builder</title>
+	<!-- links for bootstrap, parse.js, builder.css, likemojibuilder.css, googlefonts -->
+	<link
+		rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+		crossorigin="anonymous"
+	/>
+	<!-- <link rel="stylesheet" type="text/css" href="likemojibuilder.css"> -->
+	<link rel="stylesheet" type="text/css" href="builder.css" />
+	<link
+		href="https://fonts.googleapis.com/css?family=Prompt"
+		rel="stylesheet"
+	/>
+	<link
+		rel="stylesheet"
+		href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+		integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+		crossorigin="anonymous"
+	/>
+	<script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
+	<script type="text/javascript">
+
+		page.start({hashbang: false, dispatch: true});
+		page.base('/src/app');
+		page('/link1'
+				, function(ctx, next) {
+					showLink(ctx, next, 'link1')
+					}
+		);
+		page('/link2'
+				, function(ctx, next) {
+					showLink(ctx, next, 'link2')
+					}
+		);
+		page('/link3'
+				, function(ctx, next) {
+					showLink(ctx, next, 'link3')
+					}
+		);
+
+		page('/right/link10'
+				, function(ctx, next) {
+					console.log('link10');
+					showRightLink(ctx, next, 'link10')
+					}
+		);
+
+		page('*'
+				, function(ctx, next) {
+					console.log('missed');
+					console.log(ctx);
+				}
+				
+		
+		)
+
+		var rightPanel;
+
+		function showLink(ctx, next, custom){
+			console.log(`Show ${custom}`);
+			rightPanel = document.getElementById("targetDiv");		
+			console.log(rightPanel);	
+			rightPanel.innerHTML = "";
+			var newElement = document.createElement("P");
+			newElement.onclick = function(e){
+					page('/right/link10');
+					e.preventDefault();
+				};
+			var newElementContents = document.createTextNode(custom);
+			newElement.appendChild(newElementContents);
+			rightPanel.appendChild(newElement);	
+		}
+
+		function showRightLink(ctx, next, custom){
+			console.log(`Show ${custom}`);
+			rightPanel = document.getElementById("targetDiv");		
+			console.log(rightPanel);	
+			var newElement = document.createElement("P");
+			var newElementContents = document.createTextNode(custom);
+			newElement.appendChild(newElementContents);
+			rightPanel.appendChild(newElement);	
+		}
+
+
+	</script>
+
+</head>
+<body>
+	<!-- logo above navbar -->
+	<div id="title" class="title container">
+		<img
+			id="logo"
+			src="https://likemoji.com/sites/default/files/likemoji.png"
+		/>
+	</div>
+	<!-- navbar -->
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button
+					type="button"
+					class="navbar-toggle collapsed"
+					data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false"
+				>
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span> <span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+
+				<img id="brand" alt="Brand" src="assets/icon.jpg" />
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="likemojibuilder.html">Home<span class="sr-only">(current)</span></a>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li id="signup"><a>Sign-Up</a></li>
+					<li id="login" class="active"></li><a>Login</a></li>
+					<li id="logout"><a href="#">Logout</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+	<div class="container">
+		<div id="gettingStarted" class="jumbotron">
+			<div class="container">
+				<div id="edit" class="container"></div>
+				<div class="row">
+					<div class="col-lg-4">
+						<h3>Left Pane</h3>
+						<hr />
+						<ul>
+							<li><a href="link1">Link 1</a></li>
+							<li><a href="link2">Link 2</a></li>
+							<li><a href="link3">link 3</a></li>
+						</ul>
+					</div>
+					<div class="col-lg-4 channelEdit">
+						<h3>Middle Pane</h3>
+                        <hr />
+                        <div class="phone">
+                            <img class="phone" src="assets/iPhone_7_front_frame sized.png">
+                        </div>
+					</div>
+					<div class="col-lg-4 channelEdit">
+						<h3>Right Pane</h3>
+						<hr />
+						<div id="targetDiv">
+							<p>Hello</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
