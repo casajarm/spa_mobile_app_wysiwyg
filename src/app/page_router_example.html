@@ -21,71 +21,7 @@
 		crossorigin="anonymous"
 	/>
 	<script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
-	<script type="text/javascript">
-
-		page.start({hashbang: false, dispatch: true});
-		page.base('/src/app');
-		page('/link1'
-				, function(ctx, next) {
-					showLink(ctx, next, 'link1')
-					}
-		);
-		page('/link2'
-				, function(ctx, next) {
-					showLink(ctx, next, 'link2')
-					}
-		);
-		page('/link3'
-				, function(ctx, next) {
-					showLink(ctx, next, 'link3')
-					}
-		);
-
-		page('/right/link10'
-				, function(ctx, next) {
-					console.log('link10');
-					showRightLink(ctx, next, 'link10')
-					}
-		);
-
-		page('*'
-				, function(ctx, next) {
-					console.log('missed');
-					console.log(ctx);
-				}
-				
-		
-		)
-
-		var rightPanel;
-
-		function showLink(ctx, next, custom){
-			console.log(`Show ${custom}`);
-			rightPanel = document.getElementById("targetDiv");		
-			console.log(rightPanel);	
-			rightPanel.innerHTML = "";
-			var newElement = document.createElement("P");
-			newElement.onclick = function(e){
-					page('/right/link10');
-					e.preventDefault();
-				};
-			var newElementContents = document.createTextNode(custom);
-			newElement.appendChild(newElementContents);
-			rightPanel.appendChild(newElement);	
-		}
-
-		function showRightLink(ctx, next, custom){
-			console.log(`Show ${custom}`);
-			rightPanel = document.getElementById("targetDiv");		
-			console.log(rightPanel);	
-			var newElement = document.createElement("P");
-			var newElementContents = document.createTextNode(custom);
-			newElement.appendChild(newElementContents);
-			rightPanel.appendChild(newElement);	
-		}
-
-
-	</script>
+	
 
 </head>
 <body>
@@ -138,25 +74,26 @@
 				<div id="edit" class="container"></div>
 				<div class="row">
 					<div class="col-lg-4">
-						<h3>Left Pane</h3>
+						<h3>Left Panel</h3>
 						<hr />
-						<ul>
-							<li><a href="link1">Link 1</a></li>
-							<li><a href="link2">Link 2</a></li>
-							<li><a href="link3">link 3</a></li>
-						</ul>
+						<div id="panel1">
+							<ul>
+								<li><a href="link1">Create New Account</a></li>
+								<li><a href="link2">Login</a></li>
+							</ul>
+						</div>
 					</div>
 					<div class="col-lg-4 channelEdit">
-						<h3>Middle Pane</h3>
+						<h3>Middle Panel</h3>
                         <hr />
-                        <div class="phone">
+                        <div class="phone" id="panel2">
                             <img class="phone" src="assets/iPhone_7_front_frame sized.png">
                         </div>
 					</div>
 					<div class="col-lg-4 channelEdit">
-						<h3>Right Pane</h3>
+						<h3>Right Panel</h3>
 						<hr />
-						<div id="targetDiv">
+						<div id="panel3">
 							<p>Hello</p>
 						</div>
 					</div>
@@ -164,4 +101,27 @@
 			</div>
 		</div>
 	</div>
+<!-- hidden at first parts of app-->
+<div id="hiddenContainer" style="display:none">
+	<form id="signUpForm" class="form" style="display:none">
+		<h2>Create Your Account</h2>
+		<div class="form-group" id="emaildiv">
+			<label for="emailSignup">email</label>
+			<input type="email" class="form-control" id="inputEmail" placeholder="enter your email here">
+		</div>
+		<div class="form-group" id="passworddiv">
+			<label for="passwordSignup">password</label>
+			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
+		</div>
+		
+		<div class="form-group" id="organizationdiv">
+				<label for="organizationSignup">password</label>
+				<input type="text" class="form-control" id="inputOrganizetion" placeholder="organization name">
+			</div>
+		<button id="signUpUser2" type="button" class="btn btn-default">submit</button>
+	</form>
+
+
+	<script src="page_router_example.js"></script>
+</div>
 </body>
