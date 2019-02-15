@@ -1,27 +1,11 @@
 //users.js returns list of channels for current user
+// turns out exgedning user object is a little more involved. 
+// if needed check out the example in extendedUserExample.js
+//var User = Parse.Object.extend("User");
 
-/* A "standard" Parse object extend format 
-var MyClass = Parse.Object.extend("MyClass", {
-        Instance methods,
-        initialize: function(attrs, options) {
-            this.someInstanceProperty = [],
-            Other instance properties
-        }
-    }, {
-        Class properties
-    });
- */
-
-var User = Parse.Object.extend("User", {
-    logout: () => {saveChannelToOrg()}
-  , login: (username, password, options ) => {Parse.User.logIn(username, password, options)}
-  , newUser: (email, username, password) => {newUser(email, username, password)} 
-  , getUserChannels: () => {getUserChannels()} 
-});
-
-async function getUserChannels() {
-    const query = new Parse.Query(Organization);
-    query.equalTo("editors", currentUser.id);
+async function getUserChannels(userId) {
+    const query = new Parse.Query("Organization");
+    query.equalTo("editors", userId);
 
     try {
         return await query.find();
@@ -103,4 +87,4 @@ async function logout() {
         });
 }
 
-export default User;
+export default getUserChannels;
