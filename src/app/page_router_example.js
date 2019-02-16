@@ -1,5 +1,5 @@
-var panel1, panel2, panel3, holdingPen;
-    
+var panel1, panel2, panel3, holdingPen, userName;
+userName = 'You Beautiful Person You';    
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
       initApplication();
@@ -18,19 +18,23 @@ page.start({hashbang: false, dispatch: true});
 page.base('/src/app');
 page('/link1'
         , function(ctx, next) {
-            //showLink(ctx, next, 'link1');
-            clearPanel(panel2);
-            showform('signUpForm', panel2);
+            panel2.innerHTML = "";
+            renderForm(panel2, signUpForm);            
             }
 );
 page('/link2'
         , function(ctx, next) {
-            showLink(ctx, next, 'link2')
+            panel2.innerHTML = "";
+            renderForm(panel2, loginForm);            
             }
 );
 page('/link3'
         , function(ctx, next) {
-            showLink(ctx, next, 'link3')
+            userName = document.getElementById('loginEmail').value;
+            let boilerplate = `Welcome to the builder ${userName}`;
+            panel2.innerHTML = "";
+            showLink(ctx, next, boilerplate);
+            renderForm(panel2, phone);
             }
 );
 
@@ -56,6 +60,11 @@ function clearPanel(panel) {
         holdingPen.appendChild(panelContents[i]);
     }
     
+}
+
+function renderForm(panel, formFunction){
+   var form = formFunction();
+   panel.appendChild(form);
 }
 
 function showform(formID, panel) {
@@ -90,3 +99,54 @@ function showRightLink(ctx, next, custom){
     panel3.appendChild(newElement);	
 }
 
+function signUpForm() {
+    let form = document.createElement('div');
+    let form2 = `<form id="signUpForm" class="form">
+		<h2>Create Your Account</h2>
+		<div class="form-group" id="emaildiv">
+			<label for="emailSignup">email</label>
+			<input type="email" class="form-control" id="inputEmail" placeholder="enter your email here">
+		</div>
+		<div class="form-group" id="passworddiv">
+			<label for="passwordSignup">password</label>
+			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
+		</div>		
+		<div class="form-group" id="organizationdiv">
+				<label for="organizationSignup">password</label>
+				<input type="text" class="form-control" id="inputOrganizetion" placeholder="organization name">
+			</div>
+        <button id="signUpUser2" type="button" class="btn btn-default">submit</button>`;
+    form.innerHTML=form2;
+    return form;
+}
+
+
+function loginForm() {
+    let form = document.createElement('div');
+    let target = '';
+    let form2 = 
+    `<form id="loginForm" class="form">
+    <h2>Login to Your Account</h2>
+        <div class="form-group" id="emaildiv">
+            <label for="emailSignup">email</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="enter your email here">
+        </div>
+        <div class="form-group" id="passworddiv">
+            <label for="passwordSignup">password</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="enter your password here"></div>
+        <button id="loginUser" type="button" class="btn btn-default" onclick="page('/link3')">
+            submit
+        </button>
+    </form>`;
+    form.innerHTML=form2;
+    return form;
+}
+
+function phone(){
+    let form = document.createElement('div');
+    let form2 = `<div id="phoneBackground" class="phone">
+    <img class="phone" src="assets/iPhone_7_front_frame sized.png">
+    </div>`;
+    form.innerHTML=form2;
+    return form;
+}
