@@ -8,6 +8,10 @@ Clone git repo
 Turn on server (node will work fine but I use Live Server extension in VS Code)
 Point browser (Chrome or Firefox are working) at URL = http://ipaddress:port/src/app/buildChannel.html
 
+To view the router demo URL = http://ipaddress:port/src/app/page_router_example.html
+you can click the login or create new account links..add your name to login email and click submit.
+
+
 Once we get Webpack running for older browsers will move code into a dist directory
 
 
