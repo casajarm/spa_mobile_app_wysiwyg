@@ -1,4 +1,6 @@
-var panel1, panel2, panel3, holdingPen, channelName;
+'use strict'
+var panel1, panel2, panel3, holdingPen, channelName, user;
+var userChannels = [];
 channelName = 'You Beautiful Person You';    
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
@@ -13,6 +15,11 @@ function initApplication() {
     panel3 = document.getElementById("panel3");
     holdingPen = document.getElementById("hiddenContainer");	
     console.log(holdingPen);	   
+
+    Parse.initialize("fg8ZXCHKfBOWme42LGPA");
+    Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";    
+    user = new Parse.User();
+
 }
 
 page.start({hashbang: false, dispatch: true});
@@ -39,7 +46,7 @@ page('/link1'
 
                         // set orgname/channelname in state 
                         channelName = document.getElementById('inputOrganization').value;          
-                        page('/link3');
+                        page('/link2');
                         e.preventDefault();
                     }
             );
@@ -52,23 +59,89 @@ page('/link1'
                         
         }
 );
-page('/link2'
+page('/login'
         , function(ctx, next) {
             panel2.innerHTML = "";
+            panel3.innerHTML = "";
+
             renderForm(panel2, loginForm);            
-            }
-);
-page('/link3'
+            //not sure if this is the best place to wire up event handlers...
+            let loginButton = document.querySelector('#loginUser');
+            loginButton
+            .addEventListener('click'
+                    , function(e){
+                        // login the user
+                        var user_password = $("#loginPassword").val();
+                        var user_email = $("#loginEmail").val();                    
+                        loginParse(user_email, user_password);
+                        // then show them the page listing their channels
+                        page('/channels');
+                        e.preventDefault();
+                    }
+            );
+        }
+); // login page
+
+page('/distribute'
+        , function(ctx, next){
+            panel1.innerHTML = 'About your Likemoji Channel';
+            panel2.innerHTML = 'A list of links for channel';
+            
+            //TODO this would be better as a template
+            panel3.innerHTML = '';
+            let shareForm = document.createElement('form');            
+            let shareEmails = document.createElement('textarea');
+            shareEmails.value ="Enter emails to share channel";
+
+            let shareButton =document.createElement('button');
+            shareButton.innerHTML = 'Send Emails';
+            shareButton.className = 'btn btn-default';
+            shareButton.addEventListener('click', function(e) {
+                alert('emails are on the way');
+                e.preventDefault();
+            })
+            shareForm.appendChild(shareEmails);
+            shareForm.appendChild(shareButton);
+            panel3.appendChild(shareForm);
+
+        }
+); // distribute page
+
+page('/link2'
         , function(ctx, next) {
-            let boilerplate = `Welcome to the builder ${channelName}`;
             panel1.innerHTML = 'About your Likemoji Channel';
             panel2.innerHTML = '';
             panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;        
-            
+
+            let nextButton = document.createElement('button');
+            nextButton.className = 'btn btn-default';
+            nextButton.innerHTML = 'Next';
+            nextButton.addEventListener('click', function(e) {
+                page('/distribute');
+                e.preventDefault();
+            });
+            panel3.appendChild(nextButton);
+
             //showLink(ctx, next, boilerplate);
             renderForm(panel2, phone);
             }
-);
+); // link2 page
+
+page('/channels'
+        , function (ctx, next){
+            console.log('channel list view');
+            if (user.isCurrent()) {
+			    userChannels = getUserChannels(user.id);
+            //		.then(channels => displayUserChannelList(channels)
+            }
+        }
+); //channels page
+
+page('/channel/:channelID/edit'
+        , function (ctx, next){
+            console.log(`entering edit for channel id ${ctx.channelID}`)
+        }
+); //channel editor page
 
 page('/right/link10'
         , function(ctx, next) {
@@ -153,7 +226,6 @@ function signUpForm() {
     return form;
 }
 
-
 function loginForm() {
     let form = document.createElement('div');
     let target = '';
@@ -189,4 +261,18 @@ function phone(){
     form2.appendChild(image);
     form.appendChild(form2);
     return form;
+}
+
+function loginParse(username, password) {
+	console.log(`logIn call with user: ${username} and pwd: ${password}`);
+	Parse.User.logIn(username, password)
+		.then(newUser => {
+			user = newUser;
+			if (user.isCurrent()) {
+				console.log("loggedin");
+			} else {
+				console.log("loggedout");
+			}
+		})
+		.catch(err => alert(err));
 }
