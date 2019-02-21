@@ -1,4 +1,5 @@
 'use strict'
+import getUserChannels from './modules/users.js';
 var panel1, panel2, panel3, holdingPen, channelName, user;
 var userChannels = [];
 channelName = 'You Beautiful Person You';    
@@ -73,9 +74,12 @@ page('/login'
                         // login the user
                         var user_password = $("#loginPassword").val();
                         var user_email = $("#loginEmail").val();                    
-                        loginParse(user_email, user_password);
-                        // then show them the page listing their channels
-                        page('/channels');
+                        // then show them the page listing their channels 
+                        loginParse(user_email, user_password)
+                        .then (function () {
+                            page('/channels');
+                            }         
+                        );
                         e.preventDefault();
                     }
             );
@@ -131,8 +135,10 @@ page('/channels'
         , function (ctx, next){
             console.log('channel list view');
             if (user.isCurrent()) {
-			    userChannels = getUserChannels(user.id);
+                userChannels = getUserChannels(user.id)
+                .then (channels => console.log(`getUserChannels returned count: ${channels.length}`));
             //		.then(channels => displayUserChannelList(channels)
+            
             }
         }
 ); //channels page
@@ -239,7 +245,7 @@ function loginForm() {
         <div class="form-group" id="passworddiv">
             <label for="passwordSignup">password</label>
             <input type="password" class="form-control" id="loginPassword" placeholder="enter your password here"></div>
-        <button id="loginUser" type="button" class="btn btn-default" onclick="page('/link10')">
+        <button id="loginUser" type="button" class="btn btn-default">
             submit
         </button>
     </form>`;
@@ -263,16 +269,30 @@ function phone(){
     return form;
 }
 
-function loginParse(username, password) {
-	console.log(`logIn call with user: ${username} and pwd: ${password}`);
-	Parse.User.logIn(username, password)
-		.then(newUser => {
+async function loginParse(username, password) {
+    console.log(`logIn call with user: ${username} and pwd: ${password}`);
+    try {
+        user = await Parse.User.logIn(username, password);
+        console.log('logged in');
+        return user;
+    }
+    catch(err) {
+        console.log(`error logging in ${err}`);
+    }
+/*    
+        .then(function (newUser) {
 			user = newUser;
 			if (user.isCurrent()) {
 				console.log("loggedin");
 			} else {
 				console.log("loggedout");
-			}
-		})
-		.catch(err => alert(err));
+            }
+            return user;
+        })
+        .then(function (user) {
+            console.log('login function returning');
+            return user;        
+        })
+        .catch(err => alert(err));
+   */
 }
