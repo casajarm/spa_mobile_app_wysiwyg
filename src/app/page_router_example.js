@@ -1,8 +1,9 @@
-var panel1, panel2, panel3, holdingPen, userName;
-userName = 'You Beautiful Person You';    
+var panel1, panel2, panel3, holdingPen, orgName;
+orgName = 'You Beautiful Person You';    
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
       initApplication();
+      page('/');
     }
   }
 
@@ -15,12 +16,30 @@ function initApplication() {
 }
 
 page.start({hashbang: false, dispatch: true});
-page.base('/src/app');
+page.base('/src/app/page_router_example.html');
+page('/', function (ctx, next) {
+    panel3.innerHTML = "";
+
+});
+
 page('/link1'
-        , function(ctx, next) {
+        , function(ctx, next) {      
+            let productImage = document.createElement("img");
+            productImage.src = '../assets/screenshots/IMG_0971.png';
+            panel3.appendChild(productImage);
+            
             panel2.innerHTML = "";
             renderForm(panel2, signUpForm);            
-            }
+            //not sure if this is the best place to wire up event handlers...
+            let signupUser2 = document.querySelector('#signUpUser2');
+            signupUser2
+            .addEventListener('click'
+                    , function(e){
+                        page('/link3');
+                        e.preventDefault();
+                    }
+            )            
+        }
 );
 page('/link2'
         , function(ctx, next) {
@@ -30,10 +49,13 @@ page('/link2'
 );
 page('/link3'
         , function(ctx, next) {
-            userName = document.getElementById('loginEmail').value;
-            let boilerplate = `Welcome to the builder ${userName}`;
-            panel2.innerHTML = "";
-            showLink(ctx, next, boilerplate);
+            orgName = document.getElementById('inputOrganization').value;
+            let boilerplate = `Welcome to the builder ${orgName}`;
+            panel1.innerHTML = 'About your Likemoji Channel';
+            panel2.innerHTML = '';
+            panel3.innerHTML = `Congratulations ${orgName}! Here's your new Likemoji channel`;        
+            
+            //showLink(ctx, next, boilerplate);
             renderForm(panel2, phone);
             }
 );
@@ -52,7 +74,7 @@ page('*'
         }
         
 
-)
+);
 
 function clearPanel(panel) {
     var panelContents = panel.childNodes;
@@ -113,10 +135,11 @@ function signUpForm() {
 		</div>		
 		<div class="form-group" id="organizationdiv">
 				<label for="organizationSignup">password</label>
-				<input type="text" class="form-control" id="inputOrganizetion" placeholder="organization name">
+				<input type="text" class="form-control" id="inputOrganization" placeholder="organization name">
 			</div>
         <button id="signUpUser2" type="button" class="btn btn-default">submit</button>`;
     form.innerHTML=form2;
+
     return form;
 }
 
@@ -134,7 +157,7 @@ function loginForm() {
         <div class="form-group" id="passworddiv">
             <label for="passwordSignup">password</label>
             <input type="password" class="form-control" id="loginPassword" placeholder="enter your password here"></div>
-        <button id="loginUser" type="button" class="btn btn-default" onclick="page('/link3')">
+        <button id="loginUser" type="button" class="btn btn-default" onclick="page('/link10')">
             submit
         </button>
     </form>`;
@@ -144,9 +167,16 @@ function loginForm() {
 
 function phone(){
     let form = document.createElement('div');
-    let form2 = `<div id="phoneBackground" class="phone">
-    <img class="phone" src="assets/iPhone_7_front_frame sized.png">
-    </div>`;
-    form.innerHTML=form2;
+    let form2 = document.createElement('div');
+    form2.id = 'phoneBackground';
+    form2.className = 'phone';
+    
+    let image = document.createElement('img');
+    //TODO revist this ../ reference needed right now for the setting of BASE
+    //image.src = '../assets/iPhone_7_front_frame.png';
+    image.src = '../assets/iPhone_7_front_frame sized.png';
+    image.className = 'phone';
+    form2.appendChild(image);
+    form.appendChild(form2);
     return form;
 }
