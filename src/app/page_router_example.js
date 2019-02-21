@@ -136,9 +136,14 @@ page('/channels'
             console.log('channel list view');
             if (user.isCurrent()) {
                 userChannels = getUserChannels(user.id)
-                .then (channels => console.log(`getUserChannels returned count: ${channels.length}`));
-            //		.then(channels => displayUserChannelList(channels)
-            
+                .then(channels => {
+                    console.log(`getUserChannels returned count: ${channels.length}`);
+                    panel1.innerHTML = '<h2>Choose a Channel to Edit</h2>';
+                    renderForm(panel1, displayChannelList, channels);
+                    panel2.innerHTML = '';
+                    panel3.innerHTML = '';
+                    }
+                )
             }
         }
 ); //channels page
@@ -173,8 +178,8 @@ function clearPanel(panel) {
     
 }
 
-function renderForm(panel, formFunction){
-   var form = formFunction();
+function renderForm(panel, formFunction, formArguments){
+   var form = formFunction(formArguments);
    panel.appendChild(form);
 }
 
@@ -266,6 +271,16 @@ function phone(){
     image.className = 'phone';
     form2.appendChild(image);
     form.appendChild(form2);
+    return form;
+}
+
+
+function displayChannelList(channels) {
+    let form = document.createElement('div');
+    let orgList = channels.map((i) => {
+        return `<li class="channelList" id="${i.id}">${i.attributes.name}</li>`;
+     }).join('');
+    form.innerHTML=`<ul>${orgList}</ul>`;
     return form;
 }
 
