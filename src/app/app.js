@@ -1,3 +1,4 @@
+'use strict'
 import Group from "./modules/groups.js";
 import Likemoji from "./modules/likemojis.js";
 import getStartSelectors from "./modules/startselector.js";
@@ -156,7 +157,7 @@ $(".channelSelector div").hover(
 // sets template channel demo image on start selector page
 function startSelectorImage(image) {
 	var element = document.getElementById("startDemoImage");
-	element.setAttribute("src", image);
+	if (element) element.setAttribute("src", image);
 }
 
 // sets template channel demo image on channel selector page
@@ -773,13 +774,18 @@ $("#categories").on("click", ".category", function() {
 var catOrder;
 
 $(function() {
-	$("#categoriesInEditor").sortable({
-		update: function(event, ui) {
-			catOrder = $(this).sortable("toArray");
-			// $("#catOrderText").text (catOrder);
-			setNewGroupOrder();
+	var cats = $("#categoriesInEditor");
+	if (cats) {
+		if (cats.sortable) {
+			cats.sortable({
+				update: function(event, ui) {
+					catOrder = $(this).sortable("toArray");
+					// $("#catOrderText").text (catOrder);
+					setNewGroupOrder();
+				}
+			});
 		}
-	});
+	}
 });
 
 //opens category editor modal for selected (clicked) category in editor window
@@ -990,14 +996,14 @@ $("#loginUser").click(async function(event) {
 	var user_email = $("#loginEmail").val();
 
 	console.log(`logIn call with user: ${user_email} and pwd: ${user_password}`);
-	Parse.User
-		.logIn(user_email, user_password)
+	Parse.User.logIn(user_email, user_password)
 		.then(newUser => {
-            user = newUser;
+			user = newUser;
 			if (user.isCurrent()) {
 				//TODO move this to routes
-				userChannels = getUserChannels(user.id)
-					.then(channels => displayUserChannelList(channels));
+				userChannels = getUserChannels(user.id).then(channels =>
+					displayUserChannelList(channels)
+				);
 				$("#loginForm").hide();
 				$("#loginChoice").show();
 				$("#login").hide();
@@ -1012,6 +1018,20 @@ $("#loginUser").click(async function(event) {
 		})
 		.catch(err => alert(err));
 });
+
+function loginParse(username, password) {
+	console.log(`logIn call with user: ${username} and pwd: ${password}`);
+	Parse.User.logIn(username, password)
+		.then(newUser => {
+			user = newUser;
+			if (user.isCurrent()) {
+				console.log("loggedin");
+			} else {
+				console.log("loggedout");
+			}
+		})
+		.catch(err => alert(err));
+}
 
 $("#startBuild").click(function(event) {
 	$("#getStartedIntro").hide();
