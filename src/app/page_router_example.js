@@ -1,5 +1,5 @@
-var panel1, panel2, panel3, holdingPen, orgName;
-orgName = 'You Beautiful Person You';    
+var panel1, panel2, panel3, holdingPen, channelName;
+channelName = 'You Beautiful Person You';    
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
       initApplication();
@@ -18,16 +18,15 @@ function initApplication() {
 page.start({hashbang: false, dispatch: true});
 page.base('/src/app/page_router_example.html');
 page('/', function (ctx, next) {
+    
+    panel2.innerHTML = "";
     panel3.innerHTML = "";
 
 });
 
 page('/link1'
-        , function(ctx, next) {      
-            let productImage = document.createElement("img");
-            productImage.src = '../assets/screenshots/IMG_0971.png';
-            panel3.appendChild(productImage);
-            
+        , function(ctx, next) {
+        //panel 2    
             panel2.innerHTML = "";
             renderForm(panel2, signUpForm);            
             //not sure if this is the best place to wire up event handlers...
@@ -35,10 +34,22 @@ page('/link1'
             signupUser2
             .addEventListener('click'
                     , function(e){
+                        // create the user
+                        // clone a channel for them
+
+                        // set orgname/channelname in state 
+                        channelName = document.getElementById('inputOrganization').value;          
                         page('/link3');
                         e.preventDefault();
                     }
-            )            
+            );
+
+        //panel 3   
+            panel3.innerHTML = "";   
+            let productImage = document.createElement("img");
+            productImage.src = '../assets/screenshots/IMG_0971.png';
+            panel3.appendChild(productImage);
+                        
         }
 );
 page('/link2'
@@ -49,11 +60,10 @@ page('/link2'
 );
 page('/link3'
         , function(ctx, next) {
-            orgName = document.getElementById('inputOrganization').value;
-            let boilerplate = `Welcome to the builder ${orgName}`;
+            let boilerplate = `Welcome to the builder ${channelName}`;
             panel1.innerHTML = 'About your Likemoji Channel';
             panel2.innerHTML = '';
-            panel3.innerHTML = `Congratulations ${orgName}! Here's your new Likemoji channel`;        
+            panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;        
             
             //showLink(ctx, next, boilerplate);
             renderForm(panel2, phone);
@@ -134,7 +144,7 @@ function signUpForm() {
 			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
 		</div>		
 		<div class="form-group" id="organizationdiv">
-				<label for="organizationSignup">password</label>
+				<label for="organizationSignup">Orgnization Name</label>
 				<input type="text" class="form-control" id="inputOrganization" placeholder="organization name">
 			</div>
         <button id="signUpUser2" type="button" class="btn btn-default">submit</button>`;
