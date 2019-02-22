@@ -16,15 +16,13 @@ async function getUserChannels(userId) {
 }
 
 //sign up / create new user
-async function newUser (email, username, password) {
+async function newUser (email, password) {
     // TODO handle user already exists first
     console.log("function called")
-
-
-
     console.log(email + " " + password)
 
-    var user = new Parse.User(); 
+    let user = new Parse.User(); 
+    let currentUser;
     //TODO I think here we use the outer User object this method is called from
     // in other words "this"
     
@@ -38,12 +36,6 @@ async function newUser (email, username, password) {
         currentUser = await Parse
             .User
             .current();
-        // TODO move to routes 
-        $("#signUpForm").hide();
-        $("#createChannel").show();
-        $("#login").hide();
-        $("#signup").hide();
-        $("#logout").show();
 
         console.log("user is signed up")
     } catch (error) {
@@ -87,4 +79,4 @@ async function logout() {
         });
 }
 
-export default getUserChannels;
+export {getUserChannels, newUser};
