@@ -17,6 +17,11 @@ var Organization = Parse.Object.extend("Organization", {
 	saveChannelToOrg: () => {saveChannelToOrg()}
   , getOrganization: (orgId) => {getOrganization(orgId)} 
 });
+
+//TODO do we need to do this? 
+// docs say only for ES6 class/subclass syntax 
+// Parse.Object.registerSubclass("Organization", Organization);
+
 //TODO don't we want paramters for saveChannelToOrg?
 
 
