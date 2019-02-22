@@ -4,7 +4,7 @@ import Likemoji from "./modules/likemojis.js";
 import getStartSelectors from "./modules/startselector.js";
 //import Startselector from "./modules/startselector.js";
 import { ChannelStyle, saveNewStyle, getStyle } from "./modules/styles.js";
-import getUserChannels from "./modules/users.js";
+import {getUserChannels} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
 // import page from 'https://unpkg.com/page/page.js'; this has to go in html
