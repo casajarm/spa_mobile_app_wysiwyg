@@ -81,18 +81,14 @@ async function cloneLikemojis(mojis, organization) {
 		`cloning ${mojis.length} likemojies to ord id ${organization.id}`
 	);
 	// map each moji to a function that will clone it
-	let finalArray = mojis.map(async moji => {
-		// map instead of forEach
+	let mojiSaveArray = mojis.map(async moji => {
 		const result = await copyMojiToOrg(moji, organization);
-		//finalValue.oldID = moji.id;
-		//finalValue.newID = result.id;
-		//return finalValue;
-		console.log(result.id);
+		//console.log(result.id);
 		return { oldID: moji.id, newID: result.id };
 	});
 	// execute the entire array of clone calls and return the array of returned values
-	const resolvedFinalArray = await Promise.all(finalArray); // resolving all promises
-	return resolvedFinalArray;
+	const resolvedmojiSaveArray = await Promise.all(mojiSaveArray); // resolving all promises
+	return resolvedmojiSaveArray;
 }
 
 async function copyMojiToOrg(likemoji, org) {
@@ -120,10 +116,27 @@ async function getLikemojis(orgId) {
 	}
 }
 
+async function cloneGroup (group, organization, likemojiIDs) {
+	let newGroup = group.clone();
+	newGroup.set("organizationID", organization.id);
+	newGroup.set("organization", organization.get("name"));
+	//newGroup.set("order", i);
+	newGroup.set("likemojis", remapIDs(newGroup.get("likemojis"), likemojiIDs));
+	return await newGroup.save();
+}
+
 //clone groups
 async function cloneGroups(groups, organization, likemojiIDs) {
-	var newGroup;
-	let newGroupIDs = [];
+	let groupSaveArray = groups.map(async group => {
+		const result = await cloneGroup(group, organization, likemojiIDs);
+		console.log(result.id);
+		return result.id;
+	});
+	// execute the entire array of clone calls and return the array of returned values
+	const resolvedgroupSaveArray = await Promise.all(groupSaveArray); // resolving all promises
+	return resolvedgroupSaveArray;
+
+/*
 	for (var i = 0; i < groups.length; i++) {
 		let newGroupID = groups[i].id;
 		newGroup = groups[i].clone();
@@ -132,38 +145,11 @@ async function cloneGroups(groups, organization, likemojiIDs) {
 		newGroup.set("order", i);
 		newGroup.set("likemojis", remapIDs(newGroup.get("likemojis"), likemojiIDs));
 		newGroup.save().then(function(newGroup) {
-			newGroupIDs.push({ oldID: newGroupID, newID: newGroup.id }); //objectId;
+			newGroupIDs.push (newGroup.id)//({ oldID: newGroupID, newID: newGroup.id }); //objectId;
 		});
 	}
 	return newGroupIDs;
-}
-
-function saveChannelToOrg() {
-	// should rename groups to channels..?
-	let organization = new Organization(); // new organization being created
-	let editors = []; //users ids able to edit the channel to populate channel list
-
-	editors.push(currentUser.id);
-
-	organization.set("groups", groupIDs);
-	organization.set("groupPointer", groupPointers);
-	organization.set("header", returnedOrg.attributes.header);
-	organization.set("callOut", returnedOrg.attributes.callOut);
-	organization.set("editors", editors);
-
-	organization.save().then(
-		org => {
-			// Execute any logic that should take place after the object is saved.
-			console.log(`org id ${org.id} saved`);
-			//alert('Organization updated with channel: ' +
-			// org.id);
-		},
-		error => {
-			// Execute any logic that should take place if the save fails. error is a
-			// Parse.Error with an error code and message.
-			alert(`Failed to create new object, with error code: ${error.message}`);
-		}
-	);
+*/
 }
 
 //clone style
