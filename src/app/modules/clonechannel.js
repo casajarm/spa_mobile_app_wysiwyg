@@ -3,33 +3,54 @@ import Organization from "./organizations.js";
 var currentUser;
 
 async function cloneChannel(req) {
-  console.log(`cloneChannel ${req.sourceOrgId} to ${req.targetOrgId}`);
+	console.log(`cloneChannel ${req.sourceOrgId} to ${req.targetOrgId}`);
 	var targetOrg = new Organization();
 	var sourceOrg = new Organization();
 
 	currentUser = Parse.User.current();
+	//TODO before we go copy everything to this new organization we have some way of checking it is the correct target?
 
 	// TODO allow flexibility to define only a source org and clone it
 	// when no request.targetOrgId is provided
 	targetOrg = await getOrganization(req.targetOrgId);
 	sourceOrg = await getOrganization(req.sourceOrgId);
-  targetOrg.set("name", 'Clone of ' + sourceOrg.get("name"));
-
-	//TODO before we go copy everything to this new organization we have some way of checking it is the correct target?
+	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
+	// too many paramters needed for the steps in this
+	// await saveChannelToOrg(groupIDs);
+	// TODO can we make this into a separate block?
+	let editors = []; //users ids able to edit the channel to populate channel list
+	editors.push(currentUser.id);
+	targetOrg.set("editors", editors);
+	targetOrg.set("header", sourceOrg.attributes.header);
+	targetOrg.set("callOut", sourceOrg.attributes.callOut);
 
 	// get all the likemojis for the channel copying from
-	var likemojis, likemojiIDs, groups;
+	//var likemojis, likemojiIDs, groups;
 	var groupIDs = [];
-	getLikemojis(sourceOrg.objectId).then((_likemojis) => {
-		likemojis = _likemojis;
-		likemojiIDs = cloneLikemojis(likemojis, targetOrg) //async .. does it matter 
-		.then (likemojis => {
-      getGroups(sourceOrg.id)
-        .then(_groups => {
-			  groups = _groups;
-        groupIDs = cloneGroups(groups, targetOrg, likemojiIDs)
-      });
-		});
+	getLikemojis(req.sourceOrgId).then(_likemojis => {
+		let likemojis = _likemojis;
+		let likemojiIDs = cloneLikemojis(likemojis, targetOrg) //async .. does it matter
+			.then(_likemojIDs => {
+				likemojiIDs = _likemojIDs;
+				// TODO we can probably just keep passing the then return down and not pas back up to outer block scoped variables
+				getGroups(sourceOrg.id).then(_groups => {
+					let groups = _groups;
+					cloneGroups(groups, targetOrg, likemojiIDs).then(_groupIDS => {
+						// now that we have groupids we can pass that back up into the org record
+						groupIDs = _groupIDS;
+						targetOrg.set("groups", groupIDs);
+						targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+						targetOrg.save().then(
+							org => {
+								console.log(`org id ${org.id} saved`);
+							},
+							error => {
+								alert(`Failed to create new object, with error code: ${error.message}`);
+							}
+						);
+					});
+				});
+			});
 	});
 	// cloning likemojis returns a mapping of oldID to newID array
 	//.then( (likemojiIDs) => {groups = getGroups(sourceOrg.id)})
@@ -37,36 +58,8 @@ async function cloneChannel(req) {
 
 	//TODO fix this thenable mess. We can call cloneLikemojis and getGroups at the same time
 
-
 	copyStyleToOrg(sourceOrg.id, targetOrg.id);
-	// too many paramters needed for the steps in this
-	// await saveChannelToOrg(groupIDs);
-	// TODO can we make this into a separate block?
-	let editors = []; //users ids able to edit the channel to populate channel list
-  editors.push(currentUser.id);
-	targetOrg.set("editors", editors);
-  targetOrg.set("groups", remapIDs(sourceOrg.get("groups"), groupIDs));
-	targetOrg.set(
-		"groupPointer",
-		arrayToPointers(targetOrg.get("groups"), "Group")
-	);
-	targetOrg.set("groups", groupIDs);
-	targetOrg.set("header", sourceOrg.attributes.header);
-	targetOrg.set("callOut", sourceOrg.attributes.callOut);
 
-	targetOrg.save().then(
-		org => {
-			// Execute any logic that should take place after the object is saved.
-			console.log(`org id ${org.id} saved`);
-			//alert('Organization updated with channel: ' +
-			// org.id);
-		},
-		error => {
-			// Execute any logic that should take place if the save fails. error is a
-			// Parse.Error with an error code and message.
-			alert(`Failed to create new object, with error code: ${error.message}`);
-		}
-	);
 	console.log("done");
 }
 //);
@@ -84,34 +77,36 @@ async function getOrganization(orgId) {
 
 //copies given array of Likemoji objects to new organization object
 async function cloneLikemojis(mojis, organization) {
-	console.log(`cloning ${mojis.length} likemojies to ord id ${organization.id}`);	
-  // map each moji to a function that will clone it
-  let finalArray = mojis.map(async(moji) => { // map instead of forEach
-      const result = await copyMojiToOrg (moji, organization);
-      //finalValue.oldID = moji.id;
-      //finalValue.newID = result.id;
-      //return finalValue;
-      console.log(result.id);
-      return {oldID: moji.id, newID: result.id};
-    });
-  // execute the entire array of clone calls and return the array of returned values
-  const resolvedFinalArray = await Promise.all(finalArray); // resolving all promises
-  return resolvedFinalArray;
+	console.log(
+		`cloning ${mojis.length} likemojies to ord id ${organization.id}`
+	);
+	// map each moji to a function that will clone it
+	let finalArray = mojis.map(async moji => {
+		// map instead of forEach
+		const result = await copyMojiToOrg(moji, organization);
+		//finalValue.oldID = moji.id;
+		//finalValue.newID = result.id;
+		//return finalValue;
+		console.log(result.id);
+		return { oldID: moji.id, newID: result.id };
+	});
+	// execute the entire array of clone calls and return the array of returned values
+	const resolvedFinalArray = await Promise.all(finalArray); // resolving all promises
+	return resolvedFinalArray;
 }
 
-async function copyMojiToOrg (likemoji, org) {
-  let newLikemoji = likemoji.clone();
-  newLikemoji.set("organizationID", org.id);
-  newLikemoji.set("organizationName", org.get("name"));
-  // TODO this ACL setting could be handled in cloud code beforesave trigger
-  newLikemoji.setACL(org.getACL());
-  delete newLikemoji.objectId;
-  return await newLikemoji.save(); /*.then(function(newLikemoji) {
+async function copyMojiToOrg(likemoji, org) {
+	let newLikemoji = likemoji.clone();
+	newLikemoji.set("organizationID", org.id);
+	newLikemoji.set("organizationName", org.get("name"));
+	// TODO this ACL setting could be handled in cloud code beforesave trigger
+	newLikemoji.setACL(org.getACL());
+	delete newLikemoji.objectId;
+	return await newLikemoji.save(); /*.then(function(newLikemoji) {
     return newLikemoji;
       { oldID: newLikemojiID, newID: newLikemoji.id }; //objectId;
-  })*/    
-};
-
+  })*/
+}
 
 // return likemojis associated with an org
 async function getLikemojis(orgId) {
@@ -128,19 +123,19 @@ async function getLikemojis(orgId) {
 //clone groups
 async function cloneGroups(groups, organization, likemojiIDs) {
 	var newGroup;
-	var groupIDs = [];
+	let newGroupIDs = [];
 	for (var i = 0; i < groups.length; i++) {
 		let newGroupID = groups[i].id;
 		newGroup = groups[i].clone();
 		newGroup.set("organizationID", organization.id);
 		newGroup.set("organization", organization.get("name"));
 		newGroup.set("order", i);
-		newGroup.set("likemojis", remapIDs(newGroup.get("likemojis")));
+		newGroup.set("likemojis", remapIDs(newGroup.get("likemojis"), likemojiIDs));
 		newGroup.save().then(function(newGroup) {
-			groupIDs.push({ oldID: newGroupID, newID: newGroup.id }); //objectId;
+			newGroupIDs.push({ oldID: newGroupID, newID: newGroup.id }); //objectId;
 		});
 	}
-	return groupIDs;
+	return newGroupIDs;
 }
 
 function saveChannelToOrg() {
@@ -225,10 +220,15 @@ async function getGroups(orgId) {
 // attempts to find the x value and return the y
 // not found returns a null which is then filtered out of te returned array
 function remapIDs(sourceArray, mappingArray) {
+  var mapp = mappingArray;
+	const lookup = function(findID){
+		return mapp.find(x => x.oldID === findID).newID;
+	}
+
 	const remappedIDs = sourceArray
 		.map(id => {
 			try {
-				let newid = mappingArray.find(x => x.oldID === id).newID;
+				let newid = lookup(id); // mappingArray.find(x => x.oldID === id).newID;
 				return newid;
 			} catch (err) {
 				return null;
