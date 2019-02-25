@@ -138,3 +138,58 @@ function displayCategories() {
 		console.log("no groups to display");
 	}
 }
+
+
+// sets editor buttons to subcategory edit view and sets phone display to the
+// category that was clicked
+// TODO can we replace this with an accordion?
+$("#categories").on("click", ".category", function() {
+	let mojicollection = document.getElementById('likemojiGroupCollection');
+	//mojicollection 
+	$("#likemojiGroupCollection").removeClass("likemojiGroupCollectionNone");
+	$("#likemojiGroupCollection").addClass("likemojiGroupCollection-area");
+	$("#likemojiGroupCollection").addClass("categoryLikemojis");
+
+	goToPage(this.id);
+
+	if (goToPage(this.id) !== categoriesSorted[0].id) {
+		$("#phoneDisplayBackButton").show();
+		singleMultiToggle("#singlePageSelect");
+		$("#singleMultiToggle").hide();
+		cancelLikemojisAdd();
+	} else {
+	}
+});
+
+
+// this is how each category section of the phone widget is changed
+function goToPage(groupID) {
+	// removes content from phone screen
+	document.getElementById("likemojiGroupCollection").innerHTML = "";
+	document.getElementById("categories").innerHTML = "";
+
+	if (groupID == groups[0].id) {
+		// if this is the "main channel"
+		if (groupSelected.attributes.likemojis.length < 1) {
+			//TODO can we replace JQuery with elementNodeReference.classList.add and .remove .toggle?
+			// $("#likemojiGroupCollection").removeClass("likemojiGroupCollection-area");
+			$("#likemojiGroupCollection").removeClass("mainpageLikemojis");
+			$("#likemojiGroupCollection").addClass("likemojiGroupCollectionNone");
+		} else {
+			$("#likemojiGroupCollection").addClass("mainpageLikemojis");
+			$("#likemojiGroupCollection").removeClass("likemojiGroupCollectionNone");
+			// $("#likemojiGroupCollection").addClass("likemojiGroupCollection-area");
+		}
+
+		$("#likemojiGroupCollection").removeClass("categoryLikemojis");
+	} else {
+		$("#likemojiGroupCollection").removeClass("mainpageLikemojis");
+		$("#likemojiGroupCollection").removeClass("likemojiGroupCollectionNone");
+		// $("#likemojiGroupCollection").addClass("likemojiGroupCollection-area");
+		$("#likemojiGroupCollection").addClass("categoryLikemojis");
+	}
+
+	// loads and displays new page
+
+	buildPage(groupID);
+}
