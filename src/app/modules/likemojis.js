@@ -15,10 +15,10 @@ var MyClass = Parse.Object.extend("MyClass", {
  */
 
 var Likemoji = Parse.Object.extend("Likemoji", {
-      cloneMojies: (mojies) => {cloneLikemojies(mojies)}
-    , getLikemojis: (orgId) => {getLikemojis(orgId)} 
+      cloneMojies:  (mojis) => {return cloneLikemojies(mojis)}
+    , getLikemojis: (orgId)  => {return getLikemojis(orgId)}
+    , sortName:     (mojis)  => {return sortMojisByName(mojis)}
 });
-
 
 //copies given Likemojis to current Likemoji set
 async function cloneLikemojis(mojies) {
@@ -84,6 +84,12 @@ async function getLikemojis(orgId) {
 }
 async function sortMojisByName(mojis) {
   return mojis.sort(SortByName);
+}
+
+function SortByName(a, b) {
+	var aName = a.attributes.name.toLowerCase();
+	var bName = b.attributes.name.toLowerCase();
+	return aName < bName ? -1 : aName > bName ? 1 : 0;
 }
 
 export default Likemoji;
