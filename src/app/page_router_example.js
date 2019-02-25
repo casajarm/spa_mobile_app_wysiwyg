@@ -172,10 +172,6 @@ page("/channels", function (ctx, next) {
     }
 }); //channels page
 
-page("/channel/:channelID/edit", function (ctx, next) {
-    console.log(`entering edit for channel id ${ctx.channelID}`);
-}); //channel editor page
-
 page("/channel/:channelID/clone", function (ctx, next) {
     let channelID = ctx.params.channelID;
     console.log(`entering clone for channel id ${channelID}`);
@@ -188,7 +184,25 @@ page("/channel/:channelID/clone", function (ctx, next) {
             console.log("New org saved .. now clone");
             await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
         });
+});
+
+page("/channel/:channelID/view", function (ctx, next) {
+    let channelID = ctx.params.channelID;
+    console.log(`entering view for channel id ${channelID}`);
+    getOrgCategories(channelID)
+    .then(channels => {
+        let mainCategory = channels[0];
+        panel2.innerHTML ="";
+        renderForm(panel2, phone, mainCategory);
+    });
+
+});//channel editor page
+
+page("/channel/:channelID/edit", function (ctx, next) {
+    console.log(`entering edit for channel id ${ctx.channelID}`);
 }); //channel editor page
+
+
 
 page("/right/link10", function (ctx, next) {
     console.log("link10");
@@ -208,8 +222,17 @@ function clearPanel(panel) {
 }
 
 function renderForm(panel, formFunction, formArguments) {
-    var form = formFunction(formArguments);
-    panel.appendChild(form);
+    let form;
+    // sometimes form is a promise
+    // try to resolve and if it is not a thennable just append the result
+    // 
+    try {
+         formFunction(formArguments).then(_form => {panel.appendChild(_form)});
+    }
+    catch (err) {
+        form = formFunction(formArguments);  
+        panel.appendChild(form);      
+    }    
 }
 
 function showform(formID, panel) {
@@ -284,7 +307,7 @@ function loginForm() {
     return form;
 }
 
-function phone() {
+function phoneImage() {
     let form = document.createElement("div");
     let form2 = document.createElement("div");
     form2.id = "phoneBackground";
@@ -293,19 +316,21 @@ function phone() {
     let image = document.createElement("img");
     // TODO revist this ../ reference needed right now for the setting of BASE
     // image.src = '../assets/iPhone_7_front_frame.png';
-    image.src = "../assets/iPhone_7_front_frame sized.png";
+    image.src = ".../assets/iPhone_7_front_frame sized.png";
     image.className = "phone";
     form2.appendChild(image);
     form.appendChild(form2);
     return form;
 }
 
+
+//<a href="channel/${i.id}/clone">${i.attributes.name}</a>
 function displayChannelList(channels) {
     let form = document.createElement("div");
     let orgList = channels
         .map(i => {
         return `<li class="channelList" id="${i.id}">
-                    <a href="channel/${i.id}/clone">${i.attributes.name}</a>
+                    <a href="return false" onclick="page('/channel/${i.id}/view')">${i.attributes.name}</a>
                 </li>`;
     })
         .join("");
