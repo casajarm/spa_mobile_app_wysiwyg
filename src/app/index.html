@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <head>
+	<base href="/src/app/">
 	<title>Channel Builder</title>
 	<!-- links for bootstrap, parse.js, builder.css, likemojibuilder.css, googlefonts -->
 	<link
@@ -20,6 +21,7 @@
 		integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
 		crossorigin="anonymous"
 	/>
+	<link rel="stylesheet" type="text/css" href="builder.css">
 	<script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
 	
 
@@ -60,8 +62,8 @@
 					</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li id="signup"><a>Sign-Up</a></li>
-					<li id="login" class="active"></li><a>Login</a></li>
+					<li id="signup"><a href="signup">Sign-Up</a></li>
+					<li id="login" class="active"></li><a href="login">Login</a></li>
 					<li id="logout"><a href="#">Logout</a></li>
 				</ul>
 			</div>
