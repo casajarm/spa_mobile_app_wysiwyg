@@ -104,11 +104,17 @@ page("/signup", function (ctx, next) {
     panel3.appendChild(productImage);
 });
 
+
 page("/login", function (ctx, next) {
+    panel1.innerHTML = "";
     panel2.innerHTML = "";
     panel3.innerHTML = "";
 
+    let headline = document.createElement('h2');
+    headline.innerHTML = 'Login to your account';
+    panel2.appendChild(headline); 
     renderForm(panel2, loginForm);
+    
     //not sure if this is the best place to wire up event handlers...
     let loginButton = document.querySelector("#loginUser");
     loginButton.addEventListener("click", function (e) {
@@ -306,7 +312,7 @@ function loginForm() {
     let form = document.createElement("div");
     let target = "";
     let form2 = `<form id="loginForm" class="form">
-    <h2>Login to Your Account</h2>
+    
         <div class="form-group" id="emaildiv">
             <label for="emailSignup">email</label>
             <input type="email" class="form-control" id="loginEmail" placeholder="enter your email here">
