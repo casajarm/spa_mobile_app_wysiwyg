@@ -2,6 +2,7 @@
 import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
+import {getStyle} from "./modules/styles.js";
 
 var panel1,
     panel2,
@@ -196,11 +197,18 @@ page("/channel/:channelID/clone", function (ctx, next) {
 page("/channel/:channelID/view", function (ctx, next) {
     let channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
+    panel2.innerHTML ="";
     getOrgCategories(channelID)
     .then(channels => {
         let mainCategory = channels[0];
-        panel2.innerHTML ="";
         renderForm(panel2, phone, mainCategory);
+    });
+    
+    let style = getStyle(channelID)
+    .then((_style) => {
+       let style = _style[0];
+       renderForm(panel2, inlineStyle, style);
+
     });
 
 });//channel editor page
@@ -373,3 +381,32 @@ async function loginParse(username, password) {
         .catch(err => alert(err));
    */
 }
+
+function inlineStyle(style) {
+    
+    let styleRules = `#phoneDisplay { 
+        background-color: ${style.get("generalColor")};
+    }
+    
+    .navBar { 
+        background-color:  ${style.get("tabBar")}
+    }
+	
+	.activeNavIcon { 
+        color:  ${style.get("tabBarSelected")}
+    }
+	
+	.channelText { 
+        color:  ${style.get("generalTextColor")}
+    }
+    .categorytxt { 
+        color:  ${style.get("categoryTextColor")}
+    }
+    `;
+    let styleSheet = document.createElement("style");
+    styleSheet.type = 'text/css';
+    styleSheet.innerHTML = styleRules;
+    return styleSheet;
+        
+}
+
