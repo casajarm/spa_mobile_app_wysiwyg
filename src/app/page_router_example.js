@@ -87,6 +87,9 @@ page("/signup", function (ctx, next) {
                 .then(async function (org) {
                     console.log("New org saved .. now clone");
                     await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
+                    //hide login link
+                    document.getElementById('login').classList.add('active');
+
                     page("/link2");
 
                 });
@@ -115,6 +118,9 @@ page("/login", function (ctx, next) {
         // then show them the page listing their channels
         console.log(`responding to the click event ${e}`);
         loginParse(user_email, user_password).then(function () {
+            //hide login link
+            document.getElementById('login').classList.add('active');
+            // move along
             page("/channels");
         });
     });
