@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-	<base href="/src/app/">
+	<base href="/src/app/"/>
 	<title>Channel Builder</title>
 	<!-- links for bootstrap, parse.js, builder.css, likemojibuilder.css, googlefonts -->
 	<link
@@ -76,27 +76,25 @@
 			<div class="container">
 				<div id="edit" class="container"></div>
 				<div class="row">
-					<div class="col-lg-4">
-						<h3>Left Panel</h3>
+					<div id="panel1" class="col-lg-4">
+						<h3 id="panel-h3-left">Get Started</h3>
 						<hr />
-						<div id="panel1">
+						<div>
 							<ul>
 								<li><a href="signup">Create New Account</a></li>
 								<li><a href="login">Login</a></li>
 							</ul>
 						</div>
 					</div>
-					<div class="col-lg-4 channelEdit">
-						<h3>Middle Panel</h3>
+					<div id="panel2" class="col-lg-4">
+						<h3 id="panel-h3-middle">Middle Panel</h3>
 						<hr />
-						<div id="panel2"></div>
+						
 					</div>
-					<div class="col-lg-4 channelEdit">
-						<h3>Right Panel</h3>
+					<div id="panel3" class="col-lg-4">
+						<h3 id="panel-h3-right">Right Panel</h3>
 						<hr />
-						<div id="panel3">
-							<p>Hello</p>
-						</div>
+						
 					</div>
 				</div>
 			</div>
