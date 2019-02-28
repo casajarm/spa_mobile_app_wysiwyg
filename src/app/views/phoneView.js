@@ -5,7 +5,7 @@
 |--callout
 |--likemojis
 |---likemoji list
-|--other categories
+|---other categories
 |-navbar
 */
 // phone function returns all the HTML for displaying the phone widget with the
@@ -18,29 +18,30 @@ async function phone(category) {
 }
 
 function phoneView(category, categories, likemojis) {
-    let phoneHTML = `<div class="col-lg-4 channelEdit">
-<div class="phone">
-    <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
-    <div id="phoneDisplay" class="phoneDisplay-area">
-        <div id="buildHeader" class="header text-white">
-            <img id="docHeaderImage" class="header" 
-                src="${category.attributes.newHeader.url()}" />
-        </div>
-        <div id="callout" class="callout channelText">
-            ${category.attributes.callOuts.en}
-        </div>
-        <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
-            ${likemojisView(likemojis)}
-        </div>
-        <div id="categories" class="categories">
-            ${ (category.attributes.main == 1) ? categoriesView(categories) : ''}
+    let phoneHTML = 
+    `<div class="phone">
+        <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
+        <div id="phoneDisplay" class="phoneDisplay-area">
+            <div id="buildHeader" class="header text-white">
+                <img id="docHeaderImage" class="header" 
+                    src="${category.attributes.newHeader.url()}" />
+            </div>
+            <div id="callout" class="callout channelText">
+                ${category.attributes.callOuts.en}
+            </div>
+            <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
+                ${likemojisView(likemojis)}
+                <div id="categories" class="categories">
+                    ${(category.attributes.main == 1) ? categoriesView(categories) : ''}
+                </div>
+            </div>
+            ${navbarView}
         </div>
     </div>
-</div>
-${navbarView}
-</div>`;
+`;
     //console.log('done building view'); console.log(phoneView);
     let phoneView = document.createElement("div");
+    phoneView.classList.add(['col-lg-4', 'channelEdit']);
     phoneView.innerHTML = phoneHTML;
     return phoneView;
 }
@@ -93,7 +94,7 @@ function likemojisView(likemojis) {
     return `<div id="likemojiGroupCollection"
             class="likemojiGroupCollection-area mainpageLikemojis">
               ${likemojis
-        ? likemojis.map(likemojiView)
+        ? likemojis.map(likemojiView).join('')
         : `<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">
                     Add Likemojis Here!
                  </h4>`}	
@@ -101,7 +102,7 @@ function likemojisView(likemojis) {
 }
 
 function categoriesView(categories) {
-    let categoryView;
+    let categoryView = '';
     for (var i = 0; i < categories.length; i++) {
         if (categories[i].attributes.main != 1) {
             categoryView += `<div class="category" type="button" id="${categories[i]
