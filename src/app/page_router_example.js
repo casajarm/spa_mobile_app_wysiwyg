@@ -31,7 +31,8 @@ function initApplication() {
 }
 
 page.start({hashbang: false, dispatch: true});
-page.base("/src/app/page_router_example.html");
+//page.base("/src/app/page_router_example.html");
+page.base('/src/app');
 page("/", function (ctx, next) {
     panel1.innerHTML = `
         <ul>
@@ -210,7 +211,7 @@ page("/right/link10", function (ctx, next) {
 });
 
 page("*", function (ctx, next) {
-    console.log("missed");
+    console.log("catch all route");
     console.log(ctx);
 });
 
@@ -330,7 +331,7 @@ function displayChannelList(channels) {
     let orgList = channels
         .map(i => {
         return `<li class="channelList" id="${i.id}">
-                    <a href="return false" onclick="page('/channel/${i.id}/view')">${i.attributes.name}</a>
+                    <a onclick="page('/channel/${i.id}/view')">${i.attributes.name}</a>
                 </li>`;
     })
         .join("");
