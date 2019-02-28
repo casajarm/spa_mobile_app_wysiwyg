@@ -768,3 +768,7 @@ background-color: #00b6ff;
 }
 
 
+.phone-frame {
+	min-width: 310px;
+	min-height: 684px; 
+}
