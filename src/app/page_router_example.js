@@ -203,11 +203,12 @@ page("/channel/:channelID/clone", function (ctx, next) {
 page("/channel/:channelID/view", function (ctx, next) {
     let channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
+    panel2.classList.add('phone-frame');
     panel2.innerHTML ="";
     getOrgCategories(channelID)
     .then(channels => {
-        let mainCategory = channels[0];
-        renderForm(panel2, phone, mainCategory);
+        let selectedChannel = channels[0];
+        renderForm(panel2, phone, selectedChannel);
     });
     
     let style = getStyle(channelID)
@@ -217,7 +218,32 @@ page("/channel/:channelID/view", function (ctx, next) {
 
     });
 
-});//channel editor page
+});//channel view
+
+page("/channel/:channelID/view/:groupID", function (ctx, next) {
+    let channelID = ctx.params.channelID;
+    let groupID = ctx.params.groupID;
+    ctx.save();
+
+    console.log(`entering view for channel id ${channelID} and group ${groupID}`);
+    panel2.classList.add('phone-frame'); 
+    panel2.innerHTML ="";
+    getOrgCategories(channelID)
+    .then(channels => {
+        let selectedChannel = channels.find(x => x.id === groupID);   
+        renderForm(panel2, phone, selectedChannel);
+    });
+    
+    let style = getStyle(channelID)
+    .then((_style) => {
+       let style = _style[0];
+       renderForm(panel2, inlineStyle, style);
+    });
+    
+    // TODO add the back button on the left panel
+
+});//channel group page
+
 
 page("/channel/:channelID/edit", function (ctx, next) {
     console.log(`entering edit for channel id ${ctx.channelID}`);
