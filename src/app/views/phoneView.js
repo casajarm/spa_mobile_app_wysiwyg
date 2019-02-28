@@ -18,6 +18,7 @@ async function phone(category) {
 }
 
 function phoneView(category, categories, likemojis) {
+    let orgID = category.attributes.organizationID;
     let phoneHTML = 
     `<div class="phone">
         <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
@@ -37,12 +38,22 @@ function phoneView(category, categories, likemojis) {
             </div>
             ${navbarView}
         </div>
-    </div>
-`;
+    </div>`;
     //console.log('done building view'); console.log(phoneView);
     let phoneView = document.createElement("div");
     phoneView.classList.add(['col-lg-4', 'channelEdit']);
     phoneView.innerHTML = phoneHTML;
+    // add onclick handlers 
+    let categoriesButtons = phoneView.getElementsByClassName('category'); 
+    // convert nodelist to array to enable foreach
+    let categoriesButtonsArr = [].slice.call(categoriesButtons);
+    categoriesButtonsArr.forEach(cat => {
+        cat.addEventListener('click', function(e) {
+            page(`/channel/${orgID}/view/${cat.id}`);
+            }
+        );
+    });
+
     return phoneView;
 }
 
