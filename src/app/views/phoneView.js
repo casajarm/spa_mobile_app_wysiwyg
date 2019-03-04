@@ -36,7 +36,7 @@ const phoneView = (category, categories, likemojis) => {
                     ${(category.attributes.main == 1) ? categoriesView(categories) : ''}
                 </div>
             </div>
-            ${phoneNavBarView}
+            ${phoneNavBarView(orgID)}
         </div>
     </div>`;
     //console.log('done building view'); console.log(phoneView);
@@ -57,17 +57,20 @@ const phoneView = (category, categories, likemojis) => {
     return phoneView;
 }
 
-const phoneNavBarView =  () => {
+const phoneNavBarView =  (channelID) => {
     return `<div
     id="navBar"
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
     >
-        <div id="homeNavButton" class="navIcons" style="display:inline">
+        <div id="homeNavButton" 
+            class="navIcons" 
+            style="display:inline">
             <i
                 style="font-size: 1.3em; color: rgb(52, 255, 86);"
                 class="fas fa-home activeNavIcon"
-            ></i>
+                onclick="page('/channel/${channelID}/view')"
+                ></i>
         </div>
         <div id="inboxNavButton" class="navIcons" style="display:inline">
             <i
