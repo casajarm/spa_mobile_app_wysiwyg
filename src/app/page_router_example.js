@@ -13,12 +13,12 @@ var panel1,
     user,
     channelID,          // currently selected channel ID
     categoryID,         // currently selected category ID
-    channels,           // list of users channels
     channelStyle,       // current style of selected channel
     likemojis,          // all likemojis for channel
     categoryLikemojis,  // likemojis for selected category
     categories;
 
+var channels = []           // list of users channels
 var channel =  new Organization();    // current channel
 var category = new Group();
 
@@ -198,7 +198,7 @@ page("/channels", async function (ctx, next) {
 }); //channels page
 
 page("/channel/:channelID/clone", function (ctx, next) {
-    let channelID = ctx.params.channelID;
+    channelID = ctx.params.channelID;
     console.log(`entering clone for channel id ${channelID}`);
     let targetOrgName = "Clone of " + channelID;
     const targetOrg = new Organization();
@@ -225,37 +225,35 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     
     let style = getStyle(channelID)
     .then((_style) => {
-       let style = _style[0];
-       renderForm(panel2, inlineStyle, style);
-
+       channelStyle = _style[0];
+       renderForm(panel2, inlineStyle, channelStyle);
     });
 
 });//channel view
 
 page("/channel/:channelID/view/:groupID", async function (ctx, next) {
-    channelID = ctx.params.channelID;
-    categoryID = ctx.params.groupID;
-    ctx.save();
-
+    if (!channelID
+        || channelID != ctx.params.channelID) {
+        channelID = ctx.params.channelID;
+        channel = channels.find(x => x.id === channelID);   
+        let channelStyles = await getStyle(channelID);
+        channelStyle = channelStyles[0];
+        categories = await getOrgCategories(category.attributes.organizationID);
+    }
+    
+    if (!categoryID
+        || categoryID  != ctx.params.groupID) {
+        categoryID = ctx.params.groupID;
+        ctx.save();
+        category = categories.find(x => x.id === categoryID);
+        categoryLikemojis = await getCategoryLikemojis(category);    
+    }
     console.log(`entering view for channel id ${channelID} and group ${categoryID}`);
     panel2.classList.add('phone-frame'); 
     panel2.innerHTML ="";
 
-    categories = await getOrgCategories(category.attributes.organizationID);
-    likemojis = await getCategoryLikemojis(category);
- 
-    getOrgCategories(channelID)
-    .then(channels => {
-        let selectedChannel = channels.find(x => x.id === categoryID);   
-        renderForm(panel2, phone, selectedChannel);
-    });
-    
-    let style = getStyle(channelID)
-    .then((_style) => {
-       let style = _style[0];
-       renderForm(panel2, inlineStyle, style);
-    });
-    
+    renderForm(panel2, phone, category);
+    renderForm(panel2, inlineStyle, channelStyle);
     // TODO add the back button on the left panel
 
 });//channel group page
