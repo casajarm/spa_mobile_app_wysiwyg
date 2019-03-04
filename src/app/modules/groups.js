@@ -12,7 +12,7 @@ var MyClass = Parse.Object.extend("MyClass", {
 
 var Group = Parse.Object.extend("Group", {
 	saveNewGroups: () => {saveNewGroups()}
-  , getGroups: (orgId) => {getGroups(orgId)} 
+  , getGroups: (orgId) => {getGroups(orgId)}
 });
 
 
@@ -99,4 +99,14 @@ function setNewGroupOrder() {
 				});
 
 }
-export default Group;
+
+function getMainCategory(categories) {
+	for (var x = 0; x < categories.length; x++) { 
+		if (categories[x].attributes.main == 1) {
+			return categories[x];
+		}
+	}
+
+}
+
+export {Group, getMainCategory, setNewGroupOrder};
