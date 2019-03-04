@@ -17,7 +17,7 @@ async function phone(category) {
     return phoneView(category, categories, likemojis);  
 }
 
-function phoneView(category, categories, likemojis) {
+const phoneView = (category, categories, likemojis) => {
     let orgID = category.attributes.organizationID;
     let phoneHTML = 
     `<div class="phone">
@@ -36,7 +36,7 @@ function phoneView(category, categories, likemojis) {
                     ${(category.attributes.main == 1) ? categoriesView(categories) : ''}
                 </div>
             </div>
-            ${navbarView}
+            ${phoneNavBarView}
         </div>
     </div>`;
     //console.log('done building view'); console.log(phoneView);
@@ -57,27 +57,29 @@ function phoneView(category, categories, likemojis) {
     return phoneView;
 }
 
-var navbarView = `<div
+const phoneNavBarView =  () => {
+    return `<div
     id="navBar"
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
     >
-    <div id="homeNavButton" class="navIcons" style="display:inline">
-        <i
-            style="font-size: 1.3em; color: rgb(52, 255, 86);"
-            class="fas fa-home activeNavIcon"
-        ></i>
-    </div>
-    <div id="inboxNavButton" class="navIcons" style="display:inline">
-        <i
-            style="font-size: 1.3em; color: white;"
-            class="far fa-envelope"
-        ></i>
-    </div>
-    <div id="profileNavButton" class="navIcons" style="display:inline">
-        <i style="font-size: 1.3em; color: white;" class="fas fa-user"></i>
-    </div>
-</div>`;
+        <div id="homeNavButton" class="navIcons" style="display:inline">
+            <i
+                style="font-size: 1.3em; color: rgb(52, 255, 86);"
+                class="fas fa-home activeNavIcon"
+            ></i>
+        </div>
+        <div id="inboxNavButton" class="navIcons" style="display:inline">
+            <i
+                style="font-size: 1.3em; color: white;"
+                class="far fa-envelope"
+            ></i>
+        </div>
+        <div id="profileNavButton" class="navIcons" style="display:inline">
+            <i style="font-size: 1.3em; color: white;" class="fas fa-user"></i>
+        </div>
+    </div>`;
+}
 
 const likemojiView = (likemoji) => {
     return `<div
@@ -101,7 +103,7 @@ const likemojiView = (likemoji) => {
 </div>`
 };
 
-function likemojisView(likemojis) {
+const likemojisView = (likemojis) => {
     return `<div id="likemojiGroupCollection"
             class="likemojiGroupCollection-area mainpageLikemojis">
               ${likemojis
@@ -112,7 +114,7 @@ function likemojisView(likemojis) {
          </div>`;
 }
 
-function categoriesView(categories) {
+categoriesView = (categories) => {
     let categoryView = '';
     for (var i = 0; i < categories.length; i++) {
         if (categories[i].attributes.main != 1) {
