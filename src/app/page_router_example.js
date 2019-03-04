@@ -3,14 +3,25 @@ import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
 import {getStyle} from "./modules/styles.js";
+import {Group, getMainCategory} from "./modules/groups.js";
 
 var panel1,
     panel2,
     panel3,
     holdingPen,
     channelName,
-    user;
-var userChannels = [];
+    user,
+    channelID,          // currently selected channel ID
+    categoryID,         // currently selected category ID
+    channels,           // list of users channels
+    channelStyle,       // current style of selected channel
+    likemojis,          // all likemojis for channel
+    categoryLikemojis,  // likemojis for selected category
+    categories;
+
+var channel =  new Organization();    // current channel
+var category = new Group();
+
 channelName = "You Beautiful Person You";
 document.onreadystatechange = function () {
     if (document.readyState === "complete") {
@@ -173,17 +184,17 @@ page("/link2", function (ctx, next) {
     renderForm(panel2, phone);
 }); // link2 page
 
-page("/channels", function (ctx, next) {
+page("/channels", async function (ctx, next) {
     console.log("channel list view");
     if (user.isCurrent()) {
-        userChannels = getUserChannels(user.id).then(channels => {
-            console.log(`getUserChannels returned count: ${channels.length}`);
-            panel1.innerHTML = "<h2>Choose a Channel to Edit</h2>";
-            renderForm(panel1, displayChannelList, channels);
-            panel2.innerHTML = "";
-            panel3.innerHTML = "";
-        });
+    channels = await getUserChannels(user.id)
+    console.log(`getUserChannels returned count: ${channels.length}`);
+    panel1.innerHTML = "<h2>Choose a Channel to Edit</h2>";
+    renderForm(panel1, displayChannelList, channels);
+    panel2.innerHTML = "";
+    panel3.innerHTML = "";
     }
+
 }); //channels page
 
 page("/channel/:channelID/clone", function (ctx, next) {
@@ -200,16 +211,17 @@ page("/channel/:channelID/clone", function (ctx, next) {
         });
 });
 
-page("/channel/:channelID/view", function (ctx, next) {
-    let channelID = ctx.params.channelID;
+page("/channel/:channelID/view",  async function (ctx, next) {
+    channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
     panel2.classList.add('phone-frame');
+    categories = await getOrgCategories(channelID);
+    //likemojis = await get ALL LIKEMOJIS FOR CHANNEL
     panel2.innerHTML ="";
-    getOrgCategories(channelID)
-    .then(channels => {
-        let selectedChannel = channels[0];
-        renderForm(panel2, phone, selectedChannel);
-    });
+    
+    category = getMainCategory(categories);
+    
+    renderForm(panel2, phone, category);
     
     let style = getStyle(channelID)
     .then((_style) => {
@@ -220,17 +232,21 @@ page("/channel/:channelID/view", function (ctx, next) {
 
 });//channel view
 
-page("/channel/:channelID/view/:groupID", function (ctx, next) {
-    let channelID = ctx.params.channelID;
-    let groupID = ctx.params.groupID;
+page("/channel/:channelID/view/:groupID", async function (ctx, next) {
+    channelID = ctx.params.channelID;
+    categoryID = ctx.params.groupID;
     ctx.save();
 
-    console.log(`entering view for channel id ${channelID} and group ${groupID}`);
+    console.log(`entering view for channel id ${channelID} and group ${categoryID}`);
     panel2.classList.add('phone-frame'); 
     panel2.innerHTML ="";
+
+    categories = await getOrgCategories(category.attributes.organizationID);
+    likemojis = await getCategoryLikemojis(category);
+ 
     getOrgCategories(channelID)
     .then(channels => {
-        let selectedChannel = channels.find(x => x.id === groupID);   
+        let selectedChannel = channels.find(x => x.id === categoryID);   
         renderForm(panel2, phone, selectedChannel);
     });
     
