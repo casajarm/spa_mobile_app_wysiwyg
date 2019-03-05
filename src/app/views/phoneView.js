@@ -14,13 +14,14 @@
 async function phone(category) {
     let categories = await getOrgCategories(category.attributes.organizationID);
     let likemojis = await getCategoryLikemojis(category);
-    return phoneView(category, categories, likemojis);  
+    return await phoneView(category, categories, likemojis);  
 }
 
 const phoneView = (category, categories, likemojis) => {
     let orgID = category.attributes.organizationID;
+
     let phoneHTML = 
-    `<div class="phone">
+    html`<div class="phone">
         <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
         <div id="phoneDisplay" class="phoneDisplay-area">
             <div id="buildHeader" class="header text-white">
@@ -33,7 +34,10 @@ const phoneView = (category, categories, likemojis) => {
             <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
                 ${likemojisView(likemojis)}
                 <div id="categories" class="categories">
-                    ${(category.attributes.main == 1) ? categoriesView(categories) : ''}
+                    ${category.attributes.main == 1 ?
+                        categoriesSubView(categories)
+                        : html`<span></span>`
+                     }               
                 </div>
             </div>
             ${phoneNavBarView(orgID)}
@@ -42,7 +46,8 @@ const phoneView = (category, categories, likemojis) => {
     //console.log('done building view'); console.log(phoneView);
     let phoneView = document.createElement("div");
     phoneView.classList.add(['col-lg-4', 'channelEdit']);
-    phoneView.innerHTML = phoneHTML;
+    //phoneView.innerHTML = phoneHTML;
+    phoneView.appendChild(phoneHTML);
     // add onclick handlers 
     let categoriesButtons = phoneView.getElementsByClassName('category'); 
     // convert nodelist to array to enable foreach
@@ -58,7 +63,16 @@ const phoneView = (category, categories, likemojis) => {
 }
 
 const phoneNavBarView =  (channelID) => {
-    return `<div
+    function homeClick () { phoneHome(channelID)}
+
+
+    function phoneHome(channelID) {
+        let route = "/channel/" + channelID + "/view";
+        page(route);
+    }
+    
+
+    let navHTML = html`<div
     id="navBar"
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
@@ -69,7 +83,7 @@ const phoneNavBarView =  (channelID) => {
             <i
                 style="font-size: 1.3em; color: rgb(52, 255, 86);"
                 class="fas fa-home activeNavIcon"
-                onclick="page('/channel/${channelID}/view')"
+                onclick="${homeClick}"
                 ></i>
         </div>
         <div id="inboxNavButton" class="navIcons" style="display:inline">
@@ -82,64 +96,108 @@ const phoneNavBarView =  (channelID) => {
             <i style="font-size: 1.3em; color: white;" class="fas fa-user"></i>
         </div>
     </div>`;
+    return navHTML;
 }
 
-const likemojiView = (likemoji) => {
-    return `<div
+function todo(node, items = []) {
+    render(node, () => html`
+    <ul>${items.map((what, i) => html`
+      <li data-i=${i} onclick=${remove}> ${what} </li>
+    `)}
+      <button onclick=${add}> add </button>
+    </ul>`);
+    function add() {
+      items.push(prompt('do'));
+      todo(node, items);
+    }
+    function remove(e) {
+      items.splice(e.currentTarget.dataset.i, 1);
+      todo(node, items);
+    }
+  }
+
+
+  const likemojiView = (likemoji) => {
+    let likemojiViewHTML = html`<div
     class="likemojis ui-draggable ui-draggable-handle"
     id="${likemoji
         .id}">
-    <img
-        src="${likemoji
-        .attributes
-        .x3
-        .url()}"
-        class="likemojiImages"/>
-    <div
-        class="likemojiNames channelText"
-        style="color: rgb(52, 255, 86);">
-        ${likemoji
-        .attributes
-        .names
-        .en}
-    </div>
-</div>`
+        <img
+            src="${likemoji
+            .attributes
+            .x3
+            .url()}"
+            class="likemojiImages"/>
+        <div
+            class="likemojiNames channelText"
+            style="color: rgb(52, 255, 86);">
+            ${likemoji
+            .attributes
+            .names
+            .en}
+        </div>
+    </div>`;
+
+    console.log(likemojiViewHTML);
+    return likemojiViewHTML;
 };
 
 const likemojisView = (likemojis) => {
-    return `<div id="likemojiGroupCollection"
+    return html`<div id="likemojiGroupCollection"
             class="likemojiGroupCollection-area mainpageLikemojis">
               ${likemojis
-        ? likemojis.map(likemojiView).join('')
-        : `<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">
-                    Add Likemojis Here!
-                 </h4>`}	
+        ? likemojis.map(moji => likemojiView(moji))
+        : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
          </div>`;
 }
 
-categoriesView = (categories) => {
-    let categoryView = '';
-    for (var i = 0; i < categories.length; i++) {
-        if (categories[i].attributes.main != 1) {
-            categoryView += `<div class="category" type="button" id="${categories[i]
-                .id}">
-                <img
-                    src="${categories[i]
-                .attributes
-                .newCategoryImage
-                .url()}"
-                    width="100%"
-                    height="auto"/>
-                <p class="categorytxt" style="color: rgb(255, 255, 255);">
-                ${categories[i]
-                .attributes
-                .name}
-                </p>    
-            </div>`
-        }; // if not the main category
+const categoryView = (category, skipMain) => {
+    if (skipMain) {
+        if (category.attributes.main ==1) return html`<span></span>`;
     }
-    return categoryView;
+    let imgSrc = category.attributes.newCategoryImage ?
+                category.attributes.newCategoryImage.url() 
+                : category.attributes.newHeader.url();
+    let catName = category.attributes.name;
+    let catID = category.id;
+
+    let categoryViewHTML = html`<div class="category" type="button" id="${catID}">
+        <img
+            src="${imgSrc}"
+            width="100%"
+            height="auto"/>
+        <p class="categorytxt" style="color: rgb(255, 255, 255);">
+            ${catName}
+        </p>    
+    </div>`;
+
+    console.log(categoryViewHTML);
+    return categoryViewHTML;
 }
+
+/*
+    let categoriesSubView = 
+    html`<div id="categories" class="categories">
+            ${(category.attributes.main == 1) ? 
+                 categories.map(cat => categoryView(cat)) 
+              } 
+        </div>`;
+*/        
+const categoriesSubView = (cats) => {
+    return html`<div id="categories" class="categories">
+            ${cats.map(cat => categoryView(cat, true))} 
+      </div>`;
+}
+
+// let categoriesSubView =  html`<div id="categories" class="categories"></div>`;
+
+/*
+const categoriesView = (categories) => {
+    return categories.map(category => {
+        if (category.attributes.main != 1) categoryView(category); 
+    });
+}
+*/
 
 async function getCategoryLikemojis(category) {
     let IDs = category.attributes.likemojis;
