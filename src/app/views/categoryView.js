@@ -103,8 +103,8 @@ categoryView = function (category) {
 				class="form-control infoTextField"
 				rows="5"
 				placeholder="Here at XYZ Corp, We know that want to put your experience first..."
-			    value="${category.attributes.descriptions.en}"
 				>
+				${category.attributes.descriptions.en}
 			</textarea>
 		</div>
 	</div>`;
