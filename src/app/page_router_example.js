@@ -4,6 +4,10 @@ import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
 import {getStyle} from "./modules/styles.js";
 import {Group, getMainCategory} from "./modules/groups.js";
+//import {render, html} from '//unpkg.com/lighterhtml?module';
+
+
+const {render, html, svg} = lighterhtml;
 
 var panel1,
     panel2,
@@ -273,14 +277,7 @@ page("/channel/:channelID/view",  async function (ctx, next) {
 
     // panel 3 is the category editor
     panel3.innerHTML = "";
-    renderForm(panel3, categoryView, category);
-
-    
-
-
-
-
-
+    renderForm(panel3, categoryEditorView, category);
 });//channel view
 
 page("/channel/:channelID/view/:groupID", async function (ctx, next) {
@@ -332,6 +329,8 @@ page("*", function (ctx, next) {
     console.log("catch all route");
     console.log(ctx);
 });
+
+
 
 function clearPanel(panel) {
     var panelContents = panel.childNodes;
