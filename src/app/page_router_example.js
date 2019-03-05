@@ -102,7 +102,7 @@ page("/signup", function (ctx, next) {
                     //hide login link
                     document.getElementById('login').classList.add('active');
 
-                    page("/link2");
+                    page(`/viewnew/${org.id}`);
 
                 });
         }
@@ -166,7 +166,7 @@ page("/distribute", function (ctx, next) {
     panel3.appendChild(shareForm);
 }); // distribute page
 
-page("/link2", function (ctx, next) {
+page("/viewnew/:orgID", function (ctx, next) {
     panel1.innerHTML = "About your Likemoji Channel";
     panel2.innerHTML = "";
     panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;
@@ -182,7 +182,7 @@ page("/link2", function (ctx, next) {
 
     //showLink(ctx, next, boilerplate);
     renderForm(panel2, phone);
-}); // link2 page
+}); // viewnew/orgID page
 
 page("/channels", async function (ctx, next) {
     console.log("channel list view");
@@ -200,9 +200,9 @@ page("/channels", async function (ctx, next) {
 page("/channel/:channelID/clone", function (ctx, next) {
     channelID = ctx.params.channelID;
     console.log(`entering clone for channel id ${channelID}`);
-    let targetOrgName = "Clone of " + channelID;
+    channelName = "Clone of " + channelID;
     const targetOrg = new Organization();
-    targetOrg.set("name", targetOrgName);
+    targetOrg.set("name", channelName);
     targetOrg
         .save()
         .then(async function (org) {
