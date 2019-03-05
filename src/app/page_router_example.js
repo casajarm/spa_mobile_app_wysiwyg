@@ -229,6 +229,10 @@ page("/channel/:channelID/view",  async function (ctx, next) {
        renderForm(panel2, inlineStyle, channelStyle);
     });
 
+    // panel 3 is the category editor
+    panel3.innerHTML = "";
+    renderForm(panel3, categoryView, category);
+
 });//channel view
 
 page("/channel/:channelID/view/:groupID", async function (ctx, next) {
@@ -256,6 +260,12 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
     renderForm(panel2, inlineStyle, channelStyle);
     // TODO add the back button on the left panel
 
+
+    
+    // panel 3 is the category editor
+    panel3.innerHTML = "";
+    renderForm(panel3, categoryView, category);
+    
 });//channel group page
 
 
