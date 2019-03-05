@@ -225,13 +225,61 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     
     let style = getStyle(channelID)
     .then((_style) => {
-       channelStyle = _style[0];
-       renderForm(panel2, inlineStyle, channelStyle);
+        channelStyle = _style[0];
+        renderForm(panel2, inlineStyle, channelStyle);
+        // TODO we will need to set up listeners elsewhere, this is clutter
+       
+        let save1 = document.getElementById('callToActionSave');
+        save1.addEventListener('click', function(e) {
+
+        var callOutText = document.getElementById("editorCallOut").value;
+        var callOutsObject = {
+            en: callOutText
+        };
+    
+        category.set("callOuts", callOutsObject);
+        category.save().then(
+            group => {
+                // Execute any logic that should take place after the object is saved.
+            },
+            error => {
+                // Execute any logic that should take place if the save fails. error is a
+                // Parse.Error with an error code and message.
+                alert("Failed to create new object, with error code: " + error.message);
+            }
+            );
+        });
+       
+       let save2 = document.getElementById('editExtendedInfo');
+       save2.addEventListener('click', function(e){
+         let extendedInfoText = $("#categoryExtendedInfo").value;
+         let extenedInfoObject = {
+            en: extendedInfoText
+        };
+    
+        category.set("descriptions", extenedInfoObject);
+        category.save().then(
+            group => {
+                // Execute any logic that should take place after the object is saved.
+            },
+            error => {
+                // Execute any logic that should take place if the save fails. error is a
+                // Parse.Error with an error code and message.
+                alert("Failed to create new object, with error code: " + error.message);
+            }
+        );
+       });
     });
 
     // panel 3 is the category editor
     panel3.innerHTML = "";
     renderForm(panel3, categoryView, category);
+
+    
+
+
+
+
 
 });//channel view
 
@@ -265,7 +313,7 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
     // panel 3 is the category editor
     panel3.innerHTML = "";
     renderForm(panel3, categoryView, category);
-    
+
 });//channel group page
 
 
