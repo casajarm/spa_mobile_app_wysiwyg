@@ -13,10 +13,11 @@ import {render, html} from '//unpkg.com/lighterhtml?module';
 // phone function returns all the HTML for displaying the phone widget with the
 // data for an org set to be selected for the given "category" parameter
 // category is a Group object from Parse
-const phone = async (category) =>  {
-    let categories = await getOrgCategories(category.attributes.organizationID);
-    let likemojis = await getCategoryLikemojis(category);
-    return await phoneView(category, categories, likemojis);  
+const phone = async (props) =>  {
+    const {category, categories, categoryLikemojis} = props;
+    //let categories = await getOrgCategories(category.attributes.organizationID);
+   // let likemojis = await getCategoryLikemojis(category);
+    return /*await*/ phoneView(category, categories, categoryLikemojis);  
 }
 
 const phoneView = (category, categories, likemojis) => {
@@ -78,7 +79,7 @@ const phoneNavBarView =  (channelID) => {
         page(route);
     }
 
-    let navHTML = html`<div
+    let navHTML = html.for({channelID})`<div
     id="navBar"
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
@@ -241,4 +242,4 @@ async function getOrgCategories(orgId) {
     }
 }
 
-export {phone, getOrgCategories, getCategoryLikemojis};
+export {phone, phoneView, getOrgCategories, getCategoryLikemojis};
