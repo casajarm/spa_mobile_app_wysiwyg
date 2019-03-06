@@ -4,10 +4,10 @@ import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
 import {getStyle} from "./modules/styles.js";
 import {Group, getMainCategory} from "./modules/groups.js";
-//import {render, html} from '//unpkg.com/lighterhtml?module';
-
-
-const {render, html, svg} = lighterhtml;
+import {render, html} from '//unpkg.com/lighterhtml?module';
+import {phone, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
+import categoryEditorView from './views/categoryView.js';
+//const {render, html, svg} = lighterhtml;
 
 var panel1,
     panel2,

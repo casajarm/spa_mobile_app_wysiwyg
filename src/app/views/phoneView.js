@@ -1,3 +1,5 @@
+import {render, html} from '//unpkg.com/lighterhtml?module';
+
 /* Main structure of the phone panel
 |phone
 |-category
@@ -11,7 +13,7 @@
 // phone function returns all the HTML for displaying the phone widget with the
 // data for an org set to be selected for the given "category" parameter
 // category is a Group object from Parse
-async function phone(category) {
+const phone = async (category) =>  {
     let categories = await getOrgCategories(category.attributes.organizationID);
     let likemojis = await getCategoryLikemojis(category);
     return await phoneView(category, categories, likemojis);  
@@ -199,7 +201,7 @@ const categoriesView = (categories) => {
 }
 */
 
-async function getCategoryLikemojis(category) {
+const getCategoryLikemojis = async (category) => {
     let IDs = category.attributes.likemojis;
     let likemojis = [];
     if (IDs.length > 0) {
@@ -233,3 +235,5 @@ async function getOrgCategories(orgId) {
         alert(err);
     }
 }
+
+export {phone, getOrgCategories, getCategoryLikemojis};
