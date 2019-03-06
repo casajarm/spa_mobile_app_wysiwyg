@@ -7,6 +7,8 @@ import {Group, getMainCategory} from "./modules/groups.js";
 import {render, html} from '//unpkg.com/lighterhtml?module';
 import {phone, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
+import categoriesEditorView from './views/categoriesEditor.js';
+import catLeftView from './views/catLeftView.js';
 //const {render, html, svg} = lighterhtml;
 
 var panel1,
@@ -218,8 +220,14 @@ page("/channel/:channelID/clone", function (ctx, next) {
 page("/channel/:channelID/view",  async function (ctx, next) {
     channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
+    
+    
     panel2.classList.add('phone-frame');
     categories = await getOrgCategories(channelID);
+    
+    panel1.innerHTML = '';
+    render(panel1, (categories) => catLeftView(categories));
+
     //likemojis = await get ALL LIKEMOJIS FOR CHANNEL
     panel2.innerHTML ="";
     
