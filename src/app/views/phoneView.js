@@ -44,11 +44,19 @@ const phoneView = (category, categories, likemojis) => {
         </div>
     </div>`;
     //console.log('done building view'); console.log(phoneView);
+    
     let phoneView = document.createElement("div");
     phoneView.classList.add(['col-lg-4', 'channelEdit']);
     //phoneView.innerHTML = phoneHTML;
     phoneView.appendChild(phoneHTML);
     // add onclick handlers 
+    /* seems like this should work but it returns empty
+    let XXcategoriesButtons = phoneHTML.querySelectorAll('.category');
+    */
+
+    /* replaced with an onclick attribute in the view
+       -- hyperhtml seems to understand this and adds a listener to replace the onclick attribute
+       -- very nice
     let categoriesButtons = phoneView.getElementsByClassName('category'); 
     // convert nodelist to array to enable foreach
     let categoriesButtonsArr = [].slice.call(categoriesButtons);
@@ -58,19 +66,17 @@ const phoneView = (category, categories, likemojis) => {
             }
         );
     });
-
+    */
     return phoneView;
 }
 
 const phoneNavBarView =  (channelID) => {
     function homeClick () { phoneHome(channelID)}
 
-
     function phoneHome(channelID) {
         let route = "/channel/" + channelID + "/view";
         page(route);
     }
-    
 
     let navHTML = html`<div
     id="navBar"
@@ -98,24 +104,6 @@ const phoneNavBarView =  (channelID) => {
     </div>`;
     return navHTML;
 }
-
-function todo(node, items = []) {
-    render(node, () => html`
-    <ul>${items.map((what, i) => html`
-      <li data-i=${i} onclick=${remove}> ${what} </li>
-    `)}
-      <button onclick=${add}> add </button>
-    </ul>`);
-    function add() {
-      items.push(prompt('do'));
-      todo(node, items);
-    }
-    function remove(e) {
-      items.splice(e.currentTarget.dataset.i, 1);
-      todo(node, items);
-    }
-  }
-
 
   const likemojiView = (likemoji) => {
     let likemojiViewHTML = html`<div
@@ -152,6 +140,21 @@ const likemojisView = (likemojis) => {
 }
 
 const categoryView = (category, skipMain) => {
+    let orgID = category.attributes.organizationID;
+    /* simple pattern for click handlers
+    define a function that takes (e) as parameter
+    --- function myClicker(e) {
+    inside function find the target and the id data attribute
+    --- let targetID = e.currentTarget.dataset.i;
+    --- execute something
+    then define onclick and data-i attribute
+    --- <a data-i=${i.id} onclick="${myClicker}">
+    */
+   function selectCategory(e) {
+    let targetID = e.currentTarget.dataset.i;
+    page(`/channel/${orgID}/view/${targetID}`);        
+    }
+
     if (skipMain) {
         if (category.attributes.main ==1) return html`<span></span>`;
     }
@@ -161,7 +164,11 @@ const categoryView = (category, skipMain) => {
     let catName = category.attributes.name;
     let catID = category.id;
 
-    let categoryViewHTML = html`<div class="category" type="button" id="${catID}">
+    let categoryViewHTML = html`<div class="category" 
+        type="button" 
+        id="${catID}"
+        data-i="${catID}"
+        onclick="${selectCategory}">
         <img
             src="${imgSrc}"
             width="100%"
