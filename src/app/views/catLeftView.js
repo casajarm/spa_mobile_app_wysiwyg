@@ -1,7 +1,7 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
 
 const catLeftView = (categories) => {
-    return html`<div class="col-lg-4">
+    return html`<div>
         <h3>Design & Edit Your Channel</h3>
         <hr />
         <div>
