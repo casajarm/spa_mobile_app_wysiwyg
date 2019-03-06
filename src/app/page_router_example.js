@@ -5,7 +5,7 @@ import Organization from "./modules/organizations.js";
 import {getStyle} from "./modules/styles.js";
 import {Group, getMainCategory} from "./modules/groups.js";
 import {render, html} from '//unpkg.com/lighterhtml?module';
-import {phone, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
+import {phone, phoneView, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
@@ -19,10 +19,11 @@ var panel1,
     user,
     channelID,          // currently selected channel ID
     categoryID,         // currently selected category ID
-    channelStyle,       // current style of selected channel
-    likemojis,          // all likemojis for channel
-    categoryLikemojis,  // likemojis for selected category
-    categories;
+    channelStyle;       // current style of selected channel
+    
+var likemojis = [];          // all likemojis for channel
+var categoryLikemojis = [];  // likemojis for selected category
+var categories = [];         // categories (Groups) for selected channel
 
 var channels = []           // list of users channels
 var channel =  new Organization();    // current channel
@@ -214,27 +215,29 @@ page("/channel/:channelID/clone", function (ctx, next) {
         .then(async function (org) {
             console.log("New org saved .. now clone");
             await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
+            //redirect to the view now 
+            page.redirect(`/viewnew/${org.id}`);
         });
 });
 
 page("/channel/:channelID/view",  async function (ctx, next) {
     channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
-    
-    
-    panel2.classList.add('phone-frame');
     categories = await getOrgCategories(channelID);
     
     panel1.innerHTML = '';
-    render(panel1, (categories) => catLeftView(categories));
-
+    //render(panel1, (categories) => catLeftView(categories));
+    renderForm(panel1, catLeftView, categories);
     //likemojis = await get ALL LIKEMOJIS FOR CHANNEL
+    panel2.classList.add('phone-frame');
     panel2.innerHTML ="";
     
     category = getMainCategory(categories);
-    
-    renderForm(panel2, phone, category);
-    
+    categories = await getOrgCategories(category.attributes.organizationID);
+    categoryLikemojis = await getCategoryLikemojis(category);
+    renderForm(panel2, phone, {category, categories, categoryLikemojis});
+    //render(panel2, (category, categories, likemojis) => phoneView(category, categories, likemojis));
+
     let style = getStyle(channelID)
     .then((_style) => {
         channelStyle = _style[0];
@@ -295,7 +298,7 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         channel = channels.find(x => x.id === channelID);   
         let channelStyles = await getStyle(channelID);
         channelStyle = channelStyles[0];
-        categories = await getOrgCategories(category.attributes.organizationID);
+        categories = await getOrgCategories(category.attributes.organizationID);   
     }
     
     if (!categoryID
@@ -306,18 +309,15 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         categoryLikemojis = await getCategoryLikemojis(category);    
     }
     console.log(`entering view for channel id ${channelID} and group ${categoryID}`);
-    panel2.classList.add('phone-frame'); 
+    //panel2.classList.add('phone-frame'); 
     panel2.innerHTML ="";
-
-    renderForm(panel2, phone, category);
-    renderForm(panel2, inlineStyle, channelStyle);
+    renderForm(panel2, phone, {category, categories, categoryLikemojis});
+    //NOT YET...Have to move some data gets render(panel2, (category) => phone(category));
     // TODO add the back button on the left panel
-
-
     
     // panel 3 is the category editor
     panel3.innerHTML = "";
-    renderForm(panel3, categoryView, category);
+    renderForm(panel3, categoryEditorView, category);
 
 });//channel group page
 
@@ -433,34 +433,35 @@ function loginForm() {
     return form;
 }
 
-function phoneImage() {
-    let form = document.createElement("div");
-    let form2 = document.createElement("div");
-    form2.id = "phoneBackground";
-    form2.className = "phone";
-
-    let image = document.createElement("img");
-    // TODO revist this ../ reference needed right now for the setting of BASE
-    // image.src = '../assets/iPhone_7_front_frame.png';
-    image.src = ".../assets/iPhone_7_front_frame sized.png";
-    image.className = "phone";
-    form2.appendChild(image);
-    form.appendChild(form2);
-    return form;
-}
-
 
 //<a href="channel/${i.id}/clone">${i.attributes.name}</a>
-function displayChannelList(channels) {
-    let form = document.createElement("div");
-    let orgList = channels
-        .map(i => {
-        return `<li class="channelList" id="${i.id}">
-                    <a onclick="page('/channel/${i.id}/view')">${i.attributes.name}</a>
-                </li>`;
-    })
-        .join("");
-    form.innerHTML = `<ul>${orgList}</ul>`;
+const displayChannelList = (channels) => {
+    /* simple pattern for click handlers
+    define a function that takes (e) as parameter
+    --- function myClicker(e) {
+    inside function find the target and the id data attribute
+    --- let targetID = e.currentTarget.dataset.i;
+    --- execute something
+    then define onclick and data-i attribute
+    --- <a data-i=${i.id} onclick="${myClicker}">
+    */
+   
+    function selectChannel(e) {
+        let targetChannel = e.currentTarget.dataset.i;
+        let route = '/channel/' + targetChannel + '/view';         
+        page(route);        
+    }
+    
+    let orgList = channels.map(i => 
+            html`<li class="channelList" id="${i.id}">
+                    <a data-i=${i.id} onclick="${selectChannel}">${i.attributes.name}</a>
+                </li>`);
+
+    let form = html`<div>
+        <ul>
+            ${orgList}
+        </ul>
+    </div>`;
     return form;
 }
 
