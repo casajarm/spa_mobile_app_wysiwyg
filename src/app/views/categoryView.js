@@ -1,3 +1,5 @@
+import {render, html} from '//unpkg.com/lighterhtml?module';
+
 const categoryEditorView = (category) => {
 	let categoryEditorViewHTML = html`<div class="channelEdit">
 			<div
@@ -113,3 +115,4 @@ const categoryEditorView = (category) => {
 
 	return categoryEditorViewHTML;
 }
+export default categoryEditorView;
