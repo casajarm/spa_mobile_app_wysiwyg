@@ -35,12 +35,10 @@ const phoneView = (category, categories, likemojis) => {
             </div>
             <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
                 ${likemojisView(likemojis)}
-                <div id="categories" class="categories">
-                    ${category.attributes.main == 1 ?
+                ${category.attributes.main == 1 ?
                         categoriesSubView(categories)
                         : html`<span></span>`
-                     }               
-                </div>
+                  }
             </div>
             ${phoneNavBarView(orgID)}
         </div>
