@@ -1,8 +1,8 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
-
+//.for(categories)
 const categoriesEditorView = categories => {
 	let categoriesEditorViewHTML = html`
-		<div id="categoriesEditor" class="editorWindow" style="display:none">
+		<div id="categoriesEditor" class="editorWindow">
 			<h3>Edit Categories</h3>
 			<hr />
 			<div id="editorContainer" class="image upload">
@@ -18,7 +18,7 @@ const categoriesEditorView = categories => {
                                     >
 									<i class="fas fa-sort"></i>
 									<i class="fas fa-edit floatRight"></i>
-									<p class="inlineDisplay">{cat.attributes.name}</p>
+									<p class="inlineDisplay">${cat.attributes.name}</p>
 									<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
 								</li>`
 						: html`<span></span>`
