@@ -1,5 +1,5 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
-
+import {getMainCategory} from '../modules/groups.js';
 /* Main structure of the phone panel
 |phone
 |-category
@@ -20,7 +20,9 @@ const phone = async (props) =>  {
     return /*await*/ phoneView(category, categories, categoryLikemojis);  
 }
 
-const phoneView = (category, categories, likemojis) => {
+//const phoneView = (category, categories, categoryLikemojis) => {
+const phoneView = (props) => {
+    const {category, categories, categoryLikemojis} = props;
     let orgID = category.attributes.organizationID;
 
     let phoneHTML = 
@@ -35,48 +37,35 @@ const phoneView = (category, categories, likemojis) => {
                 ${category.attributes.callOuts.en}
             </div>
             <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
-                ${likemojisView(likemojis)}
+                ${likemojisView(categoryLikemojis)}
                 ${category.attributes.main == 1 ?
                         categoriesSubView(categories)
                         : html`<span></span>`
                   }
             </div>
-            ${phoneNavBarView(orgID)}
+            ${phoneNavBarView(orgID, categories)}
         </div>
     </div>`;
     //console.log('done building view'); console.log(phoneView);
-    
+    /*
     let phoneView = document.createElement("div");
     phoneView.classList.add(['col-lg-4', 'channelEdit']);
     //phoneView.innerHTML = phoneHTML;
     phoneView.appendChild(phoneHTML);
-    // add onclick handlers 
-    /* seems like this should work but it returns empty
-    let XXcategoriesButtons = phoneHTML.querySelectorAll('.category');
     */
-
-    /* replaced with an onclick attribute in the view
-       -- hyperhtml seems to understand this and adds a listener to replace the onclick attribute
-       -- very nice
-    let categoriesButtons = phoneView.getElementsByClassName('category'); 
-    // convert nodelist to array to enable foreach
-    let categoriesButtonsArr = [].slice.call(categoriesButtons);
-    categoriesButtonsArr.forEach(cat => {
-        cat.addEventListener('click', function(e) {
-            page(`/channel/${orgID}/view/${cat.id}`);
-            }
-        );
-    });
-    */
+    let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
     return phoneView;
 }
 
-const phoneNavBarView =  (channelID) => {
+const phoneNavBarView =  (channelID, categories) => {
     function homeClick () { phoneHome(channelID)}
 
-    function phoneHome(channelID) {
-        let route = "/channel/" + channelID + "/view";
-        page(route);
+    async function phoneHome(channelID) {
+        let category = getMainCategory(categories);
+        let categoryLikemojis = await getCategoryLikemojis(category);
+        render(panel2, () => phoneView({category, categories, categoryLikemojis}));
+        //let route = "/channel/" + channelID + "/view";
+        //page(route);
     }
 
     let navHTML = html.for({channelID})`<div
