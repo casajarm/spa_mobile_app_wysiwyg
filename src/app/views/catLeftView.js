@@ -1,6 +1,17 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
 
 const catLeftView = (categories) => {
+
+    function callCategoriesEditor (e) {
+        let catsView = document.getElementById('categoriesEditor');
+        console.log('clicked callCategoriesEditor');
+        let panel3Container = document.getElementById('panel3-toggle');
+        for (var i = 0; i < panel3Container.children.length; i++) {
+            panel3Container.children[i].classList.add('hidden');
+          }
+        catsView.classList.remove('hidden');
+       }
+    
     return html`<div>
         <h3>Design & Edit Your Channel</h3>
         <hr />
@@ -30,7 +41,7 @@ const catLeftView = (categories) => {
             <!-- <p>Upload likemojis - (324px × 324px)</p></center> -->
         </div>
         <div id="categoryEditorButton" class="selectDiv text-center">
-            <button id="addCategories" type="button" class="btn btn-default editor ">
+            <button id="addCategories" type="button" class="btn btn-default editor" onclick="${callCategoriesEditor}">
                 Add/Edit Categories
             </button>
             <!-- <p>Upload category image - (1242px × 312px)</p></center> -->
