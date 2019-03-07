@@ -1,7 +1,46 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
+import {phoneView} from './phoneView.js';
 
 const categoryEditorView = (category) => {
-	let categoryEditorViewHTML = html`<div class="channelEdit">
+
+	async function saveCallToAction (e) {
+		var callOutText = document.getElementById("editorCallOut").value;
+		var callOutsObject = {
+			en: callOutText
+		};
+		//TODO check if this is a change before wasting effort to call Parse
+		category.set("callOuts", callOutsObject);
+		category.save().then(
+			group => {
+				//rerender the phone
+				let phoneViewPanel = document.getElementById('phone-view').parentNode;
+				render(phoneViewPanel, () => phoneView());
+			},
+			error => {
+				// Execute any logic that should take place if the save fails. error is a
+				// Parse.Error with an error code and message.
+				alert("Failed to create new object, with error code: " + error.message);
+			}
+		);
+	};
+
+	async function saveExtendedInfo (e) {
+		let extendedInfoText = $("#categoryExtendedInfo").value;
+		let extenedInfoObject = {en: extendedInfoText};
+		category.set("descriptions", extenedInfoObject);
+		category.save().then(
+			group => {
+				// Execute any logic that should take place after the object is saved.
+			},
+			error => {
+				// Execute any logic that should take place if the save fails. error is a
+				// Parse.Error with an error code and message.
+				alert("Failed to create new object, with error code: " + error.message);
+			}
+		);
+	};
+
+	let categoryEditorViewHTML = html`<div id="categoryEditor" class="channelEdit">
 			<div
 				id="imageUploaderButtons"
 				class="btn-group"
@@ -52,6 +91,7 @@ const categoryEditorView = (category) => {
 						id="callToActionSave"
 						class="btn btn-callToAction"
 						type="button"
+						onclick=${saveCallToAction}
 					>
 						save
 					</button>
@@ -87,7 +127,7 @@ const categoryEditorView = (category) => {
 			</button>
 			<label> - Edit Theme (Color / Font)</label> <br />
 			<br />
-			<button id="editExtendedInfo" class="btn btn-editTheme">
+			<button id="editExtendedInfo" class="btn btn-editTheme" onclick=${saveExtendedInfo}>
 				<label>
 					<i
 						class="fas fa-save"
