@@ -2,6 +2,7 @@
 import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import Organization from "./modules/organizations.js";
+import Likemoji from './modules/likemojis.js';
 import {getStyle} from "./modules/styles.js";
 import {Group, getMainCategory} from "./modules/groups.js";
 import {render, html} from '//unpkg.com/lighterhtml?module';
@@ -9,6 +10,7 @@ import {phone, phoneView, getOrgCategories, getCategoryLikemojis} from './views/
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
+import  likemojisListView from './views/likemojisListView.js';
 //const {render, html, svg} = lighterhtml;
 
 var panel1,
@@ -19,7 +21,8 @@ var panel1,
     user,
     channelID,          // currently selected channel ID
     categoryID,         // currently selected category ID
-    channelStyle;       // current style of selected channel
+    channelStyle,       // current style of selected channel
+    mainCategory;       // the category considered the home for the org/channel
     
 var likemojis = [];          // all likemojis for channel
 var categoryLikemojis = [];  // likemojis for selected category
@@ -28,6 +31,7 @@ var categories = [];         // categories (Groups) for selected channel
 var channels = []           // list of users channels
 var channel =  new Organization();    // current channel
 var category = new Group();
+var Moji = new Likemoji;
 
 channelName = "You Beautiful Person You";
 document.onreadystatechange = function () {
@@ -228,67 +232,45 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     panel1.innerHTML = '';
     //render(panel1, (categories) => catLeftView(categories));
     renderForm(panel1, catLeftView, categories);
-    //likemojis = await get ALL LIKEMOJIS FOR CHANNEL
+    
     panel2.classList.add('phone-frame');
     panel2.innerHTML ="";
     
-    category = getMainCategory(categories);
-    categories = await getOrgCategories(category.attributes.organizationID);
-    categoryLikemojis = await getCategoryLikemojis(category);
-    renderForm(panel2, phone, {category, categories, categoryLikemojis});
+    mainCategory = getMainCategory(categories);
+    categories = await getOrgCategories(channelID);
+    categoryLikemojis = await getCategoryLikemojis(mainCategory);
+    category = mainCategory;
+    //renderForm(panel2, phone, {category, categories, categoryLikemojis});
     //render(panel2, (category, categories, likemojis) => phoneView(category, categories, likemojis));
+    render(panel2, () => phoneView({category, categories, categoryLikemojis}));
+
+    likemojis = await Moji.getLikemojis(channelID); //get ALL LIKEMOJIS FOR CHANNEL  
+
+    let catsView = categoriesEditorView(categories);
+    let likemojisView = likemojisListView(likemojis);
+    let catView = categoryEditorView(category);
+    // for panel 3 render all the panes and hide the categories and likemojis panes
+    
+    panel3.innerHTML = '';
+    let panel3Container = document.createElement('div');
+    panel3Container.id = 'panel3-toggle';
+    panel3Container.appendChild(catsView);
+    panel3Container.appendChild(catView);
+    panel3Container.appendChild(likemojisView);     
+    panel3.appendChild(panel3Container);
+    
+    for (var i = 0; i < panel3Container.children.length; i++) {
+        panel3Container.children[i].classList.add('hidden');
+    }
+    document.getElementById('categoryEditor').classList.remove('hidden');
 
     let style = getStyle(channelID)
     .then((_style) => {
         channelStyle = _style[0];
         renderForm(panel2, inlineStyle, channelStyle);
-        // TODO we will need to set up listeners elsewhere, this is clutter
-       
-        let save1 = document.getElementById('callToActionSave');
-        save1.addEventListener('click', function(e) {
-
-        var callOutText = document.getElementById("editorCallOut").value;
-        var callOutsObject = {
-            en: callOutText
-        };
     
-        category.set("callOuts", callOutsObject);
-        category.save().then(
-            group => {
-                // Execute any logic that should take place after the object is saved.
-            },
-            error => {
-                // Execute any logic that should take place if the save fails. error is a
-                // Parse.Error with an error code and message.
-                alert("Failed to create new object, with error code: " + error.message);
-            }
-            );
-        });
-       
-       let save2 = document.getElementById('editExtendedInfo');
-       save2.addEventListener('click', function(e){
-         let extendedInfoText = $("#categoryExtendedInfo").value;
-         let extenedInfoObject = {
-            en: extendedInfoText
-        };
-    
-        category.set("descriptions", extenedInfoObject);
-        category.save().then(
-            group => {
-                // Execute any logic that should take place after the object is saved.
-            },
-            error => {
-                // Execute any logic that should take place if the save fails. error is a
-                // Parse.Error with an error code and message.
-                alert("Failed to create new object, with error code: " + error.message);
-            }
-        );
-       });
     });
 
-    // panel 3 is the category editor
-    panel3.innerHTML = "";
-    renderForm(panel3, categoryEditorView, category);
 });//channel view
 
 page("/channel/:channelID/view/:groupID", async function (ctx, next) {
@@ -310,8 +292,9 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
     }
     console.log(`entering view for channel id ${channelID} and group ${categoryID}`);
     //panel2.classList.add('phone-frame'); 
-    panel2.innerHTML ="";
-    renderForm(panel2, phone, {category, categories, categoryLikemojis});
+    //panel2.innerHTML ="";
+    //renderForm(panel2, phone, {category, categories, categoryLikemojis});
+    render(panel2, () => phoneView({category, categories, categoryLikemojis}));
     //NOT YET...Have to move some data gets render(panel2, (category) => phone(category));
     // TODO add the back button on the left panel
     
@@ -521,4 +504,3 @@ function inlineStyle(style) {
     return styleSheet;
         
 }
-
