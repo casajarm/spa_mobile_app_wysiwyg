@@ -1,4 +1,4 @@
-import Organization from "./organizations.js";
+import {Organization} from "./organizations.js";
 //Parse.Cloud.define("CloneChannel", async request => {
 var currentUser;
 
