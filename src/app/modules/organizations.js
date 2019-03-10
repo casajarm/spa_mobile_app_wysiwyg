@@ -70,4 +70,4 @@ function saveChannelToOrg() {
         });
 }
 
-export default Organization;
+export {Organization, getOrganization};
