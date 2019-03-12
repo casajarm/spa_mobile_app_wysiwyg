@@ -34,19 +34,18 @@ const Channel =  {
     },
     
     deleteCategory: function(category) {
-        // remove from the channel object
-        /* according to parse docs we should just:*/
-        /* if we remove on parent and relation we get error:
-        Cannot merge Add Op with the previous Op
-        this.channel.remove('Groups', category);
-        */
-        // we also have groupPointer to contend with
-        let relation = this.channel.relation("Group"); //do we use category or Group??
-        relation.remove(category);
-    
+        // remove from the channel object..group and grouppointers attributes
+        let channelGroups = this.channel.get('Groups');
+        let ind = channelGroups.findIndex(x => x === category.id);
+        channelGroups.splice(ind,1);
+        this.channel.set('Groups', channelGroups);
+        this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
+        this.channel.save();
+        
+        
         //and remove it from this local object
-        let ind = this.categories.findIndex(x => x.id === category.id);
-        this.categories.splice(ind, 1);
+        let ind2 = this.categories.findIndex(x => x.id === category.id);
+        this.categories.splice(ind2, 1);
         this.channel.save();  
         // destroy means delete...
         category.destroy().then((cat) => {
@@ -62,9 +61,11 @@ const Channel =  {
     addCategory: function (category) {        
         this.categories.push(category);
         //add to the channel object too
-        this.channel.add('Groups', category);
-        let relation = this.channel.relation("Group");
-        relation.add(category);
+        let channelGroups = this.channel.get('Groups');
+        channelGroups.push(category.id);
+        this.channel.set('Groups', channelGroups);
+        this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
+        this.channel.save();
         category.set('organizationID', this.channel.id);
         category.set('organizationName', this.channel.get('name'));
         category.save();
@@ -89,19 +90,11 @@ const Channel =  {
         //TODO save()
     },
     addCategoryLikemoji: function(category, likemoji) {
-        /* according to parse docs try
-            let relation = category.relation("likemojis");
-            relation.add(likemoji);
-        */
         let catLikemojiIDs = category.get('likemojis');
         catLikemojiIDs.push(likemoji.id);
         category.set('likemojis', catLikemojiIDs);
     },
     removeCategoryLikemoji: function(category, likemoji)  {
-        /* according to parse docs try
-            let relation = category.relation("likemojis");
-            relation.remove(likemoji);
-        */
         // get the array of likemoji pointer from grou
         let catLikemojiIDs = category.get('likemojis');
         // find the array index of the given likemoji         
@@ -144,20 +137,7 @@ function isMainCategory(category) {
 }
 
 
-
-async function getOrgCategories(channel) {
-    let channelRelation = channel.relation('Group');             
-    try {
-        return await channelRelation.query().find();
-    } catch (err) {
-    // TypeError: failed to fetch
-    alert(err);
-    } 
-}
-/*
 async function getOrgCategories(orgId) {
-    // TODO try to use relations
-    //relation.query().find(
     const query = new ParseQuery("Group");
     query.equalTo("organizationID", orgId);
     query.ascending("order");
@@ -168,7 +148,7 @@ async function getOrgCategories(orgId) {
         alert(err);
     }
 }
-*/
+
 async function getLikemojis(orgId) {
     const query = new Parse.Query(Likemoji);
     query.equalTo("organizationID", orgId);
@@ -180,6 +160,18 @@ async function getLikemojis(orgId) {
       alert(err);
     }
   }
+
+
+function arrayToPointers(arr, pointerClass) {
+    const pointers = arr.map(id => {
+        return {
+            __type: "Pointer",
+            className: pointerClass,
+            objectId: id
+        };
+    });
+    return pointers;
+}
 
 // SOME TESTS HERE
 Parse.initialize("fg8ZXCHKfBOWme42LGPA");
