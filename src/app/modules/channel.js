@@ -21,8 +21,8 @@ const Channel =  {
     async populate(popID) {
       // setting a new channel refresh all the related data      
         this.channel    = await getOrganization(popID);
-        this.categories = await getOrgCategories(this.channel);    
-        this.likemojis  = await getLikemojis(popID); //get ALL LIKEMOJIS FOR CHANNEL  
+        this.categories = await getOrgCategories(popID);    
+        this.likemojis  = await getLikemojis(popID);   
         this.styles     = await getStyle(popID);    
         console.log(`populated channel for ${popID}`);
         console.log(`populated likemojis with ${this.likemojis.length}`);
@@ -33,16 +33,13 @@ const Channel =  {
         return this.likemojis.filter((moji) => catLikemojis.find(x => x === moji.id));
     },
     
-    deleteCategory: function(category) {
+    deleteCategory: async function(category) {
         // remove from the channel object..group and grouppointers attributes
         let channelGroups = this.channel.get('Groups');
         let ind = channelGroups.findIndex(x => x === category.id);
         channelGroups.splice(ind,1);
         this.channel.set('Groups', channelGroups);
         this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
-        this.channel.save();
-        
-        
         //and remove it from this local object
         let ind2 = this.categories.findIndex(x => x.id === category.id);
         this.categories.splice(ind2, 1);
@@ -58,7 +55,7 @@ const Channel =  {
         );
         
     },
-    addCategory: function (category) {        
+    addCategory: async function (category) {        
         this.categories.push(category);
         //add to the channel object too
         let channelGroups = this.channel.get('Groups');
@@ -71,12 +68,12 @@ const Channel =  {
         category.save();
     },
     
-    addLikemoji: function(likemoji) {
+    addLikemoji: async function(likemoji) {
         likemoji.set("Organization", this.channel.id);
         likemoji.save();
         this.likemojis.push(likemoji);        
     },
-    deleteLikemoji: function(likemoji) {
+    deleteLikemoji: async function(likemoji) {
         // remove from group(s)
         let rem = this.removeCategoryLikemoji;
         this.categories.forEach(function(cat) {
@@ -86,15 +83,26 @@ const Channel =  {
         // find the exact likemoji in our collection
         let ind = this.likemojis.findIndex(x => x.id === likemoji.id);
         this.likemojis.splice(ind, 1);
-        //TODO delete likemoji from the table
-        //TODO save()
+        Parse.Object.saveAll(this.categories);
+        likemoji.destroy().then((moji) => {
+            // The object was deleted from the Parse Cloud.    
+        }, (error) => {
+            // The delete failed.
+            // error is a Parse.Error with an error code and message.
+            // TODO messaging function for unified handling of errors
+            }
+        );
     },
-    addCategoryLikemoji: function(category, likemoji) {
+    addCategoryLikemoji: async function(category, likemoji) {
         let catLikemojiIDs = category.get('likemojis');
         catLikemojiIDs.push(likemoji.id);
         category.set('likemojis', catLikemojiIDs);
+        likemoji.set('OrganizationId', this.channel.id);
+        likemoji.set('organizationName', this.channel.get('name'));
+        likemoji.save();
+        category.save();        
     },
-    removeCategoryLikemoji: function(category, likemoji)  {
+    removeCategoryLikemoji: async function(category, likemoji)  {
         // get the array of likemoji pointer from grou
         let catLikemojiIDs = category.get('likemojis');
         // find the array index of the given likemoji         
@@ -102,7 +110,7 @@ const Channel =  {
         if(ind && ind > -1) {
             catLikemojiIDs.splice(ind, 1);
             category.set('likemojis', catLikemojiIDs);
-            //category.save();
+            category.save();
         }
     },
     setCategoryOrder: function(ids, orders)  {},
@@ -138,7 +146,7 @@ function isMainCategory(category) {
 
 
 async function getOrgCategories(orgId) {
-    const query = new ParseQuery("Group");
+    const query = new Parse.Query("Group");
     query.equalTo("organizationID", orgId);
     query.ascending("order");
     try {
@@ -178,7 +186,7 @@ Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
 const id = 'j1xdnYqYgh';
 Channel.populate(id) 
-.then( function() {
+.then( async function() {
     let mainCat = Channel.mainCategory;
     console.log('main category is ' + mainCat.id);
     let mainCategoryLikemojis = Channel.catLikemojis(mainCat);
@@ -186,36 +194,46 @@ Channel.populate(id)
     let testLikemoji = mainCategoryLikemojis[0];
     console.log('lets remove moji id: ' + testLikemoji.id);
 //  test removing a likemoji from a channel and then add it back
-    Channel.removeCategoryLikemoji(mainCat, testLikemoji);
+    await Channel.removeCategoryLikemoji(mainCat, testLikemoji);
     mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
     console.log('now category has count mojis:' + mainCategoryLikemojis.length);
     console.log('lets add it back');
-    Channel.addCategoryLikemoji(mainCat, testLikemoji);
+    await Channel.addCategoryLikemoji(mainCat, testLikemoji);
     mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
     console.log('now category has count mojis:' + mainCategoryLikemojis.length);
 // now lets delete the moji from the channel
     let chanLikemojis = Channel.likemojis;
     console.log(`Channel has ${chanLikemojis.length} likemojis`); 
-    Channel.deleteLikemoji(testLikemoji);
+    await Channel.deleteLikemoji(testLikemoji);
     console.log(`Channel has ${chanLikemojis.length} likemojis`); 
     console.log('the category without asking has count: ' + mainCategoryLikemojis.length);
     // value not reference....
     mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
     console.log('the category after asking has count: ' + mainCategoryLikemojis.length);
-    //what I want to be able to do it Channel.categories[0].likemojis 
+    //what I want to be able to do it Channel.categories[0].likemojis
+    if (Channel.subCategories.length == 0) { 
+        console.log('no subcategories found for this channel');
+        let newClone = mainCat.clone();
+        delete newClone.id;
+        newClone.set('main', 0);
+        await newClone.save(); //it seems we must save it to have the id for the groups array
+        await Channel.addCategory(newClone);
+           
+    }
     let lastCat = Channel.subCategories[Channel.subCategories.length -1];
     console.log('found last category named' + lastCat.get('name'));
     console.log(`Channel has ${Channel.subCategories.length} groups/categories `)
     // create a clone o we can add it back
-    /*
-    let newCat = lastCat.clone;
+    let newCat = lastCat.clone();
     delete newCat.objectId;    
     console.log('remove the category');
-    Channel.deleteCategory(lastCat);
-    console.log(`Channel now has ${Channel.subCategories.length} groups/categories `)
-    Channel.addCategory(newCat);
-    console.log(`Channel now has ${Channel.subCategories.length} groups/categories `)
-*/
+    await Channel.deleteCategory(lastCat);
+    console.log(`Channel now has ${Channel.subCategories.length} groups/categories `);
+    Channel.addCategory(newCat); // can we add it without having saved it...we need an id no?
+    console.log(`Channel now has ${Channel.subCategories.length} groups/categories `);
+    console.log(`Newly added category has ${Channel.catLikemojis(newCat).length} likemojis...add one more`);
+    await Channel.addCategoryLikemoji(newCat, Channel.likemojis[Channel.likemojis.length-1]);
+    console.log(`category now has ${Channel.catLikemojis(newCat).length} likemojis.`); 
 
 });
 
