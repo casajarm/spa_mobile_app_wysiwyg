@@ -148,9 +148,9 @@ async function getLikemojis(orgId) {
 Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
 
-
+// SOME TESTS HERE
 const id = 'j1xdnYqYgh';
-Channel.populate(id)
+Channel.populate(id) 
 .then( function() {
     let mainCat = Channel.mainCategory;
     console.log('main category is ' + mainCat.id);
