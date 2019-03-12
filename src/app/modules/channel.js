@@ -14,23 +14,23 @@ const Channel =  {
     channel:    new org(),
     categories: [], //Object.create(Group)]   
     likemojis:  [], //[Object.create(Likemoji)],  
-    //TODO how to define function getCatMojis on each array element
+    //TODO how to define function getCategoryLikemojis on each array element
     styles:     [],// [Object.create(ChannelStyle)],
     get channelID() {return this.channel.id},
 
     async populate(popID) {
       // setting a new channel refresh all the related data      
         this.channel    = await getOrganization(popID);
-        this.categories = await getOrgCategories(popID);    
+        this.categories = await getOrgCategories(this.channel);    
         this.likemojis  = await getLikemojis(popID); //get ALL LIKEMOJIS FOR CHANNEL  
         this.styles     = await getStyle(popID);    
         console.log(`populated channel for ${popID}`);
         console.log(`populated likemojis with ${this.likemojis.length}`);
     },
-    catMojis: function(category) {
-        let catMojis = category.get('likemojis'); 
+    catLikemojis: function(category) {
+        let catLikemojis = category.get('likemojis'); 
         // return the likemojis that match array in category
-        return this.likemojis.filter((moji) => catMojis.find(x => x === moji.id));
+        return this.likemojis.filter((moji) => catLikemojis.find(x => x === moji.id));
     },
     
     deleteCategory: function(category) {
@@ -41,7 +41,7 @@ const Channel =  {
         this.channel.remove('Groups', category);
         */
         // we also have groupPointer to contend with
-        let relation = this.channel.relation("category");
+        let relation = this.channel.relation("Group"); //do we use category or Group??
         relation.remove(category);
     
         //and remove it from this local object
@@ -49,34 +49,35 @@ const Channel =  {
         this.categories.splice(ind, 1);
         this.channel.save();  
         // destroy means delete...
-        /*
         category.destroy().then((cat) => {
-            // The object was deleted from the Parse Cloud.
-            }, (error) => {
+            // The object was deleted from the Parse Cloud.    
+        }, (error) => {
             // The delete failed.
             // error is a Parse.Error with an error code and message.
             // TODO messaging function for unified handling of errors
             }
         );
-        */
+        
     },
     addCategory: function (category) {        
         this.categories.push(category);
         //add to the channel object too
         this.channel.add('Groups', category);
-        let relation = this.channel.relation("category");
+        let relation = this.channel.relation("Group");
         relation.add(category);
-        this.category.save();
+        category.set('organizationID', this.channel.id);
+        category.set('organizationName', this.channel.get('name'));
+        category.save();
     },
     
-    addMoji: function(likemoji) {
+    addLikemoji: function(likemoji) {
         likemoji.set("Organization", this.channel.id);
         likemoji.save();
         this.likemojis.push(likemoji);        
     },
-    deleteMoji: function(likemoji) {
+    deleteLikemoji: function(likemoji) {
         // remove from group(s)
-        let rem = this.removeCatMoji;
+        let rem = this.removeCategoryLikemoji;
         this.categories.forEach(function(cat) {
             rem(cat, likemoji);
             }
@@ -87,31 +88,31 @@ const Channel =  {
         //TODO delete likemoji from the table
         //TODO save()
     },
-    addCatMoji: function(category, likemoji) {
+    addCategoryLikemoji: function(category, likemoji) {
         /* according to parse docs try
             let relation = category.relation("likemojis");
             relation.add(likemoji);
         */
-        let catMojiIDs = category.get('likemojis');
-        catMojiIDs.push(likemoji.id);
-        category.set('likemojis', catMojiIDs);
+        let catLikemojiIDs = category.get('likemojis');
+        catLikemojiIDs.push(likemoji.id);
+        category.set('likemojis', catLikemojiIDs);
     },
-    removeCatMoji: function(category, likemoji)  {
+    removeCategoryLikemoji: function(category, likemoji)  {
         /* according to parse docs try
             let relation = category.relation("likemojis");
             relation.remove(likemoji);
         */
         // get the array of likemoji pointer from grou
-        let catMojiIDs = category.get('likemojis');
+        let catLikemojiIDs = category.get('likemojis');
         // find the array index of the given likemoji         
-        let ind = catMojiIDs.findIndex(x => x === likemoji.id);
+        let ind = catLikemojiIDs.findIndex(x => x === likemoji.id);
         if(ind && ind > -1) {
-            catMojiIDs.splice(ind, 1);
-            category.set('likemojis', catMojiIDs);
+            catLikemojiIDs.splice(ind, 1);
+            category.set('likemojis', catLikemojiIDs);
             //category.save();
         }
     },
-    setCatOrder: function(ids, orders)  {},
+    setCategoryOrder: function(ids, orders)  {},
         
     get mainCategory()  {
         console.log('this is ' + this);
@@ -143,10 +144,21 @@ function isMainCategory(category) {
 }
 
 
+
+async function getOrgCategories(channel) {
+    let channelRelation = channel.relation('Group');             
+    try {
+        return await channelRelation.query().find();
+    } catch (err) {
+    // TypeError: failed to fetch
+    alert(err);
+    } 
+}
+/*
 async function getOrgCategories(orgId) {
     // TODO try to use relations
     //relation.query().find(
-    const query = new Parse.Query("Group");
+    const query = new ParseQuery("Group");
     query.equalTo("organizationID", orgId);
     query.ascending("order");
     try {
@@ -156,7 +168,7 @@ async function getOrgCategories(orgId) {
         alert(err);
     }
 }
-
+*/
 async function getLikemojis(orgId) {
     const query = new Parse.Query(Likemoji);
     query.equalTo("organizationID", orgId);
@@ -169,48 +181,50 @@ async function getLikemojis(orgId) {
     }
   }
 
-
+// SOME TESTS HERE
 Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
-
-// SOME TESTS HERE
 const id = 'j1xdnYqYgh';
 Channel.populate(id) 
 .then( function() {
     let mainCat = Channel.mainCategory;
     console.log('main category is ' + mainCat.id);
-    let mainCatMojis = Channel.catMojis(mainCat);
-    console.log('has count mojis: ' + mainCatMojis.length);
-    let testMoji = mainCatMojis[0];
-    console.log('lets remove moji id: ' + testMoji.id);
+    let mainCategoryLikemojis = Channel.catLikemojis(mainCat);
+    console.log('has count mojis: ' + mainCategoryLikemojis.length);
+    let testLikemoji = mainCategoryLikemojis[0];
+    console.log('lets remove moji id: ' + testLikemoji.id);
 //  test removing a likemoji from a channel and then add it back
-    Channel.removeCatMoji(mainCat, testMoji);
-    mainCatMojis = Channel.catMojis(mainCat);    
-    console.log('now category has count mojis:' + mainCatMojis.length);
+    Channel.removeCategoryLikemoji(mainCat, testLikemoji);
+    mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
+    console.log('now category has count mojis:' + mainCategoryLikemojis.length);
     console.log('lets add it back');
-    Channel.addCatMoji(mainCat, testMoji);
-    mainCatMojis = Channel.catMojis(mainCat);    
-    console.log('now category has count mojis:' + mainCatMojis.length);
+    Channel.addCategoryLikemoji(mainCat, testLikemoji);
+    mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
+    console.log('now category has count mojis:' + mainCategoryLikemojis.length);
 // now lets delete the moji from the channel
-    let chanMojis = Channel.likemojis;
-    console.log(`Channel has ${chanMojis.length} likemojis`); 
-    Channel.deleteMoji(testMoji);
-    console.log(`Channel has ${chanMojis.length} likemojis`); 
-    console.log('the category without asking has count: ' + mainCatMojis.length);
+    let chanLikemojis = Channel.likemojis;
+    console.log(`Channel has ${chanLikemojis.length} likemojis`); 
+    Channel.deleteLikemoji(testLikemoji);
+    console.log(`Channel has ${chanLikemojis.length} likemojis`); 
+    console.log('the category without asking has count: ' + mainCategoryLikemojis.length);
     // value not reference....
-    mainCatMojis = Channel.catMojis(mainCat);    
-    console.log('the category after asking has count: ' + mainCatMojis.length);
+    mainCategoryLikemojis = Channel.catLikemojis(mainCat);    
+    console.log('the category after asking has count: ' + mainCategoryLikemojis.length);
     //what I want to be able to do it Channel.categories[0].likemojis 
     let lastCat = Channel.subCategories[Channel.subCategories.length -1];
     console.log('found last category named' + lastCat.get('name'));
     console.log(`Channel has ${Channel.subCategories.length} groups/categories `)
+    // create a clone o we can add it back
+    /*
+    let newCat = lastCat.clone;
+    delete newCat.objectId;    
     console.log('remove the category');
     Channel.deleteCategory(lastCat);
     console.log(`Channel now has ${Channel.subCategories.length} groups/categories `)
-    Channel.addCategory(lastCat);
+    Channel.addCategory(newCat);
     console.log(`Channel now has ${Channel.subCategories.length} groups/categories `)
-     
+*/
 
-}
-)
+});
+
 export {Channel};
