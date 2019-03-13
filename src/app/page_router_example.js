@@ -1,16 +1,19 @@
 "use strict";
 import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
-import Organization from "./modules/organizations.js";
+import {Organization} from "./modules/organizations.js";
 import Likemoji from './modules/likemojis.js';
 import {getStyle} from "./modules/styles.js";
 import {Group, getMainCategory} from "./modules/groups.js";
-import {render, html} from '//unpkg.com/lighterhtml?module';
+import {render, html} from 'https://unpkg.com/lighterhtml?module';
 import {phone, phoneView, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
-import  likemojisListView from './views/likemojisListView.js';
+import likemojisListView from './views/likemojisListView.js';
+
+import {Channel as newChannel} from './modules/channel.js';
+
 //const {render, html, svg} = lighterhtml;
 
 var panel1,
@@ -24,6 +27,7 @@ var panel1,
     channelStyle,       // current style of selected channel
     mainCategory;       // the category considered the home for the org/channel
     
+
 var likemojis = [];          // all likemojis for channel
 var categoryLikemojis = [];  // likemojis for selected category
 var categories = [];         // categories (Groups) for selected channel
@@ -62,7 +66,6 @@ page("/", function (ctx, next) {
             <li><a href="signup">Create New Account</a></li>
             <li><a href="login">Login</a></li>
         </ul>`;
-
     panel2.innerHTML = "";
     panel3.innerHTML = "";
 });
@@ -264,9 +267,10 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     }
     document.getElementById('categoryEditor').classList.remove('hidden');
 
-    let style = getStyle(channelID)
+    getStyle(channelID)
     .then((_style) => {
-        channelStyle = _style[0];
+        Style = _style;
+        channelStyle = Style[0];
         renderForm(panel2, inlineStyle, channelStyle);
     
     });
@@ -278,9 +282,9 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         || channelID != ctx.params.channelID) {
         channelID = ctx.params.channelID;
         channel = channels.find(x => x.id === channelID);   
-        let channelStyles = await getStyle(channelID);
+        Style = await getStyle(channelID);
         channelStyle = channelStyles[0];
-        categories = await getOrgCategories(category.attributes.organizationID);   
+        categories = await getOrgCategories(channelID);   
     }
     
     if (!categoryID
