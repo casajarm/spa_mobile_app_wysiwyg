@@ -35,10 +35,10 @@ const Channel =  {
     
     deleteCategory: async function(category) {
         // remove from the channel object..group and grouppointers attributes
-        let channelGroups = this.channel.get('Groups');
+        let channelGroups = this.channel.get('groups');
         let ind = channelGroups.findIndex(x => x === category.id);
         channelGroups.splice(ind,1);
-        this.channel.set('Groups', channelGroups);
+        this.channel.set('groups', channelGroups);
         this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
         //and remove it from this local object
         let ind2 = this.categories.findIndex(x => x.id === category.id);
@@ -58,9 +58,9 @@ const Channel =  {
     addCategory: async function (category) {        
         this.categories.push(category);
         //add to the channel object too
-        let channelGroups = this.channel.get('Groups');
+        let channelGroups = this.channel.get('groups');
         channelGroups.push(category.id);
-        this.channel.set('Groups', channelGroups);
+        this.channel.set('groups', channelGroups);
         this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
         this.channel.save();
         category.set('organizationID', this.channel.id);
@@ -135,7 +135,7 @@ const Channel =  {
     organization.set("callOut", returnedOrg.attributes.callOut);
     organization.set("editors", editors);
      
-    org . set("groupPointer", arrayToPointers(groupIDs, "Group"));
+    org . set("groupPointer", arrayToPointers(groupIDs, "group"));
 						
 
     */
@@ -184,7 +184,7 @@ function arrayToPointers(arr, pointerClass) {
 // SOME TESTS HERE
 Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
-const id = 'j1xdnYqYgh';
+const id = 'j7Upfb6fEo';
 Channel.populate(id) 
 .then( async function() {
     let mainCat = Channel.mainCategory;
