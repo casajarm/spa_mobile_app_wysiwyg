@@ -4,12 +4,6 @@ import {ChannelStyle, saveNewStyle, getStyle} from "./styles.js";
 //import {Group, getMainCategory} from "./groups.js";
 
 var org = Parse.Object.extend("Organization");
-
-/* 
-removeXX means a relation is delete
-deleteXX means the object is deleted and relations are removed
-*/
-
 const Channel =  {
     channel:    new org(),
     categories: [], //Object.create(Group)]   
@@ -43,9 +37,9 @@ const Channel =  {
         //and remove it from this local object
         let ind2 = this.categories.findIndex(x => x.id === category.id);
         this.categories.splice(ind2, 1);
-        this.channel.save();  
+        await this.channel.save();  
         // destroy means delete...
-        category.destroy().then((cat) => {
+        await category.destroy().then((cat) => {
             // The object was deleted from the Parse Cloud.    
         }, (error) => {
             // The delete failed.
@@ -65,12 +59,12 @@ const Channel =  {
         this.channel.save();
         category.set('organizationID', this.channel.id);
         category.set('organizationName', this.channel.get('name'));
-        category.save();
+        await category.save();
     },
     
     addLikemoji: async function(likemoji) {
         likemoji.set("Organization", this.channel.id);
-        likemoji.save();
+        await likemoji.save();
         this.likemojis.push(likemoji);        
     },
     deleteLikemoji: async function(likemoji) {
@@ -83,8 +77,8 @@ const Channel =  {
         // find the exact likemoji in our collection
         let ind = this.likemojis.findIndex(x => x.id === likemoji.id);
         this.likemojis.splice(ind, 1);
-        Parse.Object.saveAll(this.categories);
-        likemoji.destroy().then((moji) => {
+        await Parse.Object.saveAll(this.categories);
+        await likemoji.destroy().then((moji) => {
             // The object was deleted from the Parse Cloud.    
         }, (error) => {
             // The delete failed.
@@ -99,18 +93,18 @@ const Channel =  {
         category.set('likemojis', catLikemojiIDs);
         likemoji.set('OrganizationId', this.channel.id);
         likemoji.set('organizationName', this.channel.get('name'));
-        likemoji.save();
-        category.save();        
+        await likemoji.save();
+        await category.save();        
     },
     removeCategoryLikemoji: async function(category, likemoji)  {
-        // get the array of likemoji pointer from grou
+        // get the array of likemoji pointer from group
         let catLikemojiIDs = category.get('likemojis');
         // find the array index of the given likemoji         
         let ind = catLikemojiIDs.findIndex(x => x === likemoji.id);
         if(ind && ind > -1) {
             catLikemojiIDs.splice(ind, 1);
             category.set('likemojis', catLikemojiIDs);
-            category.save();
+            await category.save();
         }
     },
     setCategoryOrder: function(ids, orders)  {},
@@ -184,7 +178,7 @@ function arrayToPointers(arr, pointerClass) {
 // SOME TESTS HERE
 Parse.initialize("fg8ZXCHKfBOWme42LGPA");
 Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
-const id = 'j7Upfb6fEo';
+const id = 'GiZ8X0ePuE';
 Channel.populate(id) 
 .then( async function() {
     let mainCat = Channel.mainCategory;
