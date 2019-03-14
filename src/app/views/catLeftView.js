@@ -2,16 +2,36 @@ import {render, html} from '//unpkg.com/lighterhtml?module';
 
 const catLeftView = (categories) => {
 
-    function callCategoriesEditor (e) {
-        let catsView = document.getElementById('categoriesEditor');
-        console.log('clicked callCategoriesEditor');
+
+    function hideAll() {
         let panel3Container = document.getElementById('panel3-toggle');
         for (var i = 0; i < panel3Container.children.length; i++) {
             panel3Container.children[i].classList.add('hidden');
           }
+    }
+
+    function callCategoriesEditor (e) {
+        let catsView = document.getElementById('categoriesEditor');
+        console.log('clicked callCategoriesEditor');
+        hideAll();
         catsView.classList.remove('hidden');
-       }
+    }
     
+    function callCategoryEditor (e) {
+        let catsView = document.getElementById('categoryEditor');
+        console.log('clicked callCategoryEditor');
+        hideAll();
+        catsView.classList.remove('hidden');
+    }
+    
+    function callLikemojiEditor (e) {
+        let catsView = document.getElementById('likemojisEditor');
+        console.log('clicked callLikemojiEditor');
+        hideAll();
+        catsView.classList.remove('hidden');
+    }
+
+
     return html`<div>
         <h3>Design & Edit Your Channel</h3>
         <hr />
@@ -24,18 +44,19 @@ const catLeftView = (categories) => {
         </div>
         <hr />
         <div class="selectDiv text-center">
-            <button
+            <button 
                 id="addHeader"
                 type="button"
                 class="btn btn-default active editor"
                 aria-pressed="true"
+                onclick="${callCategoryEditor}"
             >
                 Edit Page
             </button>
             <!-- 	<p>Upload header image - (1242px × 704px)</p></center> -->
         </div>
         <div class="selectDiv text-center">
-            <button id="addLikemojis" type="button" class="btn btn-default editor ">
+            <button id="addLikemojis" type="button" class="btn btn-default editor"  onclick="${callLikemojiEditor}">
                 Add/Edit Likemojis
             </button>
             <!-- <p>Upload likemojis - (324px × 324px)</p></center> -->
@@ -47,7 +68,7 @@ const catLeftView = (categories) => {
             <!-- <p>Upload category image - (1242px × 312px)</p></center> -->
         </div>
         <div id="afterEditorButton" class="selectDiv text-center">
-            <button id="afterEditing" type="button" class="btn btn-default editor ">
+            <button id="afterEditing" type="button" class="btn btn-default editor">
                 Next
             </button>
             <!-- <p>Upload category image - (1242px × 312px)</p></center> -->
