@@ -24,6 +24,7 @@ var panel1,
     user,
     channelID,          // currently selected channel ID
     categoryID,         // currently selected category ID
+    style,              // the Style object for the channel... contains array
     channelStyle,       // current style of selected channel
     mainCategory;       // the category considered the home for the org/channel
     
@@ -269,8 +270,8 @@ page("/channel/:channelID/view",  async function (ctx, next) {
 
     getStyle(channelID)
     .then((_style) => {
-        Style = _style;
-        channelStyle = Style[0];
+        style = _style;
+        channelStyle = style[0];
         renderForm(panel2, inlineStyle, channelStyle);
     
     });
@@ -282,7 +283,7 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         || channelID != ctx.params.channelID) {
         channelID = ctx.params.channelID;
         channel = channels.find(x => x.id === channelID);   
-        Style = await getStyle(channelID);
+        style = await getStyle(channelID);
         channelStyle = channelStyles[0];
         categories = await getOrgCategories(channelID);   
     }
@@ -302,8 +303,9 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
     //NOT YET...Have to move some data gets render(panel2, (category) => phone(category));
     // TODO add the back button on the left panel
     
-    // panel 3 is the category editor
-    panel3.innerHTML = "";
+    // panel 3 holds all the editors..we only need to refresh the category one
+    let catEditor = document.getElementById('categoryEditor');
+    catEditor.remove();
     renderForm(panel3, categoryEditorView, category);
 
 });//channel group page
