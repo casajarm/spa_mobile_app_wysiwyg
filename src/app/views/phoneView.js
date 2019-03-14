@@ -63,9 +63,9 @@ const phoneNavBarView =  (channelID, categories) => {
     async function phoneHome(channelID) {
         let category = getMainCategory(categories);
         let categoryLikemojis = await getCategoryLikemojis(category);
-        render(panel2, () => phoneView({category, categories, categoryLikemojis}));
-        //let route = "/channel/" + channelID + "/view";
-        //page(route);
+        //render(panel2, () => phoneView({category, categories, categoryLikemojis}));
+        let route = "/channel/" + channelID + "/view";
+        page(route);
     }
 
     let navHTML = html.for({channelID})`<div
