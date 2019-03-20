@@ -88,8 +88,10 @@ const Channel =  {
         );
     },
     addCategoryLikemoji: async function(category, likemoji) {
+        //TODO handle IDs as well as full objects
+        let likemojiID = typeof(likemoji) === "string" || typeof(likemoji) === "number" ? likemoji : likemoji.id;
         let catLikemojiIDs = category.get('likemojis');
-        catLikemojiIDs.push(likemoji.id);
+        catLikemojiIDs.push(likemojiID);
         category.set('likemojis', catLikemojiIDs);
         likemoji.set('OrganizationId', this.channel.id);
         likemoji.set('organizationName', this.channel.get('name'));
