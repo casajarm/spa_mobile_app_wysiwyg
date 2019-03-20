@@ -51,8 +51,8 @@ h1, h2, h3, .modalUpdateMessage{
 
 .dynamicAreaOverflow {
 
-	overflow-y:auto;
-	overflow: overflow;
+	overflow-y:scroll;
+	overflow: overlay;
 
 }
 
@@ -771,4 +771,10 @@ background-color: #00b6ff;
 .phone-frame {
 	min-width: 310px;
 	min-height: 684px; 
+}
+
+li.drag-sort-active {
+  background: transparent;
+  color: transparent;
+  border: 1px solid #4ca1af;
 }
