@@ -13,17 +13,59 @@ import {getMainCategory} from '../modules/groups.js';
 // phone function returns all the HTML for displaying the phone widget with the
 // data for an org set to be selected for the given "category" parameter
 // category is a Group object from Parse
-const phone = async (props) =>  {
-    const {category, categories, categoryLikemojis} = props;
+const phone = async (Channel, selectedCategoryID) =>  {
+    //const {category, categories, categoryLikemojis} = props;
     //let categories = await getOrgCategories(category.attributes.organizationID);
    // let likemojis = await getCategoryLikemojis(category);
-    return /*await*/ phoneView(category, categories, categoryLikemojis);  
+   // return /*await*/ phoneView(category, categories, categoryLikemojis);  
+    if (!selectedCategoryID) {
+        selectedCategoryID = Channel.main
+    }
+    return /*await*/ phoneView(Channel, selectedCategoryID);  
 }
 
+
 //const phoneView = (category, categories, categoryLikemojis) => {
-const phoneView = (props) => {
-    const {category, categories, categoryLikemojis} = props;
-    let orgID = category.attributes.organizationID;
+//const phoneView = (props) => {
+const phoneView = (Channel, selectedCategoryID) => {
+//        const {category, categories, categoryLikemojis} = props;
+    let orgID = Channel.channelID; //category.attributes.organizationID;
+    let category = Channel.categories.find(x => x.id === selectedCategoryID);
+
+    const likemojisView = (likemojis) => {
+        function handleDrop(e) {
+            e.preventDefault();
+            // find object dropped
+            // get the id
+            //alert('droped moji with id: ' + e.dataTransfer.getData('text/html'));
+            let mojiID = e.dataTransfer.getData('text/html');
+            
+            // is it already in channel..let the channel logic handle this
+            // add it
+            Channel.addCategoryLikemoji(category, mojiID);
+    
+        }
+    
+        function dragover(e) {
+            e.preventDefault()
+          }
+          
+          function dragenter(e) {
+            e.preventDefault()
+          }
+        
+        let mojiHtml = html`<div id="likemojiGroupCollection"
+                class="likemojiGroupCollection-area mainpageLikemojis"
+                ondragenter="${dragenter}"
+                ondragover="${dragover}"
+                ondrop="${handleDrop}">
+                  ${likemojis
+            ? likemojis.map(moji => likemojiView(moji))
+            : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
+             </div>`;
+    
+        return mojiHtml;     
+    }
 
     let phoneHTML = 
     html`<div class="phone">
@@ -37,22 +79,16 @@ const phoneView = (props) => {
                 ${category.attributes.callOuts.en}
             </div>
             <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
-                ${likemojisView(categoryLikemojis)}
+                ${likemojisView(Channel.catLikemojis(category))}
                 ${category.attributes.main == 1 ?
-                        categoriesSubView(categories)
+                        categoriesSubView(Channel.categories)
                         : html`<span></span>`
                   }
             </div>
-            ${phoneNavBarView(orgID, categories)}
+            ${phoneNavBarView(Channel.channelID, Channel.categories)}
         </div>
     </div>`;
-    //console.log('done building view'); console.log(phoneView);
-    /*
-    let phoneView = document.createElement("div");
-    phoneView.classList.add(['col-lg-4', 'channelEdit']);
-    //phoneView.innerHTML = phoneHTML;
-    phoneView.appendChild(phoneHTML);
-    */
+ 
     let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
     return phoneView;
 }
@@ -63,6 +99,7 @@ const phoneNavBarView =  (channelID, categories) => {
     async function phoneHome(channelID) {
         let category = getMainCategory(categories);
         let categoryLikemojis = await getCategoryLikemojis(category);
+        //TODO decide to render our route here
         //render(panel2, () => phoneView({category, categories, categoryLikemojis}));
         let route = "/channel/" + channelID + "/view";
         page(route);
@@ -98,6 +135,7 @@ const phoneNavBarView =  (channelID, categories) => {
   const likemojiView = (likemoji) => {
     let likemojiViewHTML = html`<div
     class="likemojis ui-draggable ui-draggable-handle"
+    draggable="true"
     id="${likemoji
         .id}">
         <img
@@ -120,14 +158,6 @@ const phoneNavBarView =  (channelID, categories) => {
     return likemojiViewHTML;
 };
 
-const likemojisView = (likemojis) => {
-    return html`<div id="likemojiGroupCollection"
-            class="likemojiGroupCollection-area mainpageLikemojis">
-              ${likemojis
-        ? likemojis.map(moji => likemojiView(moji))
-        : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
-         </div>`;
-}
 
 const categoryView = (category, skipMain) => {
     let orgID = category.attributes.organizationID;
@@ -140,9 +170,9 @@ const categoryView = (category, skipMain) => {
     then define onclick and data-i attribute
     --- <a data-i=${i.id} onclick="${myClicker}">
     */
-   function selectCategory(e) {
-    let targetID = e.currentTarget.dataset.i;
-    page(`/channel/${orgID}/view/${targetID}`);        
+    function selectCategory(e) {
+        let targetID = e.currentTarget.dataset.i;
+        page(`/channel/${orgID}/view/${targetID}`);        
     }
 
     if (skipMain) {
@@ -172,29 +202,11 @@ const categoryView = (category, skipMain) => {
     return categoryViewHTML;
 }
 
-/*
-    let categoriesSubView = 
-    html`<div id="categories" class="categories">
-            ${(category.attributes.main == 1) ? 
-                 categories.map(cat => categoryView(cat)) 
-              } 
-        </div>`;
-*/        
 const categoriesSubView = (cats) => {
     return html`<div id="categories" class="categories">
             ${cats.map(cat => categoryView(cat, true))} 
       </div>`;
 }
-
-// let categoriesSubView =  html`<div id="categories" class="categories"></div>`;
-
-/*
-const categoriesView = (categories) => {
-    return categories.map(category => {
-        if (category.attributes.main != 1) categoryView(category); 
-    });
-}
-*/
 
 const getCategoryLikemojis = async (category) => {
     let IDs = category.attributes.likemojis;
