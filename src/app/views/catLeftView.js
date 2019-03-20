@@ -4,7 +4,7 @@ const catLeftView = (categories) => {
 
 
     function hideAll() {
-        let panel3Container = document.getElementById('panel3-toggle');
+        let panel3Container = document.getElementById('panel3');
         for (var i = 0; i < panel3Container.children.length; i++) {
             panel3Container.children[i].classList.add('hidden');
           }
