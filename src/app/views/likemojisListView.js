@@ -1,6 +1,11 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
 
-const likemojisListView = (likemojis) => {
+//const likemojisListView = (likemojis) => {
+const likemojisListView = (Channel) => {
+
+    function dragMoji(e) {
+        e.dataTransfer.setData('text/html', e.currentTarget.id);
+    }
 
     const likemojiView = (likemoji) => {
         let likemojiViewHTML = html`<div
@@ -8,6 +13,8 @@ const likemojisListView = (likemojis) => {
             id="${likemoji.id}"
             data-toggle="modal"
             data-target="#editLikemojisModal"
+            draggable="true"
+            ondragstart="${dragMoji}"
         >
             <img
                 src="${likemoji.attributes.x3.url()}"
@@ -20,7 +27,6 @@ const likemojisListView = (likemojis) => {
         return likemojiViewHTML;
     };
     
-
     let likemojisListViewHTML = html`<div id="likemojisEditor" class="editorWindow" style="display: block;">
         <h3>Edit Likemojis</h3>
         <hr/>
@@ -28,7 +34,7 @@ const likemojisListView = (likemojis) => {
             id="likemojisContainer"
             class="scroll likemojisContainer-area dynamicAreaOverflow ui-droppable"
         >
-            ${likemojis.map(moji => likemojiView(moji))}
+            ${Channel.likemojis.map(moji => likemojiView(moji))}
         </div>
     </div>`;
 
