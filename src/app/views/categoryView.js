@@ -1,8 +1,12 @@
 import {render, html} from '//unpkg.com/lighterhtml?module';
 import {phoneView} from './phoneView.js';
 
-const categoryEditorView = (category) => {
-
+//const categoryEditorView = (category) => {
+const categoryEditorView = (Channel, categoryID) => {
+	let category = Channel.categories.find(x => x.id === categoryID);
+	let callOut = category.attributes.callOuts.en;
+	console.log('catgorid is ' + categoryID);
+	console.log('callout is ' + callOut);
 	async function saveCallToAction (e) {
 		var callOutText = document.getElementById("editorCallOut").value;
 		var callOutsObject = {
@@ -14,7 +18,7 @@ const categoryEditorView = (category) => {
 			group => {
 				//rerender the phone
 				let phoneViewPanel = document.getElementById('phone-view').parentNode;
-				render(phoneViewPanel, () => phoneView());
+				render(phoneViewPanel, () => phoneView(Channel));
 			},
 			error => {
 				// Execute any logic that should take place if the save fails. error is a
@@ -84,7 +88,7 @@ const categoryEditorView = (category) => {
 					class="form-control"
 					id="editorCallOut"
 					placeholder="Let us know how we're doing..."
-					value="${category.attributes.callOuts.en}"
+					value="${callOut}"
 				/>
 				<div class="input-group-btn">
 					<button
