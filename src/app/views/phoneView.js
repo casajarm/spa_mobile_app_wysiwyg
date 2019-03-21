@@ -35,24 +35,23 @@ const phoneView = (Channel, selectedCategoryID) => {
     const likemojisView = (likemojis) => {
         function handleDrop(e) {
             e.preventDefault();
-            // find object dropped
-            // get the id
-            //alert('droped moji with id: ' + e.dataTransfer.getData('text/html'));
-            let mojiID = e.dataTransfer.getData('text/html');
-            
-            // is it already in channel..let the channel logic handle this
-            // add it
-            Channel.addCategoryLikemoji(category, mojiID);
-    
+            // find object dropped..get the id
+            alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
+            // storing data in drag event as "ID,add" or "ID,remove"
+            let dropEvent = e.dataTransfer.getData('Text').split(',');
+            if (dropEvent[1] === 'add') {
+                // add it
+                Channel.addCategoryLikemoji(category, dropEvent[0]);
+            }
         }
     
         function dragover(e) {
             e.preventDefault()
-          }
+        }
           
-          function dragenter(e) {
+        function dragenter(e) {
             e.preventDefault()
-          }
+        }
         
         let mojiHtml = html`<div id="likemojiGroupCollection"
                 class="likemojiGroupCollection-area mainpageLikemojis"
@@ -60,9 +59,9 @@ const phoneView = (Channel, selectedCategoryID) => {
                 ondragover="${dragover}"
                 ondrop="${handleDrop}">
                   ${likemojis
-            ? likemojis.map(moji => likemojiView(moji))
-            : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
-             </div>`;
+                    ? likemojis.map(moji => likemojiView(moji))
+                    : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
+            </div>`;
     
         return mojiHtml;     
     }
@@ -133,24 +132,25 @@ const phoneNavBarView =  (channelID, categories) => {
 }
 
   const likemojiView = (likemoji) => {
+
+    function dragMoji(e) {
+        e.dataTransfer.setData('Text', e.currentTarget.id + ',remove');
+    }
+
     let likemojiViewHTML = html`<div
     class="likemojis ui-draggable ui-draggable-handle"
     draggable="true"
-    id="${likemoji
-        .id}">
+    id="${likemoji.id}"
+    draggable="true"
+    ondragstart="${dragMoji}"
+    >
         <img
-            src="${likemoji
-            .attributes
-            .x3
-            .url()}"
+            src="${likemoji.attributes.x3.url()}"
             class="likemojiImages"/>
         <div
             class="likemojiNames channelText"
             style="color: rgb(52, 255, 86);">
-            ${likemoji
-            .attributes
-            .names
-            .en}
+            ${likemoji.attributes.names.en}
         </div>
     </div>`;
 
