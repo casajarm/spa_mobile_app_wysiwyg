@@ -17,8 +17,8 @@ const likemojisListView = (Channel) => {
         if (dropEvent[1] === 'remove') {
             // add it
             Channel.removeCategoryLikemoji(Channel.selectedCategory, dropEvent[0]);
+            //TODO refresh the view here ??? render(panel2, () => phoneView(Channel));
         }
-       
     }
 
     function dragover(e) {
@@ -46,7 +46,7 @@ const likemojisListView = (Channel) => {
             <div class="likemojiNames">${likemoji.attributes.names.en}</div>
         </div>`;
     
-        console.log(likemojiViewHTML);
+        //console.log(likemojiViewHTML);
         return likemojiViewHTML;
     };
     
