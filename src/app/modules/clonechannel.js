@@ -135,21 +135,6 @@ async function cloneGroups(groups, organization, likemojiIDs) {
 	// execute the entire array of clone calls and return the array of returned values
 	const resolvedgroupSaveArray = await Promise.all(groupSaveArray); // resolving all promises
 	return resolvedgroupSaveArray;
-
-/*
-	for (var i = 0; i < groups.length; i++) {
-		let newGroupID = groups[i].id;
-		newGroup = groups[i].clone();
-		newGroup.set("organizationID", organization.id);
-		newGroup.set("organization", organization.get("name"));
-		newGroup.set("order", i);
-		newGroup.set("likemojis", remapIDs(newGroup.get("likemojis"), likemojiIDs));
-		newGroup.save().then(function(newGroup) {
-			newGroupIDs.push (newGroup.id)//({ oldID: newGroupID, newID: newGroup.id }); //objectId;
-		});
-	}
-	return newGroupIDs;
-*/
 }
 
 //clone style
