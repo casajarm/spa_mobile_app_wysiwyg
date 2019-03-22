@@ -183,9 +183,9 @@ page("/viewnew/:orgID", function (ctx, next) {
     panel3.appendChild(nextButton);
 
     //showLink(ctx, next, boilerplate);
-    
+    Channel.selectedCategory = Channel.mainCategory;
     //renderForm(panel2, phone);
-    render(panel2, () => phoneView(Channel, Channel.mainCategory));
+    render(panel2, () => phoneView(Channel));
 
 }); // viewnew/orgID page
 
@@ -226,36 +226,28 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     
     panel1.innerHTML = '';
     render(panel1, () => catLeftView(Channel.categories));
-    //renderForm(panel1, catLeftView, Channel.categories);
     
-    panel2.classList.add('phone-frame');
-    //panel2.innerHTML ="";
+    //panel2.classList.add('phone-frame');
     
-    //renderForm(panel2, phone, {category, categories, categoryLikemojis});
-    //render(panel2, (category, categories, likemojis) => phoneView(category, categories, likemojis));
     let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
-    render(panel2,  () => phoneView(Channel, mainCategoryID));
+    Channel.selectedCategory = Channel.mainCategory;
+    render(panel2,  () => phoneView(Channel));
 
     let catsView = categoriesEditorView(Channel);
     let likemojisView = likemojisListView(Channel);
-    let catView = categoryEditorView(Channel, mainCategoryID);
-    // for panel 3 render all the panes and hide the categories and likemojis panes
-    
+    let catView = categoryEditorView(Channel);    
+    // for panel 3 render all the panes and hide the categories and likemojis panes   
     panel3.innerHTML = '';
-    let panel3Container = panel3; //document.createElement('div');
-    //panel3Container.id = 'panel3-toggle';
+    let panel3Container = panel3; 
     panel3Container.appendChild(catsView);
     panel3Container.appendChild(catView);
     panel3Container.appendChild(likemojisView);     
-    //panel3.appendChild(panel3Container);
     
     for (var i = 0; i < panel3Container.children.length; i++) {
         panel3Container.children[i].classList.add('hidden');
     }
     document.getElementById('categoryEditor').classList.remove('hidden');
     panel2.appendChild (inlineStyle(Channel.channelStyle));
-    //render(panel2, () => inlineStyle(Channel.channelStyle));
-    //renderForm(panel2, inlineStyle, Channel.channelStyle);
     
 });  //channel view
 
@@ -274,16 +266,14 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         let category = Channel.categories.find(x => x.id === selectedCategoryID);
         
         console.log(`entering view for channel id ${channelID} and group ${selectedCategoryID}`);
-        //renderForm(panel2, phone, {category, categories, categoryLikemojis});
-        render(panel2, () => phoneView(Channel, selectedCategoryID));
+        Channel.selectedCategoryID = selectedCategoryID;
+        render(panel2, () => phoneView(Channel));
         // TODO add the back button on the left panel
         
         // panel 3 holds all the editors..we only need to refresh the category one
         let catEditor = document.getElementById('categoryEditor');
         catEditor.remove();
-        panel3.appendChild(categoryEditorView(Channel, selectedCategoryID));
-        //render(panel3, () => categoryEditorView(Channel, selectedCategoryID));
-        //renderForm(panel3, categoryEditorView, category);
+        panel3.appendChild(categoryEditorView(Channel));
     }
 
 });//channel group page

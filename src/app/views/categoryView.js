@@ -2,10 +2,10 @@ import {render, html} from '//unpkg.com/lighterhtml?module';
 import {phoneView} from './phoneView.js';
 
 //const categoryEditorView = (category) => {
-const categoryEditorView = (Channel, categoryID) => {
-	let category = Channel.categories.find(x => x.id === categoryID);
+const categoryEditorView = (Channel) => {
+	let category = Channel.selectedCategory;
 	let callOut = category.attributes.callOuts.en;
-	console.log('catgorid is ' + categoryID);
+	console.log('category id is ' + category.id);
 	console.log('callout is ' + callOut);
 	async function saveCallToAction (e) {
 		var callOutText = document.getElementById("editorCallOut").value;

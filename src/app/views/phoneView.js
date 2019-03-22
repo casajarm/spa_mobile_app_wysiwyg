@@ -10,6 +10,7 @@ import {getMainCategory} from '../modules/groups.js';
 |---other categories
 |-navbar
 */
+
 // phone function returns all the HTML for displaying the phone widget with the
 // data for an org set to be selected for the given "category" parameter
 // category is a Group object from Parse
@@ -27,11 +28,12 @@ const phone = async (Channel, selectedCategoryID) =>  {
 
 //const phoneView = (category, categories, categoryLikemojis) => {
 //const phoneView = (props) => {
-const phoneView = (Channel, selectedCategoryID) => {
+const phoneView = (Channel) => {
 //        const {category, categories, categoryLikemojis} = props;
     let orgID = Channel.channelID; //category.attributes.organizationID;
-    let category = Channel.categories.find(x => x.id === selectedCategoryID);
-
+    //let category = Channel.categories.find(x => x.id === selectedCategoryID);
+    let category = Channel.selectedCategory;
+    console.log(`entering phoneView for category id: ${category.id}`);
     const likemojisView = (likemojis) => {
         function handleDrop(e) {
             e.preventDefault();
@@ -67,44 +69,50 @@ const phoneView = (Channel, selectedCategoryID) => {
     }
 
     let phoneHTML = 
-    html`<div class="phone">
-        <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
-        <div id="phoneDisplay" class="phoneDisplay-area">
-            <div id="buildHeader" class="header text-white">
-                <img id="docHeaderImage" class="header" 
-                    src="${category.attributes.newHeader.url()}" />
+    html`<div id='phone-view' class="col-lg-4 channelEdit">
+        <div class="phone" id="phoneView">
+            <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
+            <div id="phoneDisplay" class="phoneDisplay-area">
+                <div id="buildHeader" class="header text-white">
+                    <img id="docHeaderImage" class="header" 
+                        src="${category.attributes.newHeader.url()}" />
+                </div>
+                <div id="callout" class="callout channelText">
+                    ${category.attributes.callOuts.en}
+                </div>
+                <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
+                    ${likemojisView(Channel.catLikemojis(category))}
+                    ${category.attributes.main == 1 ?
+                            categoriesSubView(Channel.categories)
+                            : html`<span></span>`
+                    }
+                </div>
+                ${phoneNavBarView(Channel)}
             </div>
-            <div id="callout" class="callout channelText">
-                ${category.attributes.callOuts.en}
-            </div>
-            <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
-                ${likemojisView(Channel.catLikemojis(category))}
-                ${category.attributes.main == 1 ?
-                        categoriesSubView(Channel.categories)
-                        : html`<span></span>`
-                  }
-            </div>
-            ${phoneNavBarView(Channel.channelID, Channel.categories)}
         </div>
     </div>`;
- 
-    let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
-    return phoneView;
+    console.log(phoneHTML);
+    //let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
+    return phoneHTML;
 }
 
-const phoneNavBarView =  (channelID, categories) => {
-    function homeClick () { phoneHome(channelID)}
+const phoneNavBarView =  (Channel) => {
+    function homeClick () { phoneHome(Channel)}
 
-    async function phoneHome(channelID) {
-        let category = getMainCategory(categories);
-        let categoryLikemojis = await getCategoryLikemojis(category);
+    async function phoneHome(Channel) {
+        Channel.selectedCategory = Channel.mainCategory;
+        //let category = getMainCategory(categories);
+        //let categoryLikemojis = await getCategoryLikemojis(category);
         //TODO decide to render our route here
-        //render(panel2, () => phoneView({category, categories, categoryLikemojis}));
-        let route = "/channel/" + channelID + "/view";
-        page(route);
+        //TODO can we just refer to this views parent (<div id="phoneView">.parent)?
+        let panel2 = document.getElementById("panel2");
+        //panel2.innerHTML = '';
+        render(panel2, function () { return phoneView(Channel)});
+        //let route = "/channel/" + channelID + "/view";
+        //page(route);
     }
-
-    let navHTML = html.for({channelID})`<div
+    let channelID = Channel.channelID;
+    let navHTML = html`<div
     id="navBar"
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
@@ -154,7 +162,7 @@ const phoneNavBarView =  (channelID, categories) => {
         </div>
     </div>`;
 
-    console.log(likemojiViewHTML);
+    //console.log(likemojiViewHTML);
     return likemojiViewHTML;
 };
 
@@ -172,7 +180,11 @@ const categoryView = (category, skipMain) => {
     */
     function selectCategory(e) {
         let targetID = e.currentTarget.dataset.i;
-        page(`/channel/${orgID}/view/${targetID}`);        
+        page(`/channel/${orgID}/view/${targetID}`);    
+        
+        //Channel.selectedCategoryID = targetID;
+        //let panel2 = document.getElementById("panel2");
+        //render(panel2, function () { return phoneView(Channel)});
     }
 
     if (skipMain) {
@@ -198,11 +210,12 @@ const categoryView = (category, skipMain) => {
         </p>    
     </div>`;
 
-    console.log(categoryViewHTML);
+    //console.log(categoryViewHTML);
     return categoryViewHTML;
 }
 
 const categoriesSubView = (cats) => {
+    console.log('composing categoriesSubView');
     return html`<div id="categories" class="categories">
             ${cats.map(cat => categoryView(cat, true))} 
       </div>`;

@@ -10,8 +10,21 @@ const Channel =  {
     likemojis:  [], //[Object.create(Likemoji)],  
     //TODO how to define function getCategoryLikemojis on each array element
     styles:     [],// [Object.create(ChannelStyle)],
+    _selectedCategory: '',
     get channelID() {return this.channel.id},
-
+    
+    get selectedCategory() {return this._selectedCategory},
+    /**
+     * @param {object} category
+     */
+    set selectedCategory(category) {
+        this._selectedCategory = category;
+    },
+    get selectedCategoryID() {return this._selectedCategory.id},
+    set selectedCategoryID(ID) {
+        this._selectedCategory = this.categories.find(x => x.id === ID);
+    },
+    
     async populate(popID) {
       // setting a new channel refresh all the related data      
         this.channel    = await getOrganization(popID);
@@ -88,22 +101,37 @@ const Channel =  {
         );
     },
     addCategoryLikemoji: async function(category, likemoji) {
-        //TODO handle IDs as well as full objects
-        let likemojiID = typeof(likemoji) === "string" || typeof(likemoji) === "number" ? likemoji : likemoji.id;
+        //if likemoji is an id find the actual object
+        let likemojiID, likemojiObj;
+        if (typeof(likemoji) === "string" || typeof(likemoji) === "number") {
+            likemojiID = likemoji;
+            try {
+                likemojiObj = this.likemojis.find(x => x.id === likemojiID);
+            }
+            catch {
+                alert (`${likemoji} is an invalid ID for likemojis`);
+            }
+            
+        }
+        else {
+            likemojiObj = likemoji;
+            likemojiID = likemojiObj.id;
+        }
+        
         let catLikemojiIDs = category.get('likemojis');
         catLikemojiIDs.push(likemojiID);
         category.set('likemojis', catLikemojiIDs);
-        likemoji.set('OrganizationId', this.channel.id);
-        likemoji.set('organizationName', this.channel.get('name'));
-        await likemoji.save();
+        likemojiObj.set('OrganizationId', this.channel.id);
+        likemojiObj.set('organizationName', this.channel.get('name'));
+        await likemojiObj.save();
         await category.save();        
     },
-    removeCategoryLikemoji: async function(category, likemoji)  {
+    removeCategoryLikemoji: async function(category, likemojiID)  {
         // get the array of likemoji pointer from group
         let catLikemojiIDs = category.get('likemojis');
         // find the array index of the given likemoji         
-        let ind = catLikemojiIDs.findIndex(x => x === likemoji.id);
-        if(ind && ind > -1) {
+        let ind = catLikemojiIDs.findIndex(x => x === likemojiID);
+        if(ind > -1) {
             catLikemojiIDs.splice(ind, 1);
             category.set('likemojis', catLikemojiIDs);
             await category.save();
@@ -112,7 +140,6 @@ const Channel =  {
     setCategoryOrder: function(ids, orders)  {},
         
     get mainCategory()  {
-        console.log('this is ' + this);
         let mainCat = this.categories.filter(isMainCategory); 
         return mainCat[0]; //filter returns array here
     },
@@ -123,18 +150,11 @@ const Channel =  {
 }
 
 /*  need to incorporate this logic
-
     editors.push(currentUser.id);
-    organization.set("groups", groupsIDs);
-    organization.set("groupPointer", groupPointers);
     organization.set("header", returnedOrg.attributes.header);
     organization.set("callOut", returnedOrg.attributes.callOut);
-    organization.set("editors", editors);
-     
-    org . set("groupPointer", arrayToPointers(groupIDs, "group"));
-						
-
-    */
+    organization.set("editors", editors);     
+*/
 
 function isMainCategory(category) {
     return category.attributes.main == 1;
