@@ -5,7 +5,7 @@ import {Organization} from "./modules/organizations.js";
 //import Likemoji from './modules/likemojis.js';
 //import {getStyle} from "./modules/styles.js";
 //import {Group, getMainCategory} from "./modules/groups.js";
-import {render, html} from 'https://unpkg.com/lighterhtml?module';
+//import {render, html} from 'https://unpkg.com/lighterhtml?module';
 import {phone, phoneView, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
@@ -14,7 +14,7 @@ import likemojisListView from './views/likemojisListView.js';
 
 import {Channel} from './modules/channel.js';
 
-//const {render, html, svg} = lighterhtml;
+const {render, html, svg} = lighterhtml;
 
 var panel1,
     panel2,

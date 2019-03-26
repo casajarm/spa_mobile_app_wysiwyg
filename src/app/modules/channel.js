@@ -83,6 +83,8 @@ const Channel =  {
     deleteLikemoji: async function(likemoji) {
         // remove from group(s)
         let rem = this.removeCategoryLikemoji;
+//        let {removeCategoryLikemoji: rem} = this;
+
         this.categories.forEach(function(cat) {
             rem(cat, likemoji);
             }

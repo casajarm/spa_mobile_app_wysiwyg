@@ -1,6 +1,7 @@
-import {render, html} from '//unpkg.com/lighterhtml?module';
 import {phoneView} from './phoneView.js';
 //.for(categories)
+
+const {render, html, svg} = lighterhtml;
 
 //const categoriesEditorView = categories => {
 const categoriesEditorView = (Channel) => {

@@ -1,5 +1,6 @@
-import {render, html} from '//unpkg.com/lighterhtml?module';
-import {getMainCategory} from '../modules/groups.js';
+//import {render, html} from '//unpkg.com/lighterhtml?module';
+const {render, html, svg} = lighterhtml;
+
 /* Main structure of the phone panel
 |phone
 |-category

@@ -1,4 +1,4 @@
-import {render, html} from '//unpkg.com/lighterhtml?module';
+const {render, html, svg} = lighterhtml;
 
 //const likemojisListView = (likemojis) => {
 const likemojisListView = (Channel) => {
