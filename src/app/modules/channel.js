@@ -104,7 +104,7 @@ const Channel =  {
     },
     addCategoryLikemoji: async function(category, likemoji) {
         //if likemoji is an id find the actual object
-        let likemojiID, likemojiObj;
+        let likemojiID, likemojiObj, maxCount = 20;
         if (typeof(likemoji) === "string" || typeof(likemoji) === "number") {
             likemojiID = likemoji;
             try {
@@ -119,17 +119,26 @@ const Channel =  {
             likemojiObj = likemoji;
             likemojiID = likemojiObj.id;
         }
-        
+        // limit main category to 3 likemojis
+        if (isMainCategory(category)) {
+            maxCount = 3;
+        }
+
         let catLikemojiIDs = category.get('likemojis');
+        if (catLikemojiIDs.length >= maxCount) {
+           alert('This section only allows 3 Likemojis');
+        }
+        else {
         // don't add if it is already in the list
-        if (!catLikemojiIDs.find(x => x == likemojiID)) {
-            catLikemojiIDs.push(likemojiID);
-            category.set('likemojis', catLikemojiIDs);
-            likemojiObj.set('OrganizationId', this.channel.id);
-            likemojiObj.set('organizationName', this.channel.get('name'));
-            await likemojiObj.save();
-            await category.save();
-        }        
+            if (!catLikemojiIDs.find(x => x == likemojiID)) {
+                catLikemojiIDs.push(likemojiID);
+                category.set('likemojis', catLikemojiIDs);
+                likemojiObj.set('OrganizationId', this.channel.id);
+                likemojiObj.set('organizationName', this.channel.get('name'));
+                await likemojiObj.save();
+                await category.save();
+            }     
+        }   
     },
     removeCategoryLikemoji: async function(category, likemojiID)  {
         // get the array of likemoji pointer from group
