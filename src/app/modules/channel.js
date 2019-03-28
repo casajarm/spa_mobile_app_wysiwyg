@@ -121,12 +121,15 @@ const Channel =  {
         }
         
         let catLikemojiIDs = category.get('likemojis');
-        catLikemojiIDs.push(likemojiID);
-        category.set('likemojis', catLikemojiIDs);
-        likemojiObj.set('OrganizationId', this.channel.id);
-        likemojiObj.set('organizationName', this.channel.get('name'));
-        await likemojiObj.save();
-        await category.save();        
+        // don't add if it is already in the list
+        if (!catLikemojiIDs.find(x => x == likemojiID)) {
+            catLikemojiIDs.push(likemojiID);
+            category.set('likemojis', catLikemojiIDs);
+            likemojiObj.set('OrganizationId', this.channel.id);
+            likemojiObj.set('organizationName', this.channel.get('name'));
+            await likemojiObj.save();
+            await category.save();
+        }        
     },
     removeCategoryLikemoji: async function(category, likemojiID)  {
         // get the array of likemoji pointer from group
