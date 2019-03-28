@@ -22,8 +22,10 @@ var panel1,
     channelName,
     user,
     channelID,              // currently selected channel ID
-    selectedCategoryID;     // currently selected category ID
-    
+    selectedCategoryID,     // currently selected category ID
+    categoriesPanel,
+    likemojisPanel, 
+    editorPanel;
 var channels = []           // list of users channels
 
 channelName = "You Beautiful Person You";
@@ -38,7 +40,11 @@ function initApplication() {
     panel1 = document.getElementById("panel1");
     panel2 = document.getElementById("panel2");
     panel3 = document.getElementById("panel3");
-
+    // not sure about having to add these elements like this
+    likemojisPanel = getOrCreateDiv('likemojis-panel', panel3);
+    editorPanel =  getOrCreateDiv('editor-panel', panel3)
+    categoriesPanel = getOrCreateDiv('categories-panel', panel3);
+    
     Parse.initialize("fg8ZXCHKfBOWme42LGPA");
     Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
     user = new Parse.User();
@@ -222,31 +228,29 @@ page("/channel/:channelID/clone", function (ctx, next) {
 page("/channel/:channelID/view",  async function (ctx, next) {
     channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
-    await Channel.populate(channelID);
-    
-    panel1.innerHTML = '';
-    render(panel1, () => catLeftView(Channel.categories));
-    
+    if (!Channel.channelID
+        || Channel.channelID != channelID) {    
+            await Channel.populate(channelID);
+            //channel = channels.find(x => x.id === channelID);   
+    }
+    render(panel1, () => catLeftView(Channel.categories));    
     //panel2.classList.add('phone-frame');
     
     let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
     Channel.selectedCategory = Channel.mainCategory;
     render(panel2,  () => phoneView(Channel));
+    // not sure about having to add these elements like this
+    likemojisPanel = getOrCreateDiv('likemojis-panel', panel3);
+    editorPanel =  getOrCreateDiv('editor-panel', panel3)
+    categoriesPanel = getOrCreateDiv('categories-panel', panel3);
 
-    let catsView = categoriesEditorView(Channel);
-    let likemojisView = likemojisListView(Channel);
-    let catView = categoryEditorView(Channel);    
-    // for panel 3 render all the panes and hide the categories and likemojis panes   
-    panel3.innerHTML = '';
-    let panel3Container = panel3; 
-    panel3Container.appendChild(catsView);
-    panel3Container.appendChild(catView);
-    panel3Container.appendChild(likemojisView);     
-    
-    for (var i = 0; i < panel3Container.children.length; i++) {
-        panel3Container.children[i].classList.add('hidden');
-    }
-    document.getElementById('categoryEditor').classList.remove('hidden');
+    likemojisPanel.classList.add('hidden');
+    categoriesPanel.classList.add('hidden');
+    editorPanel.classList.remove('hidden');
+    render(categoriesPanel, () => categoriesEditorView(Channel));
+    render(editorPanel, () => categoryEditorView(Channel));    
+    render(likemojisPanel, () => likemojisListView(Channel));
+       
     panel2.appendChild (inlineStyle(Channel.channelStyle));
     
 });  //channel view
@@ -256,7 +260,7 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         || Channel.channelID != ctx.params.channelID) {
         channelID = ctx.params.channelID;
         Channel.populate(channelID);
-        channel = channels.find(x => x.id === channelID);   
+        //channel = channels.find(x => x.id === channelID);   
         }
     
     if (!selectedCategoryID
@@ -270,10 +274,10 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         render(panel2, () => phoneView(Channel));
         // TODO add the back button on the left panel
         
-        // panel 3 holds all the editors..we only need to refresh the category one
-        let catEditor = document.getElementById('categoryEditor');
-        catEditor.remove();
-        panel3.appendChild(categoryEditorView(Channel));
+       likemojisPanel.classList.add('hidden');
+       categoriesPanel.classList.add('hidden');
+       editorPanel.classList.remove('hidden');
+       render(editorPanel, () => categoryEditorView(Channel));   
     }
 
 });//channel group page
@@ -477,4 +481,14 @@ function inlineStyle(style) {
     styleSheet.innerHTML = styleRules;
     return styleSheet;
         
+}
+
+function getOrCreateDiv(id, parent) {
+    let elem = document.getElementById(id);
+    if (!elem) { 
+        elem = document.createElement('div')
+        elem.id = id;
+        parent.appendChild(elem);
+    }
+    return elem;
 }
