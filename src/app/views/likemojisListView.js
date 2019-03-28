@@ -1,8 +1,9 @@
+import {phoneView} from './phoneView.js';
 const {render, html, svg} = lighterhtml;
 
 //const likemojisListView = (likemojis) => {
 const likemojisListView = (Channel) => {
-
+    let panel2 = document.getElementById("panel2");
     function dragMoji(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',add' );
     }
@@ -10,14 +11,14 @@ const likemojisListView = (Channel) => {
     function handleDrop(e) {
         e.preventDefault();
         // find object dropped..get the id
-        alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
+        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
         let mojiID = e.dataTransfer.getData('Text');
         // storing data in drag event as "ID,add" or "ID,remove"
         let dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'remove') {
             // add it
-            Channel.removeCategoryLikemoji(Channel.selectedCategory, dropEvent[0]);
-            //TODO refresh the view here ??? render(panel2, () => phoneView(Channel));
+            Channel.removeCategoryLikemoji(Channel.selectedCategory, dropEvent[0])
+            .then(render(panel2, () => phoneView(Channel)))
         }
     }
 
