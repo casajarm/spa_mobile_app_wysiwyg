@@ -6,6 +6,9 @@ const {render, html, svg} = lighterhtml;
 const categoryEditorView = (Channel) => {
 	let category = Channel.selectedCategory;
 	let callOut = category.attributes.callOuts.en;
+	let description;
+	try { description = category.attributes.descriptions.en;}
+	  catch {description = '';}
 	console.log('category id is ' + category.id);
 	console.log('callout is ' + callOut);
 	async function saveCallToAction (e) {
@@ -152,7 +155,7 @@ const categoryEditorView = (Channel) => {
 					rows="5"
 					placeholder="Here at XYZ Corp, We know that want to put your experience first..."
 					>
-					${category.attributes.descriptions.en}
+					${description}
 				</textarea>
 			</div>
 		</div>
