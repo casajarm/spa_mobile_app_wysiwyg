@@ -1,7 +1,7 @@
 const {render, html, svg} = lighterhtml;
 
 const catLeftView = (categories) => {
-
+    //TODO what is a better way to keep this view from knowing about the other parts of the page
 
     function hideAll() {
         let panel3Container = document.getElementById('panel3');
@@ -11,26 +11,25 @@ const catLeftView = (categories) => {
     }
 
     function callCategoriesEditor (e) {
-        let catsView = document.getElementById('categoriesEditor');
+        let categoriesPanel = document.getElementById('categories-panel');
         console.log('clicked callCategoriesEditor');
         hideAll();
-        catsView.classList.remove('hidden');
+        categoriesPanel.classList.remove('hidden');
     }
     
     function callCategoryEditor (e) {
-        let catsView = document.getElementById('categoryEditor');
+        let editorPanel =  document.getElementById('editor-panel');
         console.log('clicked callCategoryEditor');
         hideAll();
-        catsView.classList.remove('hidden');
+        editorPanel.classList.remove('hidden');
     }
     
     function callLikemojiEditor (e) {
-        let catsView = document.getElementById('likemojisEditor');
+        let likemojisPanel = document.getElementById('likemojis-panel');
         console.log('clicked callLikemojiEditor');
         hideAll();
-        catsView.classList.remove('hidden');
+        likemojisPanel.classList.remove('hidden');
     }
-
 
     return html`<div>
         <h3>Design & Edit Your Channel</h3>
