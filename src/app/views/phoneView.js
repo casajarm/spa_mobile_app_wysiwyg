@@ -32,35 +32,17 @@ const phone = async (Channel, selectedCategoryID) =>  {
 const phoneView = (Channel) => {
 //        const {category, categories, categoryLikemojis} = props;
     let orgID = Channel.channelID; //category.attributes.organizationID;
+    let panel2 = document.getElementById("panel2");
     //let category = Channel.categories.find(x => x.id === selectedCategoryID);
     let category = Channel.selectedCategory;
     console.log(`entering phoneView for category id: ${category.id}`);
     const likemojisView = (likemojis) => {
-        function handleDrop(e) {
-            e.preventDefault();
-            // find object dropped..get the id
-            alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
-            // storing data in drag event as "ID,add" or "ID,remove"
-            let dropEvent = e.dataTransfer.getData('Text').split(',');
-            if (dropEvent[1] === 'add') {
-                // add it
-                Channel.addCategoryLikemoji(category, dropEvent[0]);
-            }
+        let mainPageClass = 'likemojiGroupCollection-area';
+        if(category.attributes.main == 1) {
+            mainPageClass = mainPageClass + ' mainpageLikemojis';
         }
-    
-        function dragover(e) {
-            e.preventDefault()
-        }
-          
-        function dragenter(e) {
-            e.preventDefault()
-        }
-        
         let mojiHtml = html`<div id="likemojiGroupCollection"
-                class="likemojiGroupCollection-area mainpageLikemojis"
-                ondragenter="${dragenter}"
-                ondragover="${dragover}"
-                ondrop="${handleDrop}">
+                class="${mainPageClass}">
                   ${likemojis
                     ? likemojis.map(moji => likemojiView(moji))
                     : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
@@ -81,7 +63,11 @@ const phoneView = (Channel) => {
                 <div id="callout" class="callout channelText">
                     ${category.attributes.callOuts.en}
                 </div>
-                <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow">
+                <div class="phoneDisplayDynamicArea scroll dynamicAreaOverflow"
+                    ondragenter="${dragenter}"
+                    ondragover="${dragover}"
+                    ondrop="${handleDrop}"
+                >
                     ${likemojisView(Channel.catLikemojis(category))}
                     ${category.attributes.main == 1 ?
                             categoriesSubView(Channel.categories)
@@ -92,6 +78,29 @@ const phoneView = (Channel) => {
             </div>
         </div>
     </div>`;
+    function handleDrop(e) {
+        e.preventDefault();
+        // find object dropped..get the id
+        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
+        // storing data in drag event as "ID,add" or "ID,remove"
+        let dropEvent = e.dataTransfer.getData('Text').split(',');
+        if (dropEvent[1] === 'add') {
+            // add it
+            Channel.addCategoryLikemoji(category, dropEvent[0])
+            .then (
+                render(panel2, function () { return phoneView(Channel)})
+            )
+        }
+    }
+
+    function dragover(e) {
+        e.preventDefault()
+    }
+        
+    function dragenter(e) {
+        e.preventDefault()
+    }
+    
     console.log(phoneHTML);
     //let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
     return phoneHTML;
@@ -107,10 +116,13 @@ const phoneNavBarView =  (Channel) => {
         //TODO decide to render our route here
         //TODO can we just refer to this views parent (<div id="phoneView">.parent)?
         let panel2 = document.getElementById("panel2");
+        let panel3 = document.getElementById("panel3");
+        
         //panel2.innerHTML = '';
-        render(panel2, function () { return phoneView(Channel)});
-        //let route = "/channel/" + channelID + "/view";
+        //render(panel2, function () { return phoneView(Channel)});
+        let route = "/channel/" + channelID + "/view";
         //page(route);
+        page.redirect(route);
     }
     let channelID = Channel.channelID;
     let navHTML = html`<div
@@ -181,8 +193,7 @@ const categoryView = (category, skipMain) => {
     */
     function selectCategory(e) {
         let targetID = e.currentTarget.dataset.i;
-        page(`/channel/${orgID}/view/${targetID}`);    
-        
+        page.redirect(`/channel/${orgID}/view/${targetID}`);    
         //Channel.selectedCategoryID = targetID;
         //let panel2 = document.getElementById("panel2");
         //render(panel2, function () { return phoneView(Channel)});
