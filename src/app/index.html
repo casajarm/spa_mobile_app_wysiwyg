@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <head>
-	<base href="/src/app/"/>
+	<base href="/src/app/" />
 	<title>Channel Builder</title>
 	<script src="https://unpkg.com/lighterhtml"></script>
-
 
 	<!-- links for bootstrap, parse.js, builder.css, likemojibuilder.css, googlefonts -->
 	<link
@@ -24,10 +23,8 @@
 		integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
 		crossorigin="anonymous"
 	/>
-	<link rel="stylesheet" type="text/css" href="builder.css">
+	<link rel="stylesheet" type="text/css" href="builder.css" />
 	<script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
-	
-
 </head>
 <body>
 	<!-- logo above navbar -->
@@ -92,52 +89,438 @@
 					<div id="panel2" class="col-lg-4">
 						<h3 id="panel-h3-middle">Middle Panel</h3>
 						<hr />
-						
 					</div>
 					<div id="panel3" class="col-lg-4">
 						<h3 id="panel-h3-right">Right Panel</h3>
 						<hr />
-						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="panel-modal">
+			<!-- categories modal -->
+			<div
+				class="modal fade"
+				id="addCategoriesModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="myModalLabel"
+			>
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Add / Edit a Category
+							</h4>
+						</div>
+						<div class="modal-body">
+							<div class="createLikemojiModal">
+								<div class="form-group">
+									<label for="categoryName">Category Name</label>
+									<input
+										type="string"
+										class="form-control"
+										id="categoryName"
+										placeholder="Category Name"
+									/>
+								</div>
+								<div class="form-group">
+									<label for="categoryDisplayName">Category Display Name</label>
+									<input
+										type="string"
+										class="form-control"
+										id="categoryDisplayName"
+										placeholder="leave blank if name is in image"
+									/>
+								</div>
+								<div class="input-group selectCategoryImage">
+									<input
+										id="categoryImageInput"
+										type="file"
+										multiple
+										class="form-control"
+										placeholder="Select category image .jpg"
+									/>
+									<span class="input-group-btn">
+										<button
+											id="categoryImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											Upload
+										</button>
+									</span>
+								</div>
+								<div>
+									<h4 style="display:inline">Category Image:</h4>
+									<p id="categoryImageName" style="display:inline">
+										Template Image
+									</p>
+									<img
+										id="categoryPreview"
+										class="categoryPreview"
+										src="assets/category.jpg"
+									/>
+								</div>
+								<div class="checkbox">
+									<label
+										><input
+											id="disableCat"
+											type="checkbox"
+											value=""
+										/>Disable</label
+									>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								id="saveCategory"
+								type="button"
+								class="btn btn-default"
+								data-dismiss="modal"
+							>
+								Save
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end category modal -->
+
+			<!-- edit likemojis modal -->
+			<div
+				class="modal fade"
+				id="editLikemojisModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="myModalLabel"
+			>
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="likemojiEditLabel">Edit Likemoji</h4>
+						</div>
+						<div class="modal-body">
+							<div class="editLikemojiModal">
+								<div class="form-group">
+									<label for="likemojiName">Likemoji Name</label>
+									<input
+										type="string"
+										class="form-control"
+										id="likemojiName"
+										placeholder="Name your Likemoji - ie: \'cleanliness\'"
+									/>
+								</div>
+								<div class="input-group selectCategoryImage">
+									<input
+										id="likemojiEditorImageInput"
+										type="file"
+										multiple
+										class="form-control"
+										placeholder="Select category image .jpg"
+									/>
+									<span class="input-group-btn">
+										<button
+											id="likemojiEditorImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											Upload
+										</button>
+									</span>
+								</div>
+								<div>
+									<h4 style="display:inline">Likemoji Image:</h4>
+									<p id="LikemojiEditorImageName" style="display:inline">
+										Template Image
+									</p>
+								</div>
+								<img class="mojiPreview" id="likemojiPreview" src="" />
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								id="saveEditedLikemoji"
+								type="button"
+								class="btn btn-default"
+								data-dismiss="modal"
+							>
+								Save
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end edit likemojis modal -->
+			<!-- add likemojis modal -->
+
+			<div
+				class="modal fade"
+				id="addLikemojisModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="myModalLabel"
+			>
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Create a Likemoji!</h4>
+						</div>
+						<div class="modal-body">
+							<div class="createLikemojiModal">
+								<div class="input-group selectLikemojiFiles">
+									<input
+										id="likemojisImageInput"
+										type="file"
+										multiple
+										class="form-control"
+										placeholder="Select Likemoji .png files"
+									/>
+									<span class="input-group-btn">
+										<button
+											id="likemojisImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											Upload
+										</button>
+									</span>
+								</div>
+
+								<h4
+									class="modalUpdateMessage"
+									id="uploadComplete"
+									style="display:none"
+								>
+									Upload Complete!
+								</h4>
+
+								<div id="likemojisThumbsContainer" class="grid">
+									<!-- add code to preview likemojis here prior to saving to parse-->
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-default"
+								data-dismiss="modal"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end add likemojis modal -->
+
+			<!-- edit header modal -->
+
+			<div
+				class="modal fade"
+				id="editheaderModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="myModalLabel"
+			>
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="headerEditLabel">Edit Header</h4>
+						</div>
+						<div class="modal-body">
+							<div class="editHeaderModal">
+								<div class="input-group selectHeaderImage">
+									<input
+										id="imageUpload"
+										type="file"
+										accept=".png, .jpg, .jpeg"
+										multiple
+										class="form-control"
+										placeholder="Select header image .jpg"
+									/>
+									<span class="input-group-btn">
+										<button
+											id="headerEditorImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											Upload
+										</button>
+									</span>
+								</div>
+								<div>
+									<h4 style="display:inline">Mobile Header Image:</h4>
+									<p id="headerEditorImageName" style="display:inline">
+										Template Image
+									</p>
+								</div>
+								<img class="headerPreview" id="headerPreview" src="" />
+
+								<div class="input-group selectHeaderImage">
+									<input
+										id="ipadImageUpload"
+										type="file"
+										accept=".png, .jpg, .jpeg"
+										multiple
+										class="form-control"
+										placeholder="Select header image .jpg"
+									/>
+									<span class="input-group-btn">
+										<button
+											id="ipadHeaderEditorImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											Upload
+										</button>
+									</span>
+								</div>
+								<div>
+									<h4 style="display:inline">iPad Header Image:</h4>
+									<p id="ipadHeaderEditorImageName" style="display:inline">
+										Template Image
+									</p>
+								</div>
+								<img class="headerPreview" id="ipadHeaderPreview" src="" />
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								id="saveEditedHeader"
+								type="button"
+								class="btn btn-default"
+								data-dismiss="modal"
+							>
+								Save
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end edit header modal -->
+
+			<!-- unsplash modal -->
+
+			<div
+				class="modal fade "
+				id="unsplashModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="myModalLabel"
+			>
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Get Images Provided by Unsplash!
+							</h4>
+						</div>
+						<div class="modal-body">
+							<div class="unsplashModal">
+								<div class="input-group unsplashSearchbar">
+									<input
+										id="unsplashImageInput"
+										type="text"
+										class="form-control"
+										placeholder="Search on Unsplash..."
+									/>
+									<span class="input-group-btn">
+										<button
+											id="unsplashImageButton"
+											class="btn btn-unsplash"
+											type="button"
+										>
+											GO!
+										</button>
+									</span>
+								</div>
+								<div id="thumbsContainer" class="grid"></div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-default"
+								data-dismiss="modal"
+							>
+								Close
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-<!-- hidden at first parts of app-->
-<div id="hiddenContainer" style="display:none">
-	<form id="signUpForm" class="form" style="display:none">
-		<h2>Create Your Account</h2>
-		<div class="form-group" id="emaildiv">
-			<label for="emailSignup">email</label>
-			<input type="email" class="form-control" id="inputEmail" placeholder="enter your email here">
-		</div>
-		<div class="form-group" id="passworddiv">
-			<label for="passwordSignup">password</label>
-			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
-		</div>
-		
-		<div class="form-group" id="organizationdiv">
-				<label for="organizationSignup">password</label>
-				<input type="text" class="form-control" id="inputOrganizetion" placeholder="organization name">
-			</div>
-		<button id="signUpUser2" type="button" class="btn btn-default">submit</button>
-	</form>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" type="text/javascript"></script>
-	
+	<script
+		src="https://code.jquery.com/jquery-3.3.1.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		crossorigin="anonymous"
+		type="text/javascript"
+	></script>
+
 	<!-- //TODO can we replace bootstrap full with just css or with the native variants?
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	-->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+		crossorigin="anonymous"
+	></script>
 	<!--
 	<script type="text/javascript" src="https://npmcdn.com/parse/dist/parse.min.js">	</script>
 	-->
-	
-	<script type="text/javascript" src="https://npmcdn.com/parse@2.1.0/dist/parse.js"></script>
-	
+
+	<script
+		type="text/javascript"
+		src="https://npmcdn.com/parse@2.1.0/dist/parse.js"
+	></script>
+
 	<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
 	<script type="module" src="index.js"></script>
-	
+
 	<!-- 
 	<script type="module" src="page_router_example.js"></script>
 	
@@ -146,5 +529,4 @@
 	<script type="application/javascript" src="views/categoryView.js">
 	</script>
 	-->
-</div>
 </body>
