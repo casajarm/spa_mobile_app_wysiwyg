@@ -21,8 +21,7 @@ const categoryEditorView = (Channel) => {
 		category.save().then(
 			group => {
 				//rerender the phone
-				let phoneViewPanel = document.getElementById('phone-view').parentNode;
-				render(phoneViewPanel, () => phoneView(Channel));
+				Channel.updateViews();
 			},
 			error => {
 				// Execute any logic that should take place if the save fails. error is a
@@ -163,4 +162,32 @@ const categoryEditorView = (Channel) => {
 
 	return categoryEditorViewHTML;
 }
+
+/*
+//opens header editor modal
+
+$("#uploadHeader").click(function(event) {
+
+//editheaderModal needs to be shown.....
+
+	$("#imageUpload").val("");
+
+	$("#headerPreview").attr("src", groupSelected.attributes.newHeader.url());
+
+	$("#headerEditorImageName").text(groupSelected.attributes.newHeader._name);
+
+	$("#ipadImageUpload").val("");
+
+	$("#ipadHeaderPreview").attr(
+		"src",
+		groupSelected.attributes.newIpadHeader.url()
+	);
+
+	$("#ipadHeaderEditorImageName").text(
+		groupSelected.attributes.newIpadHeader._name
+	);
+});
+
+*/
+
 export default categoryEditorView;
