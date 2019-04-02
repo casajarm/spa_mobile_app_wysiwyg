@@ -92,7 +92,8 @@ const categoriesEditorView = (Channel) => {
 					console.log(Channel.categories[i].id + " " + Channel.categories[i].attributes.order);
 				}
 				//refresh phone panel here
-				render(panel2, () => phoneView(Channel, Channel.mainCategory.id));
+				//render(panel2, () => phoneView(Channel, Channel.mainCategory.id));
+				Channel.updateViews();
 			},
 			error => {
 				reject();
