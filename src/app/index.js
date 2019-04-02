@@ -118,7 +118,7 @@ page("/signup", function (ctx, next) {
     });
 
     //panel 3
-    panel3.innerHTML = "";
+    viewControl.deleteView(panel3);
     let productImage = document.createElement("img");
     productImage.src = "../assets/screenshots/IMG_0971.png";
     panel3.appendChild(productImage);
@@ -126,10 +126,9 @@ page("/signup", function (ctx, next) {
 
 
 page("/login", function (ctx, next) {
-    panel1.innerHTML = "";
-    panel2.innerHTML = "";
-    panel3.innerHTML = "";
-
+    viewControl.deleteView(panel1);
+    viewControl.deleteView(panel2);
+    viewControl.deleteView(panel3);
     let headline = document.createElement('h2');
     headline.innerHTML = 'Login to your account';
     panel2.appendChild(headline); 
@@ -158,7 +157,7 @@ page("/distribute", function (ctx, next) {
     panel2.innerHTML = "A list of links for channel";
 
     //TODO this would be better as a template
-    panel3.innerHTML = "";
+    viewControl.deleteView(panel3);
     let shareForm = document.createElement("form");
     let shareEmails = document.createElement("textarea");
     shareEmails.value = "Enter emails to share channel";
@@ -178,7 +177,7 @@ page("/distribute", function (ctx, next) {
 page("/viewnew/:orgID", function (ctx, next) {
     Channel.populate(ctx.params.orgID);
     panel1.innerHTML = "About your Likemoji Channel";    
-    panel2.innerHTML = "";
+    viewControl.deleteView(panel2);
     panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;
 
     let nextButton = document.createElement("button");
@@ -192,8 +191,6 @@ page("/viewnew/:orgID", function (ctx, next) {
 
     //showLink(ctx, next, boilerplate);
     Channel.selectedCategory = Channel.mainCategory;
-    //renderForm(panel2, phone);
-    //render(panel2, () => phoneView(Channel));
     viewControl.add(panel2, () => phoneView(Channel));
 }); // viewnew/orgID page
 
@@ -202,8 +199,6 @@ page("/channels", async function (ctx, next) {
     if (user.isCurrent()) {
     channels = await getUserChannels(user.id)
     console.log(`getUserChannels returned count: ${channels.length}`);
-    panel1.innerHTML = "<h2>Choose a Channel to Edit</h2>";
-    //renderForm(panel1, displayChannelList, channels);
     viewControl.add(panel1, () => displayChannelList(channels));
     viewControl.deleteView(panel2);
     viewControl.deleteView(panel3);
