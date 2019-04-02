@@ -1,6 +1,8 @@
 import {Organization, getOrganization} from "./organizations.js";
 import Likemoji from './likemojis.js';
 import {ChannelStyle, saveNewStyle, getStyle} from "./styles.js";
+import viewControl from './viewcontrol.js';
+
 //import {Group, getMainCategory} from "./groups.js";
 
 var org = Parse.Object.extend("Organization");
@@ -160,7 +162,10 @@ const Channel =  {
     
     get subCategories() {return this.categories.filter(function(cat) {return !isMainCategory(cat)})},
     get channelStyle() {return this.styles[0]},
-    saveAll: function() {return x}  
+    saveAll: function() {return x} ,
+    updateViews: function() {
+        viewControl.update();
+    }
 }
 
 /*  need to incorporate this logic
@@ -210,4 +215,4 @@ function arrayToPointers(arr, pointerClass) {
     });
     return pointers;
 }
-export {Channel};
+export {Channel, viewControl};
