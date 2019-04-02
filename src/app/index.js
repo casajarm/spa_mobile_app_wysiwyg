@@ -12,7 +12,7 @@ import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
 import likemojisListView from './views/likemojisListView.js';
 
-import {Channel} from './modules/channel.js';
+import {Channel, viewControl} from './modules/channel.js';
 
 const {render, html, svg} = lighterhtml;
 
@@ -54,13 +54,15 @@ page.start({hashbang: false, dispatch: true});
 //page.base("/src/app/page_router_example.html");
 page.base('/src/app');
 page("/", function (ctx, next) {
-    panel1.innerHTML = `
+    viewControl.add(panel1
+    , () => html`
         <ul>
             <li><a href="signup">Create New Account</a></li>
             <li><a href="login">Login</a></li>
-        </ul>`;
-    panel2.innerHTML = "";
-    panel3.innerHTML = "";
+        </ul>`);
+
+    viewControl.deleteView(panel2);
+    viewControl.deleteView(panel3);
 });
 
 page("/home", function (ctx, next) {
@@ -69,7 +71,7 @@ page("/home", function (ctx, next) {
 
 page("/signup", function (ctx, next) {
     //panel 2
-    panel2.innerHTML = "";
+    viewControl.deleteView(panel2);
     renderForm(panel2, signUpForm);
     //not sure if this is the best place to wire up event handlers...
     let signupUser2 = document.querySelector("#signUpUser2");
@@ -191,8 +193,8 @@ page("/viewnew/:orgID", function (ctx, next) {
     //showLink(ctx, next, boilerplate);
     Channel.selectedCategory = Channel.mainCategory;
     //renderForm(panel2, phone);
-    render(panel2, () => phoneView(Channel));
-
+    //render(panel2, () => phoneView(Channel));
+    viewControl.add(panel2, () => phoneView(Channel));
 }); // viewnew/orgID page
 
 page("/channels", async function (ctx, next) {
@@ -202,9 +204,9 @@ page("/channels", async function (ctx, next) {
     console.log(`getUserChannels returned count: ${channels.length}`);
     panel1.innerHTML = "<h2>Choose a Channel to Edit</h2>";
     //renderForm(panel1, displayChannelList, channels);
-    render(panel1, () => displayChannelList(channels));
-    panel2.innerHTML = "";
-    panel3.innerHTML = "";
+    viewControl.add(panel1, () => displayChannelList(channels));
+    viewControl.deleteView(panel2);
+    viewControl.deleteView(panel3);
     }
 
 }); //channels page
@@ -233,12 +235,13 @@ page("/channel/:channelID/view",  async function (ctx, next) {
             await Channel.populate(channelID);
             //channel = channels.find(x => x.id === channelID);   
     }
-    render(panel1, () => catLeftView(Channel.categories));    
+    viewControl.add(panel1, () => catLeftView(Channel.categories));    
     //panel2.classList.add('phone-frame');
     
     let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
     Channel.selectedCategory = Channel.mainCategory;
-    render(panel2,  () => phoneView(Channel));
+    viewControl.deleteAll();
+    viewControl.add(panel2, () => phoneView(Channel));
     // not sure about having to add these elements like this
     likemojisPanel = getOrCreateDiv('likemojis-panel', panel3);
     editorPanel =  getOrCreateDiv('editor-panel', panel3)
@@ -247,9 +250,9 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     likemojisPanel.classList.add('hidden');
     categoriesPanel.classList.add('hidden');
     editorPanel.classList.remove('hidden');
-    render(categoriesPanel, () => categoriesEditorView(Channel));
-    render(editorPanel, () => categoryEditorView(Channel));    
-    render(likemojisPanel, () => likemojisListView(Channel));
+    viewControl.add(categoriesPanel, () => categoriesEditorView(Channel));
+    viewControl.add(editorPanel, () => categoryEditorView(Channel));    
+    viewControl.add(likemojisPanel, () => likemojisListView(Channel));
        
     panel2.appendChild (inlineStyle(Channel.channelStyle));
     
@@ -271,13 +274,13 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         
         console.log(`entering view for channel id ${channelID} and group ${selectedCategoryID}`);
         Channel.selectedCategoryID = selectedCategoryID;
-        render(panel2, () => phoneView(Channel));
+        viewControl.add(panel2, () => phoneView(Channel));
         // TODO add the back button on the left panel
         
        likemojisPanel.classList.add('hidden');
        categoriesPanel.classList.add('hidden');
        editorPanel.classList.remove('hidden');
-       render(editorPanel, () => categoryEditorView(Channel));   
+       viewControl.add(editorPanel, () => categoryEditorView(Channel));   
     }
 
 });//channel group page
@@ -331,7 +334,7 @@ function showform(formID, panel) {
 
 function showLink(ctx, next, custom) {
     console.log(`Show ${custom}`);
-    panel3.innerHTML = "";
+    viewControl.deleteView(panel3);
     var newElement = document.createElement("P");
     newElement.onclick = function (e) {
         page("/right/link10");
