@@ -11,24 +11,24 @@ const catLeftView = (categories) => {
     }
 
     function callCategoriesEditor (e) {
-        let categoriesPanel = document.getElementById('categories-panel');
+        let panelCategories = document.getElementById('panel-categories');
         console.log('clicked callCategoriesEditor');
         hideAll();
-        categoriesPanel.classList.remove('hidden');
+        panelCategories.classList.remove('hidden');
     }
-    
+
     function callCategoryEditor (e) {
-        let editorPanel =  document.getElementById('editor-panel');
+        let panelEditor =  document.getElementById('panel-editor');
         console.log('clicked callCategoryEditor');
         hideAll();
-        editorPanel.classList.remove('hidden');
+        panelEditor.classList.remove('hidden');
     }
-    
+
     function callLikemojiEditor (e) {
-        let likemojisPanel = document.getElementById('likemojis-panel');
+        let panelLikemojis = document.getElementById('panel-likemojis');
         console.log('clicked callLikemojiEditor');
         hideAll();
-        likemojisPanel.classList.remove('hidden');
+        panelLikemojis.classList.remove('hidden');
     }
 
     return html`<div>
@@ -43,7 +43,7 @@ const catLeftView = (categories) => {
         </div>
         <hr />
         <div class="selectDiv text-center">
-            <button 
+            <button
                 id="addHeader"
                 type="button"
                 class="btn btn-default active editor"
