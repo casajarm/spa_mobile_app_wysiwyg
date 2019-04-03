@@ -19,13 +19,14 @@ const {render, html, svg} = lighterhtml;
 var panel1,
     panel2,
     panel3,
+    panelStyle,
     channelName,
     user,
     channelID,              // currently selected channel ID
     selectedCategoryID,     // currently selected category ID
-    categoriesPanel,
-    likemojisPanel, 
-    editorPanel;
+    panelCategories,
+    panelLikemojis,
+    panelEditor;
 var channels = []           // list of users channels
 
 channelName = "You Beautiful Person You";
@@ -40,11 +41,12 @@ function initApplication() {
     panel1 = document.getElementById("panel1");
     panel2 = document.getElementById("panel2");
     panel3 = document.getElementById("panel3");
+    panelStyle = document.getElementById("panel-style");
     // not sure about having to add these elements like this
-    likemojisPanel = getOrCreateDiv('likemojis-panel', panel3);
-    editorPanel =  getOrCreateDiv('editor-panel', panel3)
-    categoriesPanel = getOrCreateDiv('categories-panel', panel3);
-    
+    panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
+    panelEditor =  getOrCreateDiv('panel-editor', panel3)
+    panelCategories = getOrCreateDiv('panel-categories', panel3);
+
     Parse.initialize("fg8ZXCHKfBOWme42LGPA");
     Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
     user = new Parse.User();
@@ -127,13 +129,9 @@ page("/signup", function (ctx, next) {
 
 page("/login", function (ctx, next) {
     viewControl.deleteView(panel1);
-    viewControl.deleteView(panel2);
+    viewControl.add(panel2, loginForm);
     viewControl.deleteView(panel3);
-    let headline = document.createElement('h2');
-    headline.innerHTML = 'Login to your account';
-    panel2.appendChild(headline); 
-    renderForm(panel2, loginForm);
-    
+
     //not sure if this is the best place to wire up event handlers...
     let loginButton = document.querySelector("#loginUser");
     loginButton.addEventListener("click", function (e) {
@@ -176,7 +174,7 @@ page("/distribute", function (ctx, next) {
 
 page("/viewnew/:orgID", function (ctx, next) {
     Channel.populate(ctx.params.orgID);
-    panel1.innerHTML = "About your Likemoji Channel";    
+    panel1.innerHTML = "About your Likemoji Channel";
     viewControl.deleteView(panel2);
     panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;
 
@@ -217,7 +215,7 @@ page("/channel/:channelID/clone", function (ctx, next) {
         .then(async function (org) {
             console.log("New org saved .. now clone");
             await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
-            //redirect to the view now 
+            //redirect to the view now
             page.redirect(`/viewnew/${org.id}`);
         });
 });
@@ -226,31 +224,31 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     channelID = ctx.params.channelID;
     console.log(`entering view for channel id ${channelID}`);
     if (!Channel.channelID
-        || Channel.channelID != channelID) {    
+        || Channel.channelID != channelID) {
             await Channel.populate(channelID);
-            //channel = channels.find(x => x.id === channelID);   
+            //channel = channels.find(x => x.id === channelID);
     }
-    viewControl.add(panel1, () => catLeftView(Channel.categories));    
+    viewControl.add(panel1, () => catLeftView(Channel.categories));
     //panel2.classList.add('phone-frame');
-    
+
     let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
     Channel.selectedCategory = Channel.mainCategory;
     viewControl.deleteAll();
     viewControl.add(panel2, () => phoneView(Channel));
     // not sure about having to add these elements like this
-    likemojisPanel = getOrCreateDiv('likemojis-panel', panel3);
-    editorPanel =  getOrCreateDiv('editor-panel', panel3)
-    categoriesPanel = getOrCreateDiv('categories-panel', panel3);
+    panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
+    panelEditor =  getOrCreateDiv('panel-editor', panel3)
+    panelCategories = getOrCreateDiv('panel-categories', panel3);
 
-    likemojisPanel.classList.add('hidden');
-    categoriesPanel.classList.add('hidden');
-    editorPanel.classList.remove('hidden');
-    viewControl.add(categoriesPanel, () => categoriesEditorView(Channel));
-    viewControl.add(editorPanel, () => categoryEditorView(Channel));    
-    viewControl.add(likemojisPanel, () => likemojisListView(Channel));
-       
-    panel2.appendChild (inlineStyle(Channel.channelStyle));
-    
+    panelLikemojis.classList.add('hidden');
+    panelCategories.classList.add('hidden');
+    panelEditor.classList.remove('hidden');
+    // we could combine these 3 views into one view.js file
+    viewControl.add(panelCategories, () => categoriesEditorView(Channel));
+    viewControl.add(panelEditor, () => categoryEditorView(Channel));
+    viewControl.add(panelLikemojis, () => likemojisListView(Channel));
+    viewControl.add(panelStyle, () => inlineStyle(Channel.channelStyle));
+
 });  //channel view
 
 page("/channel/:channelID/view/:groupID", async function (ctx, next) {
@@ -258,24 +256,24 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         || Channel.channelID != ctx.params.channelID) {
         channelID = ctx.params.channelID;
         Channel.populate(channelID);
-        //channel = channels.find(x => x.id === channelID);   
+        //channel = channels.find(x => x.id === channelID);
         }
-    
+
     if (!selectedCategoryID
         || selectedCategoryID  != ctx.params.groupID) {
             selectedCategoryID = ctx.params.groupID;
         ctx.save();
         let category = Channel.categories.find(x => x.id === selectedCategoryID);
-        
+
         console.log(`entering view for channel id ${channelID} and group ${selectedCategoryID}`);
         Channel.selectedCategoryID = selectedCategoryID;
         viewControl.add(panel2, () => phoneView(Channel));
         // TODO add the back button on the left panel
-        
-       likemojisPanel.classList.add('hidden');
-       categoriesPanel.classList.add('hidden');
-       editorPanel.classList.remove('hidden');
-       viewControl.add(editorPanel, () => categoryEditorView(Channel));   
+
+       panelLikemojis.classList.add('hidden');
+       panelCategories.classList.add('hidden');
+       panelEditor.classList.remove('hidden');
+       viewControl.add(panelEditor, () => categoryEditorView(Channel));
     }
 
 });//channel group page
@@ -310,14 +308,14 @@ function renderForm(panel, formFunction, formArguments) {
     let form;
     // sometimes form is a promise
     // try to resolve and if it is not a thennable just append the result
-    // 
+    //
     try {
          formFunction(formArguments).then(_form => {panel.appendChild(_form)});
     }
     catch (err) {
-        form = formFunction(formArguments);  
-        panel.appendChild(form);      
-    }    
+        form = formFunction(formArguments);
+        panel.appendChild(form);
+    }
 }
 
 function showform(formID, panel) {
@@ -361,7 +359,7 @@ function signUpForm() {
 		<div class="form-group" id="passworddiv">
 			<label for="passwordSignup">password</label>
 			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
-		</div>		
+		</div>
 		<div class="form-group" id="organizationdiv">
 				<label for="organizationSignup">Orgnization Name</label>
 				<input type="text" class="form-control" id="inputOrganization" placeholder="organization name">
@@ -373,10 +371,8 @@ function signUpForm() {
 }
 
 function loginForm() {
-    let form = document.createElement("div");
-    let target = "";
-    let form2 = `<form id="loginForm" class="form">
-    
+    let form = html`<h2>Login to your account</h2>
+    <form id="loginForm" class="form">
         <div class="form-group" id="emaildiv">
             <label for="emailSignup">email</label>
             <input type="email" class="form-control" id="loginEmail" placeholder="enter your email here">
@@ -388,7 +384,6 @@ function loginForm() {
             submit
         </button>
     </form>`;
-    form.innerHTML = form2;
     return form;
 }
 
@@ -404,14 +399,14 @@ const displayChannelList = (channels) => {
     then define onclick and data-i attribute
     --- <a data-i=${i.id} onclick="${myClicker}">
     */
-   
+
     function selectChannel(e) {
         let targetChannel = e.currentTarget.dataset.i;
-        let route = '/channel/' + targetChannel + '/view';         
-        page(route);        
+        let route = '/channel/' + targetChannel + '/view';
+        page(route);
     }
-    
-    let orgList = channels.map(i => 
+
+    let orgList = channels.map(i =>
             html`<li class="channelList" id="${i.id}">
                     <a data-i=${i.id} onclick="${selectChannel}">${i.attributes.name}</a>
                 </li>`);
@@ -453,37 +448,36 @@ async function loginParse(username, password) {
    */
 }
 
+
+
 function inlineStyle(style) {
-    
-    let styleRules = `#phoneDisplay { 
-        background-color: ${style.get("generalColor")};
-    }
-    
-    .navBar { 
-        background-color:  ${style.get("tabBar")}
-    }
-	
-	.activeNavIcon { 
-        color:  ${style.get("tabBarSelected")}
-    }
-	
-	.channelText { 
-        color:  ${style.get("generalTextColor")}
-    }
-    .categorytxt { 
-        color:  ${style.get("categoryTextColor")}
-    }
-    `;
-    let styleSheet = document.createElement("style");
-    styleSheet.type = 'text/css';
-    styleSheet.innerHTML = styleRules;
-    return styleSheet;
-        
+    let styleSheet = `
+        #phoneDisplay {
+            background-color: ${style.get("generalColor")};
+        }
+
+        .navBar {
+            background-color:  ${style.get("tabBar")}
+        }
+
+        .activeNavIcon {
+            color:  ${style.get("tabBarSelected")}
+        }
+
+        .channelText {
+            color:  ${style.get("generalTextColor")}
+        }
+        .categorytxt {
+            color:  ${style.get("categoryTextColor")}
+        }`;
+    let styleTag = document.createElement('style');
+    styleTag.append(styleSheet);
+    return styleTag;
 }
 
 function getOrCreateDiv(id, parent) {
     let elem = document.getElementById(id);
-    if (!elem) { 
+    if (!elem) {
         elem = document.createElement('div')
         elem.id = id;
         parent.appendChild(elem);
