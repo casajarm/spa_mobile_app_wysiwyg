@@ -19,7 +19,7 @@ viewControl.add = function (target, source) {
 viewControl.deleteView = function (target) {
     let key = viewControl.views.find( x => x.target === target);
     if (key) {
-        let deleted = viewControl.splice(key);
+        let deleted = viewControl.views.splice(key);
         console.log('deleted view' + deleted);
     }
     render(target, () => html`<span />`);
