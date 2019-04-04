@@ -3,11 +3,47 @@ const {render, html, svg} = lighterhtml;
 const catLeftView = (categories) => {
     //TODO what is a better way to keep this view from knowing about the other parts of the page
 
+    function togglePanelWithin(panelName, parentName) {
+        let panel, parent;
+        panel = document.getElementById(panelName);
+        if (panel) {
+            parent = document.getElementById(parentName);
+            if (parent){
+                for (var i = 0; i < parent.children.length; i++) {
+                    parent.children[i].classList.add('hidden');
+                  }
+                panel.classList.remove('hidden');
+            }
+            else {
+                console.warn(`panel ${parentName} not found`);
+            }
+        }
+        else {
+            console.warn(`panel ${panelName} not found`);
+        }
+    }
+
+    function callCategoriesEditor (e) {
+        e.preventDefault();
+        togglePanelWithin('panel-categories', 'panel3');
+    }
+
+    function callCategoryEditor (e) {
+        e.preventDefault();
+        togglePanelWithin('panel-editor', 'panel3');
+    }
+
+    function callLikemojiEditor (e) {
+        e.preventDefault();
+        togglePanelWithin('panel-likemojis', 'panel3');
+    }
+
+/*
     function hideAll() {
         let panel3Container = document.getElementById('panel3');
         for (var i = 0; i < panel3Container.children.length; i++) {
             panel3Container.children[i].classList.add('hidden');
-          }
+        }
     }
 
     function callCategoriesEditor (e) {
@@ -30,6 +66,7 @@ const catLeftView = (categories) => {
         hideAll();
         panelLikemojis.classList.remove('hidden');
     }
+*/
 
     return html`<div>
         <h3>Design & Edit Your Channel</h3>
