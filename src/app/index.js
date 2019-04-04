@@ -11,6 +11,8 @@ import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
 import likemojisListView from './views/likemojisListView.js';
+import styleEditorView from './views/styleEditorView.js';
+
 
 import {Channel, viewControl} from './modules/channel.js';
 
@@ -26,7 +28,8 @@ var panel1,
     selectedCategoryID,     // currently selected category ID
     panelCategories,
     panelLikemojis,
-    panelEditor;
+    panelEditor,
+    panelStyle;             //styles editor
 var channels = []           // list of users channels
 
 channelName = "You Beautiful Person You";
@@ -46,6 +49,7 @@ function initApplication() {
     panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
+    panelStyle =  getOrCreateDiv('panel-style', panel3);
 
     Parse.initialize("fg8ZXCHKfBOWme42LGPA");
     Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
@@ -229,7 +233,6 @@ page("/channel/:channelID/view",  async function (ctx, next) {
             //channel = channels.find(x => x.id === channelID);
     }
     viewControl.add(panel1, () => catLeftView(Channel.categories));
-    //panel2.classList.add('phone-frame');
 
     let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
     Channel.selectedCategory = Channel.mainCategory;
@@ -239,10 +242,13 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
+    panelStyle =  getOrCreateDiv('panel-style', panel3);
 
     panelLikemojis.classList.add('hidden');
     panelCategories.classList.add('hidden');
+    panelStyle.classList.add('hidden');
     panelEditor.classList.remove('hidden');
+
     // we could combine these 3 views into one view.js file
     viewControl.add(panelCategories, () => categoriesEditorView(Channel));
     viewControl.add(panelEditor, () => categoryEditorView(Channel));
@@ -448,8 +454,6 @@ async function loginParse(username, password) {
    */
 }
 
-
-
 function inlineStyle(style) {
     let styleSheet = `
         #phoneDisplay {
@@ -484,3 +488,30 @@ function getOrCreateDiv(id, parent) {
     }
     return elem;
 }
+
+
+
+$("#saveEditedHeader").click(function() {
+	// var name = $('#imageUpload')[0].files[0].name;   $("#headerName").text(name);
+	groupSelected.set("newHeader", headerParseFile);
+	groupSelected.set("newIpadHeader", ipadParseFile);
+	groupSelected.save().then(
+		group => {
+			// Execute any logic that should take place after the object is saved.
+			console.log("header saved");
+
+			$("#buildHeader img").attr(
+				"src",
+				groupSelected.attributes.newHeader.url()
+			);
+			$("#buildHeader").hide();
+			$("#buildHeader").fadeIn(650);
+			$("#imageUpload")[0].value = "";
+		},
+		error => {
+			// Execute any logic that should take place if the save fails. error is a
+			// Parse.Error with an error code and message.
+			alert("Failed to create new object, with error code: " + error.message);
+		}
+	);
+});
