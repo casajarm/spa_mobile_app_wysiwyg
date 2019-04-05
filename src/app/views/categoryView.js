@@ -1,4 +1,4 @@
-import {phoneView} from './phoneView.js';
+//import {phoneView} from './phoneView.js';
 
 const {render, html, svg} = lighterhtml;
 
@@ -119,11 +119,9 @@ const categoryEditorView = (Channel) => {
 					On
 				</button>
 			</div>
-
 			<label> - Likemojis Outline Stroke</label> <br />
 			<br />
-
-			<button id="editTheme" class="btn btn-editTheme">
+			<button id="editTheme" class="btn btn-editTheme" onclick="${callStyleEditor}">
 				<label>
 					<i
 						class="fas fa-edit"
@@ -160,7 +158,33 @@ const categoryEditorView = (Channel) => {
 		</div>
 	</div>`;
 
+	function callStyleEditor (e) {
+		e.preventDefault();
+		togglePanelWithin('panel-style-editor', 'panel3');
+	}
+
+
 	return categoryEditorViewHTML;
+}
+
+function togglePanelWithin(panelName, parentName) {
+    let panel, parent;
+    panel = document.getElementById(panelName);
+    if (panel) {
+        parent = document.getElementById(parentName);
+        if (parent){
+            for (var i = 0; i < parent.children.length; i++) {
+                parent.children[i].classList.add('hidden');
+              }
+            panel.classList.remove('hidden');
+        }
+        else {
+            console.warn(`panel ${parentName} not found`);
+        }
+    }
+    else {
+        console.warn(`panel ${panelName} not found`);
+    }
 }
 
 /*
