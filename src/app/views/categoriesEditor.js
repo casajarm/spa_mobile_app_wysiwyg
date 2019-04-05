@@ -1,4 +1,4 @@
-import {phoneView} from './phoneView.js';
+//import {phoneView} from './phoneView.js';
 //.for(categories)
 
 const {render, html, svg} = lighterhtml;
@@ -12,7 +12,7 @@ const categoriesEditorView = (Channel) => {
 		<div id="editorContainer" class="image upload">
 			<h4 style="display:inline">Click to edit / Drag to reorder:</h4>
 			<ul id="categoriesInEditor">
-				${Channel.categories.map((cat, index) => 
+				${Channel.categories.map((cat, index) =>
 					cat.attributes.main != 1
 					? html`<li
 								id="${cat.id+index}"
@@ -75,7 +75,7 @@ const categoriesEditorView = (Channel) => {
 	//sets group order to order that was set in the dragable editor
 	function setNewGroupOrder() {
 		//user catOrder above to update all groups order
-		let catOrder = document.querySelectorAll('#categoriesInEditor li');	
+		let catOrder = document.querySelectorAll('#categoriesInEditor li');
 		for (var i = 0; i < catOrder.length; i++) {
 			let thisID = catOrder[i].dataset.i;
 			let group = Channel.categories.find(x => x.id === thisID);
@@ -87,7 +87,7 @@ const categoriesEditorView = (Channel) => {
 				Channel.categories.sort(function (a,b) {
 					return a.get('order') - b.get('order');
   				});
-				
+
 				for (var i = 1; i < Channel.categories.length; i++) {
 					console.log(Channel.categories[i].id + " " + Channel.categories[i].attributes.order);
 				}
@@ -101,7 +101,7 @@ const categoriesEditorView = (Channel) => {
 			}
 		);
 	}
-	return categoriesEditorViewHTML;	
-}        
+	return categoriesEditorViewHTML;
+}
 
 export default categoriesEditorView;
