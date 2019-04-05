@@ -75,9 +75,10 @@ function styleEditorView(Channel) {
         let attribs = e.currentTarget.dataset.attr.split(' ');
         let val = e.currentTarget.value;
         console.log(`set attribute ${attribs} to value ${val}`);
-        for (i = 0; i < attribs.length; i++) {
-            tempStyle.set(attribs[i], val);
+        for (var i = 0; i < attribs.length; i++) {
+            style.set(attribs[i], val);
         }
+        Channel.updateViews();
     }
 
     function saveStyle() {
