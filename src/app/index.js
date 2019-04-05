@@ -29,7 +29,7 @@ var panel1,
     panelCategories,
     panelLikemojis,
     panelEditor,
-    panelStyle;             //styles editor
+    panelStyleEditor;             //styles editor
 var channels = []           // list of users channels
 
 channelName = "You Beautiful Person You";
@@ -49,7 +49,7 @@ function initApplication() {
     panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
-    panelStyle =  getOrCreateDiv('panel-style', panel3);
+    panelStyleEditor =  getOrCreateDiv('panel-style-editor', panel3);
 
     Parse.initialize("fg8ZXCHKfBOWme42LGPA");
     Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
@@ -177,7 +177,7 @@ page("/distribute", function (ctx, next) {
 }); // distribute page
 
 page("/viewnew/:orgID", function (ctx, next) {
-    Channel.populate(ctx.params.orgID);
+    Channel.populateAll(ctx.params.orgID);
     panel1.innerHTML = "About your Likemoji Channel";
     viewControl.deleteView(panel2);
     panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;
@@ -229,7 +229,7 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     console.log(`entering view for channel id ${channelID}`);
     if (!Channel.channelID
         || Channel.channelID != channelID) {
-            await Channel.populate(channelID);
+            await Channel.populateAll(channelID);
             //channel = channels.find(x => x.id === channelID);
     }
     viewControl.add(panel1, () => catLeftView(Channel.categories));
@@ -242,17 +242,19 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
-    panelStyle =  getOrCreateDiv('panel-style', panel3);
+    panelStyleEditor =  getOrCreateDiv('panel-style-editor', panel3);
 
     panelLikemojis.classList.add('hidden');
     panelCategories.classList.add('hidden');
     panelStyle.classList.add('hidden');
     panelEditor.classList.remove('hidden');
 
-    // we could combine these 3 views into one view.js file
+    // we could combine these 4 views into one view.js file
     viewControl.add(panelCategories, () => categoriesEditorView(Channel));
     viewControl.add(panelEditor, () => categoryEditorView(Channel));
     viewControl.add(panelLikemojis, () => likemojisListView(Channel));
+    viewControl.add(panelStyleEditor, () => styleEditorView(Channel));
+
     viewControl.add(panelStyle, () => inlineStyle(Channel.channelStyle));
 
 });  //channel view
@@ -261,7 +263,7 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
     if (!Channel.channelID
         || Channel.channelID != ctx.params.channelID) {
         channelID = ctx.params.channelID;
-        Channel.populate(channelID);
+        Channel.populateAll(channelID);
         //channel = channels.find(x => x.id === channelID);
         }
 
