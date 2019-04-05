@@ -8,13 +8,13 @@ import viewControl from './viewcontrol.js';
 var org = Parse.Object.extend("Organization");
 const Channel =  {
     channel:    new org(),
-    categories: [], //Object.create(Group)]   
-    likemojis:  [], //[Object.create(Likemoji)],  
+    categories: [], //Object.create(Group)]
+    likemojis:  [], //[Object.create(Likemoji)],
     //TODO how to define function getCategoryLikemojis on each array element
     styles:     [],// [Object.create(ChannelStyle)],
     _selectedCategory: '',
     get channelID() {return this.channel.id},
-    
+
     get selectedCategory() {return this._selectedCategory},
     /**
      * @param {object} category
@@ -26,22 +26,27 @@ const Channel =  {
     set selectedCategoryID(ID) {
         this._selectedCategory = this.categories.find(x => x.id === ID);
     },
-    
-    async populate(popID) {
-      // setting a new channel refresh all the related data      
+
+    async populateAll(popID) {
+      // setting a new channel refresh all the related data
         this.channel    = await getOrganization(popID);
-        this.categories = await getOrgCategories(popID);    
-        this.likemojis  = await getLikemojis(popID);   
-        this.styles     = await getStyle(popID);    
+        this.categories = await getOrgCategories(popID);
+        this.likemojis  = await getLikemojis(popID);
+        this.styles     = await getStyle(popID);
         console.log(`populated channel for ${popID}`);
         console.log(`populated likemojis with ${this.likemojis.length}`);
     },
+
+    async populateStyle() {
+        this.styles     = await getStyle(this.channelID);
+    }
+
     catLikemojis: function(category) {
-        let catLikemojis = category.get('likemojis'); 
+        let catLikemojis = category.get('likemojis');
         // return the likemojis that match array in category
         return this.likemojis.filter((moji) => catLikemojis.find(x => x === moji.id));
     },
-    
+
     deleteCategory: async function(category) {
         // remove from the channel object..group and grouppointers attributes
         let channelGroups = this.channel.get('groups');
@@ -52,19 +57,19 @@ const Channel =  {
         //and remove it from this local object
         let ind2 = this.categories.findIndex(x => x.id === category.id);
         this.categories.splice(ind2, 1);
-        await this.channel.save();  
+        await this.channel.save();
         // destroy means delete...
         await category.destroy().then((cat) => {
-            // The object was deleted from the Parse Cloud.    
+            // The object was deleted from the Parse Cloud.
         }, (error) => {
             // The delete failed.
             // error is a Parse.Error with an error code and message.
             // TODO messaging function for unified handling of errors
             }
         );
-        
+
     },
-    addCategory: async function (category) {        
+    addCategory: async function (category) {
         this.categories.push(category);
         //add to the channel object too
         let channelGroups = this.channel.get('groups');
@@ -76,11 +81,11 @@ const Channel =  {
         category.set('organizationName', this.channel.get('name'));
         await category.save();
     },
-    
+
     addLikemoji: async function(likemoji) {
         likemoji.set("Organization", this.channel.id);
         await likemoji.save();
-        this.likemojis.push(likemoji);        
+        this.likemojis.push(likemoji);
     },
     deleteLikemoji: async function(likemoji) {
         // remove from group(s)
@@ -96,7 +101,7 @@ const Channel =  {
         this.likemojis.splice(ind, 1);
         await Parse.Object.saveAll(this.categories);
         await likemoji.destroy().then((moji) => {
-            // The object was deleted from the Parse Cloud.    
+            // The object was deleted from the Parse Cloud.
         }, (error) => {
             // The delete failed.
             // error is a Parse.Error with an error code and message.
@@ -115,7 +120,7 @@ const Channel =  {
             catch {
                 alert (`${likemoji} is an invalid ID for likemojis`);
             }
-            
+
         }
         else {
             likemojiObj = likemoji;
@@ -139,13 +144,13 @@ const Channel =  {
                 likemojiObj.set('organizationName', this.channel.get('name'));
                 await likemojiObj.save();
                 await category.save();
-            }     
-        }   
+            }
+        }
     },
     removeCategoryLikemoji: async function(category, likemojiID)  {
         // get the array of likemoji pointer from group
         let catLikemojiIDs = category.get('likemojis');
-        // find the array index of the given likemoji         
+        // find the array index of the given likemoji
         let ind = catLikemojiIDs.findIndex(x => x === likemojiID);
         if(ind > -1) {
             catLikemojiIDs.splice(ind, 1);
@@ -154,12 +159,12 @@ const Channel =  {
         }
     },
     setCategoryOrder: function(ids, orders)  {},
-        
+
     get mainCategory()  {
-        let mainCat = this.categories.filter(isMainCategory); 
+        let mainCat = this.categories.filter(isMainCategory);
         return mainCat[0]; //filter returns array here
     },
-    
+
     get subCategories() {return this.categories.filter(function(cat) {return !isMainCategory(cat)})},
     get channelStyle() {return this.styles[0]},
     saveAll: function() {return x} ,
@@ -172,7 +177,7 @@ const Channel =  {
     editors.push(currentUser.id);
     organization.set("header", returnedOrg.attributes.header);
     organization.set("callOut", returnedOrg.attributes.callOut);
-    organization.set("editors", editors);     
+    organization.set("editors", editors);
 */
 
 function isMainCategory(category) {
@@ -195,7 +200,7 @@ async function getOrgCategories(orgId) {
 async function getLikemojis(orgId) {
     const query = new Parse.Query(Likemoji);
     query.equalTo("organizationID", orgId);
-  
+
     try {
       return await query.find();
     } catch (err) {
