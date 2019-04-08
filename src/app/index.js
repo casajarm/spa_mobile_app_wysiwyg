@@ -6,7 +6,7 @@ import {Organization} from "./modules/organizations.js";
 //import {getStyle} from "./modules/styles.js";
 //import {Group, getMainCategory} from "./modules/groups.js";
 //import {render, html} from 'https://unpkg.com/lighterhtml?module';
-import {phone, phoneView, getOrgCategories, getCategoryLikemojis} from './views/phoneView.js';
+import {phone, phoneView, getCategoryLikemojis} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
@@ -31,6 +31,23 @@ var panel1,
     panelEditor,
     panelStyleEditor;             //styles editor
 var channels = []           // list of users channels
+
+
+//modal editor vars
+var editors = []; //users ids able to edit the channel to populate channel list
+var activeEditorWindow = "pageHeaderEditor";
+var imagefile; //image to be saved to S3
+var unsplashResults = []; //array of images returned from unsplash search
+var parseFile;
+var headerParseFile;
+var ipadParseFile;
+
+// used to deal with errors on undefined attributes where parse wants you to chain a call to something like URL to the attribute
+// for example groupSelected.attributes.newCategoryImage.url()
+let mockObject = {};
+        mockObject.url = function () {
+            return '';
+        };
 
 channelName = "You Beautiful Person You";
 document.onreadystatechange = function () {
@@ -232,12 +249,10 @@ page("/channel/:channelID/view",  async function (ctx, next) {
             await Channel.populateAll(channelID);
             //channel = channels.find(x => x.id === channelID);
     }
-    viewControl.add(panel1, () => catLeftView(Channel.categories));
-
-    let mainCategoryID = Channel.mainCategory.id;// TODO bake this into my channel object
     Channel.selectedCategory = Channel.mainCategory;
     viewControl.deleteAll();
     viewControl.add(panel2, () => phoneView(Channel));
+    viewControl.add(panel1, () => catLeftView(Channel.categories));
     // not sure about having to add these elements like this
     panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
@@ -246,7 +261,7 @@ page("/channel/:channelID/view",  async function (ctx, next) {
 
     panelLikemojis.classList.add('hidden');
     panelCategories.classList.add('hidden');
-    panelStyle.classList.add('hidden');
+    panelStyleEditor.classList.add('hidden');
     panelEditor.classList.remove('hidden');
 
     // we could combine these 4 views into one view.js file
@@ -267,22 +282,22 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
         //channel = channels.find(x => x.id === channelID);
         }
 
-    if (!selectedCategoryID
-        || selectedCategoryID  != ctx.params.groupID) {
-            selectedCategoryID = ctx.params.groupID;
-        ctx.save();
-        let category = Channel.categories.find(x => x.id === selectedCategoryID);
-
+        selectedCategoryID = ctx.params.groupID;
         console.log(`entering view for channel id ${channelID} and group ${selectedCategoryID}`);
         Channel.selectedCategoryID = selectedCategoryID;
         viewControl.add(panel2, () => phoneView(Channel));
-        // TODO add the back button on the left panel
 
-       panelLikemojis.classList.add('hidden');
-       panelCategories.classList.add('hidden');
-       panelEditor.classList.remove('hidden');
-       viewControl.add(panelEditor, () => categoryEditorView(Channel));
-    }
+        viewControl.add(panelCategories, () => categoriesEditorView(Channel));
+        viewControl.add(panelEditor, () => categoryEditorView(Channel));
+        viewControl.add(panelLikemojis, () => likemojisListView(Channel));
+        viewControl.add(panelStyleEditor, () => styleEditorView(Channel));
+
+        viewControl.add(panelStyle, () => inlineStyle(Channel.channelStyle));
+        // TODO add the back button on the left panel
+        panelLikemojis.classList.add('hidden');
+        panelCategories.classList.add('hidden');
+        panelStyleEditor.classList.add('hidden');
+        panelEditor.classList.remove('hidden');
 
 });//channel group page
 
@@ -457,6 +472,7 @@ async function loginParse(username, password) {
 }
 
 function inlineStyle(style) {
+    console.info(`running inline style with tabbar value of ${style.get("tabBar")}`);
     let styleSheet = `
         #phoneDisplay {
             background-color: ${style.get("generalColor")};
@@ -491,24 +507,148 @@ function getOrCreateDiv(id, parent) {
     return elem;
 }
 
+/* jquery/bootstrap handler for the categories editor modal
+TODO replace with template function?
+*/
+$('#addCategoriesModal').on('show.bs.modal',
+    function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var categoryID = button.data('i') // Extract info from data-* attributes
+        var modal = $(this);
+        Channel.selectedCategoryID = categoryID;
+        let groupSelected = Channel.selectedCategory;
 
+        modal.find("#categoryName").val(groupSelected.attributes.name);
+        modal.find("#categoryDisplayName").val(groupSelected.attributes.names.en);
+        modal.find("#categoryImageInput").val("");
+        if (groupSelected.attributes.disable == 1) {
+            modal.find("#disableCat").prop("checked", true);
+        } else {
+            modal.find("#disableCat").prop("checked", false);
+        }
+        modal.find("#categoryPreview").hide();
+        modal.find("#categoryPreview").attr("src", groupSelected.attributes.newCategoryImage.url());
+        modal.find("#categoryPreview").fadeIn(650);
+        modal.find("#categoryImageName").text(groupSelected.attributes.newCategoryImage._name);
+    }
+)
+
+//uploads a category image from category editor modal
+$("#categoryImageButton").click(function() {
+	var fileUploadControl = $("#categoryImageInput")[0];
+	if (fileUploadControl.files.length > 0) {
+		var file = fileUploadControl.files[0];
+		var name = fileUploadControl.files[0].name;
+		parseFile = new Parse.File(name, file);
+
+		parseFile.save().then(
+			function() {
+				// $('#categoryPreview').hide();
+				$("#categoryPreview").attr("src", parseFile._url);
+				// $('#categoryPreview').fadeIn(650);
+				console.log(parseFile._url);
+
+				// The file has been saved to Parse.
+			},
+			function(error) {
+				// The file either could not be read, or could not be saved to Parse.
+			}
+		);
+		$("#categoryImageInput")[0].value = "";
+	}
+});
+
+//saves category when editor modal is closed with save button
+$("#saveCategory").click(function(event) {
+    let categoryText = $("#categoryDisplayName").val();
+	let categoryNameInternal = $("#categoryName").val();
+	let categoryTextEN = {
+		en: categoryText
+	};
+
+    let disabled = $("#disableCat").is(":checked") ? 1 : 0;
+    let groupSelected = Channel.selectedCategory;
+
+	if (groupSelected == undefined) {
+		groupSelected = new Group();
+		groupSelected.set("organizationID", returnedOrg.id);
+
+		groupSelected.set("order", groups.length + 1);
+		groupSelected.set("newHeader", groups[0].attributes.newHeader);
+		groupSelected.set("callOuts", { en: "Connect with us!" });
+		groupSelected.set("likemojis", []);
+	    Channel.addCategory(groupSelected);
+	}
+
+	groupSelected.set("name", categoryNameInternal);
+	groupSelected.set("names", categoryTextEN);
+	groupSelected.set("disable", disabled);
+
+	if (parseFile != undefined) {
+		groupSelected.set("newCategoryImage", parseFile);
+		console.log("skipped");
+	}
+
+	// need to add "else" above to handle if user adds a category and doesn't upload
+	// an image.. should default to a default parse image we host - should do the
+	// same for the header as well - currently it just duplicates the main page
+	// header here...
+
+	groupSelected.save().then(
+		async group => {
+			console.log("category image saved");
+			parseFile = undefined;
+            page.redirect('/channel/' + channelID + '/view/' + groupSelected.id);
+			//document.getElementById("categoriesInEditor").innerHTML = "";
+		},
+		error => {
+			//  error is a Parse.Error with an error code and message.
+			alert("Failed to create new object, with error code: " + error.message);
+		}
+	);
+});
+
+//fills data for header editor modal
+$('#editheaderModal').on('show.bs.modal',
+    function (event) {
+        let modal = $(this);
+        let groupSelected = Channel.selectedCategory;
+
+        modal.find("#imageUpload").val("");
+        modal.find("#headerPreview").attr("src", groupSelected.attributes.newHeader.url());
+        modal.find("#headerEditorImageName").text(groupSelected.attributes.newHeader._name);
+        modal.find("#ipadImageUpload").val("");
+        modal.find("#ipadHeaderPreview").attr(
+            "src",
+            (groupSelected.attributes.newIpadHeader || mockObject).url() || ''
+        );
+        modal.find("#ipadHeaderEditorImageName").text(
+            (groupSelected.attributes.newIpadHeader || mockObject)._name || ''
+    	);
+    }
+);
 
 $("#saveEditedHeader").click(function() {
 	// var name = $('#imageUpload')[0].files[0].name;   $("#headerName").text(name);
-	groupSelected.set("newHeader", headerParseFile);
+    let groupSelected = Channel.selectedCategory;
+    groupSelected.set("newHeader", headerParseFile);
 	groupSelected.set("newIpadHeader", ipadParseFile);
 	groupSelected.save().then(
 		group => {
 			// Execute any logic that should take place after the object is saved.
 			console.log("header saved");
-
-			$("#buildHeader img").attr(
+            /*
+            $("#buildHeader img").attr(
 				"src",
 				groupSelected.attributes.newHeader.url()
 			);
 			$("#buildHeader").hide();
 			$("#buildHeader").fadeIn(650);
-			$("#imageUpload")[0].value = "";
+            */
+            Channel.updateViews();
+
+           // todo see if bootstrap has a reset modal feature
+            $("#imageUpload")[0].value = "";
 		},
 		error => {
 			// Execute any logic that should take place if the save fails. error is a
@@ -517,3 +657,126 @@ $("#saveEditedHeader").click(function() {
 		}
 	);
 });
+
+
+
+// when likemoji editor modal is opened this fills data
+
+
+
+$('#editLikemojisModal').on('show.bs.modal',
+    function (event) {
+        let thisLikemojiID = event.relatedTarget.id // id of calling likemoji icon
+        let modal = $(this);
+        // alert("clicked");
+        let likemoji = Channel.likemojis.find(x => x.id === thisLikemojiID);
+
+        modal.find("#likemojiName").val(likemoji.attributes.names.en);
+        modal.find("#likemojiEditorImageInput").val("");
+        modal.find("#likemojiPreview").hide();
+        modal.find("#likemojiPreview").attr("src", likemoji.attributes.x3.url());
+        modal.find("#likemojiPreview").fadeIn(650);
+        modal.find("#LikemojiEditorImageName").text(likemoji.attributes.x3._name);
+});
+
+
+//uploads a likemoji image from category editor modal
+$("#likemojiEditorImageButton").click(function() {
+	var fileUploadControl = $("#likemojiEditorImageInput")[0];
+	if (fileUploadControl.files.length > 0) {
+		var file = fileUploadControl.files[0];
+		var name = fileUploadControl.files[0].name;
+		parseFile = new Parse.File(name, file);
+
+		parseFile.save().then(
+			function() {
+				// $('#likemojiPreview').hide();
+				$("#likemojiPreview").attr("src", parseFile._url);
+				// $('#likemojiPreview').fadeIn(650);
+				console.log(parseFile._url);
+
+				// The file has been saved to Parse.
+			},
+			function(error) {
+				// The file either could not be read, or could not be saved to Parse.
+			}
+		);
+		$("#likemojiEditorImageInput")[0].value = "";
+	}
+});
+
+// uploads mobile header image to parse and sets the preview image src
+$("#headerEditorImageButton").click(function() {
+	var fileUploadControl = $("#imageUpload")[0];
+	if (fileUploadControl.files.length > 0) {
+		var file = fileUploadControl.files[0];
+		var name = fileUploadControl.files[0].name;
+		headerParseFile = new Parse.File(name, file);
+
+		headerParseFile.save().then(
+			function() {
+				$("#headerPreview").attr("src", headerParseFile._url);
+
+				console.log(headerParseFile._url);
+
+				// The file has been saved to Parse.
+			},
+			function(error) {
+				// The file either could not be read, or could not be saved to Parse.
+			}
+		);
+	}
+});
+
+// uploads mobile header image to parse and sets the preview image src
+
+$("#ipadHeaderEditorImageButton").click(function() {
+	console.log("ipad upload clicked");
+
+	var fileUploadControl = $("#ipadImageUpload")[0];
+	if (fileUploadControl.files.length > 0) {
+		var file = fileUploadControl.files[0];
+		var name = fileUploadControl.files[0].name;
+		ipadParseFile = new Parse.File(name, file);
+
+		ipadParseFile.save().then(
+			function() {
+				$("#ipadHeaderPreview").attr("src", ipadParseFile._url);
+
+				console.log(ipadParseFile._url);
+
+				// The file has been saved to Parse.
+			},
+			function(error) {
+				// The file either could not be read, or could not be saved to Parse.
+			}
+		);
+	}
+});
+
+//saves edited likemoji when editor modal is closed with save button
+
+$("#saveEditedLikemoji").click(function(event) {
+	var likemojiNamesEN = $("#likemojiName").val();
+
+	likemoji.set("names", { en: likemojiNamesEN });
+
+	if (parseFile != undefined) {
+		likemoji.set("x3", parseFile);
+	}
+
+	likemoji.save().then(
+		async returnedLikemoji => {
+			// Execute any logic that should take place after the object is saved.
+			console.log("likemoji saved");
+            Channel.updateViews();
+			parseFile = undefined;
+		},
+		error => {
+			// Execute any logic that should take place if the save fails. error is a
+			// Parse.Error with an error code and message.
+			alert("Failed to create new object, with error code: " + error.message);
+		}
+	);
+});
+
