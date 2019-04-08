@@ -31,16 +31,14 @@ const categoriesEditorView = (Channel) => {
 			)}
 			</ol>
 		</div>
-		<div
-			class="selectDiv text-center"
-			data-toggle="modal"
-			data-target="#addCategoriesModal"
-		>
+		<div class="selectDiv text-center">
 			<button
 				type="button"
 				id="addNewCategories"
 				class="btn btn-default addCategories"
-			>
+				data-toggle="modal"
+				data-target="#addCategoriesModal"
+				>
 				<i
 					style="font-size: 1.3em; color: white; margin-top: 4px;"
 					class="far fa-plus-square grow"
