@@ -512,24 +512,31 @@ TODO replace with template function?
 */
 $('#addCategoriesModal').on('show.bs.modal',
     function (event) {
-        var button = $(event.relatedTarget) // Button that triggered the modal
-        var categoryID = button.data('i') // Extract info from data-* attributes
-        var modal = $(this);
-        Channel.selectedCategoryID = categoryID;
-        let groupSelected = Channel.selectedCategory;
-
-        modal.find("#categoryName").val(groupSelected.attributes.name);
-        modal.find("#categoryDisplayName").val(groupSelected.attributes.names.en);
-        modal.find("#categoryImageInput").val("");
-        if (groupSelected.attributes.disable == 1) {
-            modal.find("#disableCat").prop("checked", true);
-        } else {
-            modal.find("#disableCat").prop("checked", false);
+        let modal = $(this);
+        let triggeringElement = event.relatedTarget; // Button/link/div that triggered the modal
+        if (triggeringElement.id == 'addNewCategories') {
+            Channel.selectedCategory = null;
+            document.getElementById('likemoji-edit-form').reset();
+            modal.find("#categoryPreview").attr("src", '');
+            modal.find("#categoryImageName").text('');
         }
-        modal.find("#categoryPreview").hide();
-        modal.find("#categoryPreview").attr("src", groupSelected.attributes.newCategoryImage.url());
-        modal.find("#categoryPreview").fadeIn(650);
-        modal.find("#categoryImageName").text(groupSelected.attributes.newCategoryImage._name);
+        else {
+            let categoryID = triggeringElement.dataset.i; // Extract info from data-* attributes
+            Channel.selectedCategoryID = categoryID;
+            let groupSelected = Channel.selectedCategory;
+            modal.find("#categoryName").val(groupSelected.attributes.name);
+            modal.find("#categoryDisplayName").val(groupSelected.attributes.names.en);
+            modal.find("#categoryImageInput").val("");
+            if (groupSelected.attributes.disable == 1) {
+                modal.find("#disableCat").prop("checked", true);
+            } else {
+                modal.find("#disableCat").prop("checked", false);
+            }
+            modal.find("#categoryPreview").hide();
+            modal.find("#categoryPreview").attr("src", groupSelected.attributes.newCategoryImage.url());
+            modal.find("#categoryPreview").fadeIn(650);
+            modal.find("#categoryImageName").text(groupSelected.attributes.newCategoryImage._name);
+        }
     }
 )
 
@@ -658,53 +665,6 @@ $("#saveEditedHeader").click(function() {
 	);
 });
 
-
-
-// when likemoji editor modal is opened this fills data
-
-
-
-$('#editLikemojisModal').on('show.bs.modal',
-    function (event) {
-        let thisLikemojiID = event.relatedTarget.id // id of calling likemoji icon
-        let modal = $(this);
-        // alert("clicked");
-        let likemoji = Channel.likemojis.find(x => x.id === thisLikemojiID);
-
-        modal.find("#likemojiName").val(likemoji.attributes.names.en);
-        modal.find("#likemojiEditorImageInput").val("");
-        modal.find("#likemojiPreview").hide();
-        modal.find("#likemojiPreview").attr("src", likemoji.attributes.x3.url());
-        modal.find("#likemojiPreview").fadeIn(650);
-        modal.find("#LikemojiEditorImageName").text(likemoji.attributes.x3._name);
-});
-
-
-//uploads a likemoji image from category editor modal
-$("#likemojiEditorImageButton").click(function() {
-	var fileUploadControl = $("#likemojiEditorImageInput")[0];
-	if (fileUploadControl.files.length > 0) {
-		var file = fileUploadControl.files[0];
-		var name = fileUploadControl.files[0].name;
-		parseFile = new Parse.File(name, file);
-
-		parseFile.save().then(
-			function() {
-				// $('#likemojiPreview').hide();
-				$("#likemojiPreview").attr("src", parseFile._url);
-				// $('#likemojiPreview').fadeIn(650);
-				console.log(parseFile._url);
-
-				// The file has been saved to Parse.
-			},
-			function(error) {
-				// The file either could not be read, or could not be saved to Parse.
-			}
-		);
-		$("#likemojiEditorImageInput")[0].value = "";
-	}
-});
-
 // uploads mobile header image to parse and sets the preview image src
 $("#headerEditorImageButton").click(function() {
 	var fileUploadControl = $("#imageUpload")[0];
@@ -754,29 +714,69 @@ $("#ipadHeaderEditorImageButton").click(function() {
 	}
 });
 
-//saves edited likemoji when editor modal is closed with save button
 
-$("#saveEditedLikemoji").click(function(event) {
-	var likemojiNamesEN = $("#likemojiName").val();
+// when likemoji editor modal is opened this fills data
+$('#editLikemojisModal').on('show.bs.modal',
+    function (event) {
+        let thisLikemojiID = event.relatedTarget.id // id of calling likemoji icon
+        let modal = $(this);
+        // alert("clicked");
+        let likemoji = Channel.likemojis.find(x => x.id === thisLikemojiID);
 
-	likemoji.set("names", { en: likemojiNamesEN });
+        modal.find("#likemojiName").val(likemoji.attributes.names.en);
+        modal.find("#likemojiEditorImageInput").val("");
+        modal.find("#likemojiPreview").hide();
+        modal.find("#likemojiPreview").attr("src", likemoji.attributes.x3.url());
+        modal.find("#likemojiPreview").fadeIn(650);
+        modal.find("#LikemojiEditorImageName").text(likemoji.attributes.x3._name);
+        modal.find("#likemojiEditorImageButton").click(function() {
+        var fileUploadControl = $("#likemojiEditorImageInput")[0];
+        if (fileUploadControl.files.length > 0) {
+            var file = fileUploadControl.files[0];
+            var name = fileUploadControl.files[0].name;
+            parseFile = new Parse.File(name, file);
 
-	if (parseFile != undefined) {
-		likemoji.set("x3", parseFile);
-	}
+            parseFile.save().then(
+                function() {
+                    // $('#likemojiPreview').hide();
+                    $("#likemojiPreview").attr("src", parseFile._url);
+                    // $('#likemojiPreview').fadeIn(650);
+                    console.log(parseFile._url);
 
-	likemoji.save().then(
-		async returnedLikemoji => {
-			// Execute any logic that should take place after the object is saved.
-			console.log("likemoji saved");
-            Channel.updateViews();
-			parseFile = undefined;
-		},
-		error => {
-			// Execute any logic that should take place if the save fails. error is a
-			// Parse.Error with an error code and message.
-			alert("Failed to create new object, with error code: " + error.message);
-		}
-	);
+                    // The file has been saved to Parse.
+                },
+                function(error) {
+                    // The file either could not be read, or could not be saved to Parse.
+                }
+            );
+            $("#likemojiEditorImageInput")[0].value = "";
+        }
+    });
+
+    //saves edited likemoji when editor modal is closed with save button
+    modal.find("#saveEditedLikemoji").click(function(event) {
+            var likemojiNamesEN = $("#likemojiName").val();
+
+            likemoji.set("names", { en: likemojiNamesEN });
+
+            if (parseFile != undefined) {
+                likemoji.set("x3", parseFile);
+            }
+
+            likemoji.save().then(
+                async returnedLikemoji => {
+                    // Execute any logic that should take place after the object is saved.
+                    console.log("likemoji saved");
+                    Channel.updateViews();
+                    parseFile = undefined;
+                },
+                error => {
+                    // Execute any logic that should take place if the save fails. error is a
+                    // Parse.Error with an error code and message.
+                    alert("Failed to create new object, with error code: " + error.message);
+                }
+            );
+    });
 });
+
 
