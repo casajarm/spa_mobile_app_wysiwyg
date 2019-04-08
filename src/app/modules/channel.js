@@ -13,6 +13,7 @@ const Channel =  {
     //TODO how to define function getCategoryLikemojis on each array element
     styles:     [],// [Object.create(ChannelStyle)],
     _selectedCategory: '',
+
     get channelID() {return this.channel.id},
 
     get selectedCategory() {return this._selectedCategory},
@@ -37,9 +38,11 @@ const Channel =  {
         console.log(`populated likemojis with ${this.likemojis.length}`);
     },
 
-    async populateStyle() {
-        this.styles     = await getStyle(this.channelID);
-    }
+    async resetStyle() {
+        await this.styles[0].fetch()
+        console.info(`populated style and now tabbar has a value of ${Channel.channelStyle.get("tabBar")}`);
+        return this.styles[0];
+    },
 
     catLikemojis: function(category) {
         let catLikemojis = category.get('likemojis');
@@ -143,7 +146,7 @@ const Channel =  {
                 likemojiObj.set('OrganizationId', this.channel.id);
                 likemojiObj.set('organizationName', this.channel.get('name'));
                 await likemojiObj.save();
-                await category.save();
+                // TODO move to button action to "save" await category.save();
             }
         }
     },
@@ -155,7 +158,7 @@ const Channel =  {
         if(ind > -1) {
             catLikemojiIDs.splice(ind, 1);
             category.set('likemojis', catLikemojiIDs);
-            await category.save();
+            // TODO move to button action to "save" await category.save();
         }
     },
     setCategoryOrder: function(ids, orders)  {},
@@ -167,7 +170,19 @@ const Channel =  {
 
     get subCategories() {return this.categories.filter(function(cat) {return !isMainCategory(cat)})},
     get channelStyle() {return this.styles[0]},
-    saveAll: function() {return x} ,
+
+    saveAll: function() {
+        Promise.all([
+            this.styles.saveAll(),
+            this.categories.saveAll(),
+            this.likemojis.saveAll(),
+            this.channel.save()])
+            .then( () => {return})
+            .catch(error => {
+                console.log(error.message)
+              });
+    },
+
     updateViews: function() {
         viewControl.update();
     }
