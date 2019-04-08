@@ -16,26 +16,21 @@ const {render, html, svg} = lighterhtml;
 // data for an org set to be selected for the given "category" parameter
 // category is a Group object from Parse
 const phone = async (Channel, selectedCategoryID) =>  {
-    //const {category, categories, categoryLikemojis} = props;
-    //let categories = await getOrgCategories(category.attributes.organizationID);
-   // let likemojis = await getCategoryLikemojis(category);
-   // return /*await*/ phoneView(category, categories, categoryLikemojis);  
     if (!selectedCategoryID) {
         selectedCategoryID = Channel.main
     }
-    return /*await*/ phoneView(Channel, selectedCategoryID);  
+    return /*await*/ phoneView(Channel, selectedCategoryID);
 }
 
 
 //const phoneView = (category, categories, categoryLikemojis) => {
 //const phoneView = (props) => {
 const phoneView = (Channel) => {
-//        const {category, categories, categoryLikemojis} = props;
+    console.info('rendering phoneView');
     let orgID = Channel.channelID; //category.attributes.organizationID;
     let panel2 = document.getElementById("panel2");
-    //let category = Channel.categories.find(x => x.id === selectedCategoryID);
-    let category = Channel.selectedCategory;
-    console.log(`entering phoneView for category id: ${category.id}`);
+    let category = Channel.selectedCategory || Channel.mainCategory;
+    console.info(`selected category id: ${category.id}`);
     const likemojisView = (likemojis) => {
         let mainPageClass = 'likemojiGroupCollection-area';
         if(category.attributes.main == 1) {
@@ -45,19 +40,19 @@ const phoneView = (Channel) => {
                 class="${mainPageClass}">
                   ${likemojis
                     ? likemojis.map(moji => likemojiView(moji))
-                    : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}	
+                    : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}
             </div>`;
-    
-        return mojiHtml;     
+
+        return mojiHtml;
     }
 
-    let phoneHTML = 
+    let phoneHTML =
     html`<div id='phone-view' class="col-lg-4 channelEdit">
         <div class="phone" id="phoneView">
             <img class="phone" src="assets/iPhone_7_front_frame sized.png" />
             <div id="phoneDisplay" class="phoneDisplay-area">
                 <div id="buildHeader" class="header text-white">
-                    <img id="docHeaderImage" class="header" 
+                    <img id="docHeaderImage" class="header"
                         src="${category.attributes.newHeader.url()}" />
                 </div>
                 <div id="callout" class="callout channelText">
@@ -96,13 +91,13 @@ const phoneView = (Channel) => {
     function dragover(e) {
         e.preventDefault()
     }
-        
+
     function dragenter(e) {
         e.preventDefault()
     }
-    
+
     console.log(phoneHTML);
-    //let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`; 
+    //let phoneView = html`<div id='phone-view' class="col-lg-4 channelEdit">${phoneHTML}</div>`;
     return phoneHTML;
 }
 
@@ -117,7 +112,7 @@ const phoneNavBarView =  (Channel) => {
         //TODO can we just refer to this views parent (<div id="phoneView">.parent)?
         let panel2 = document.getElementById("panel2");
         let panel3 = document.getElementById("panel3");
-        
+
         //panel2.innerHTML = '';
         //render(panel2, function () { return phoneView(Channel)});
         let route = "/channel/" + channelID + "/view";
@@ -130,8 +125,8 @@ const phoneNavBarView =  (Channel) => {
     class="navBar"
     style="background-color: rgb(24, 49, 103);"
     >
-        <div id="homeNavButton" 
-            class="navIcons" 
+        <div id="homeNavButton"
+            class="navIcons"
             style="display:inline">
             <i
                 style="font-size: 1.3em; color: rgb(52, 255, 86);"
@@ -159,11 +154,11 @@ const phoneNavBarView =  (Channel) => {
     }
 
     let likemojiViewHTML = html`<div
-    class="likemojis ui-draggable ui-draggable-handle"
-    draggable="true"
-    id="${likemoji.id}"
-    draggable="true"
-    ondragstart="${dragMoji}"
+        class="likemojis ui-draggable ui-draggable-handle"
+        draggable="true"
+        id="${likemoji.id}"
+        draggable="true"
+        ondragstart="${dragMoji}"
     >
         <img
             src="${likemoji.attributes.x3.url()}"
@@ -193,7 +188,7 @@ const categoryView = (category, skipMain) => {
     */
     function selectCategory(e) {
         let targetID = e.currentTarget.dataset.i;
-        page.redirect(`/channel/${orgID}/view/${targetID}`);    
+        page.redirect(`/channel/${orgID}/view/${targetID}`);
         //Channel.selectedCategoryID = targetID;
         //let panel2 = document.getElementById("panel2");
         //render(panel2, function () { return phoneView(Channel)});
@@ -203,13 +198,13 @@ const categoryView = (category, skipMain) => {
         if (category.attributes.main ==1) return html`<span></span>`;
     }
     let imgSrc = category.attributes.newCategoryImage ?
-                category.attributes.newCategoryImage.url() 
+                category.attributes.newCategoryImage.url()
                 : category.attributes.newHeader.url();
     let catName = category.attributes.name;
     let catID = category.id;
 
-    let categoryViewHTML = html`<div class="category" 
-        type="button" 
+    let categoryViewHTML = html`<div class="category"
+        type="button"
         id="${catID}"
         data-i="${catID}"
         onclick="${selectCategory}">
@@ -219,7 +214,7 @@ const categoryView = (category, skipMain) => {
             height="auto"/>
         <p class="categorytxt" style="color: rgb(255, 255, 255);">
             ${catName}
-        </p>    
+        </p>
     </div>`;
 
     //console.log(categoryViewHTML);
@@ -229,7 +224,7 @@ const categoryView = (category, skipMain) => {
 const categoriesSubView = (cats) => {
     console.log('composing categoriesSubView');
     return html`<div id="categories" class="categories">
-            ${cats.map(cat => categoryView(cat, true))} 
+            ${cats.map(cat => categoryView(cat, true))}
       </div>`;
 }
 
@@ -256,16 +251,4 @@ async function getLikemojisByID(likemojiIDs) {
     }
 }
 
-async function getOrgCategories(orgId) {
-    const query = new Parse.Query("Group");
-    query.equalTo("organizationID", orgId);
-    query.ascending("order");
-    try {
-        return await query.find();
-    } catch (err) {
-        // TypeError: failed to fetch
-        alert(err);
-    }
-}
-
-export {phone, phoneView, getOrgCategories, getCategoryLikemojis};
+export {phone, phoneView, getCategoryLikemojis};
