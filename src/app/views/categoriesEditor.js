@@ -1,17 +1,15 @@
-//import {phoneView} from './phoneView.js';
-//.for(categories)
-
 const {render, html, svg} = lighterhtml;
 
 //const categoriesEditorView = categories => {
 const categoriesEditorView = (Channel) => {
+	console.info('rendering categoriesEditorView');
 	let categoriesEditorViewHTML = html`
 	<div id="categoriesEditor" class="editorWindow">
 		<h3>Edit Categories</h3>
 		<hr />
 		<div id="editorContainer" class="image upload">
 			<h4 style="display:inline">Click to edit / Drag to reorder:</h4>
-			<ul id="categoriesInEditor">
+			<ol id="categoriesInEditor">
 				${Channel.categories.map((cat, index) =>
 					cat.attributes.main != 1
 					? html`<li
@@ -31,7 +29,7 @@ const categoriesEditorView = (Channel) => {
 							</li>`
 					: html``
 			)}
-			</ul>
+			</ol>
 		</div>
 		<div
 			class="selectDiv text-center"
@@ -60,20 +58,27 @@ const categoriesEditorView = (Channel) => {
 
 		selectedItem.classList.add('drag-sort-active');
 		let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
-
+		// TODO a more functional approach would be to just look at keys being swapped and send them to the model as actions
 		if (list === swapItem.parentNode) {
 			swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
 			list.insertBefore(selectedItem, swapItem);
 		}
 	}
 
-	function handleDrop(event) {
+	async function handleDrop(event) {
 		event.target.classList.remove('drag-sort-active');
-		setNewGroupOrder();
-	}
+		await setNewGroupOrder();
+		console.info('categories sorted now refresh views');
+		// seems we like dom manipulation in page messes up the render cycle
+		// so we need to just blank this panel and let it rerender
+		let elem = document.getElementById('panel-categories');
+		render(elem, () => html``);
+		Channel.updateViews();
+	};
+
 
 	//sets group order to order that was set in the dragable editor
-	function setNewGroupOrder() {
+	async function setNewGroupOrder() {
 		//user catOrder above to update all groups order
 		let catOrder = document.querySelectorAll('#categoriesInEditor li');
 		for (var i = 0; i < catOrder.length; i++) {
@@ -82,25 +87,15 @@ const categoriesEditorView = (Channel) => {
 			let order = i + 1;
 			group.set("order", order);
 		}
-		Parse.Object.saveAll(Channel.categories).then(
-			async groupsSaved => {
-				Channel.categories.sort(function (a,b) {
+		await Parse.Object.saveAll(Channel.categories);
+		Channel.categories.sort(function (a,b) {
+					console.info('category array sort element');
 					return a.get('order') - b.get('order');
-  				});
+				});
+		return;
+		}
 
-				for (var i = 1; i < Channel.categories.length; i++) {
-					console.log(Channel.categories[i].id + " " + Channel.categories[i].attributes.order);
-				}
-				//refresh phone panel here
-				//render(panel2, () => phoneView(Channel, Channel.mainCategory.id));
-				Channel.updateViews();
-			},
-			error => {
-				reject();
-				alert("Failed to create new objects, with error code: " + error.message);
-			}
-		);
-	}
+	console.log(categoriesEditorViewHTML);
 	return categoriesEditorViewHTML;
 }
 
