@@ -4,13 +4,12 @@ const {render, html, svg} = lighterhtml;
 
 //const categoryEditorView = (category) => {
 const categoryEditorView = (Channel) => {
+	console.info('rendering categoryEditorView');
 	let category = Channel.selectedCategory;
 	let callOut = category.attributes.callOuts.en;
 	let description;
 	try { description = category.attributes.descriptions.en;}
 	  catch {description = '';}
-	console.log('category id is ' + category.id);
-	console.log('callout is ' + callOut);
 	async function saveCallToAction (e) {
 		var callOutText = document.getElementById("editorCallOut").value;
 		var callOutsObject = {
@@ -186,32 +185,5 @@ function togglePanelWithin(panelName, parentName) {
         console.warn(`panel ${panelName} not found`);
     }
 }
-
-/*
-//opens header editor modal
-
-$("#uploadHeader").click(function(event) {
-
-//editheaderModal needs to be shown.....
-
-	$("#imageUpload").val("");
-
-	$("#headerPreview").attr("src", groupSelected.attributes.newHeader.url());
-
-	$("#headerEditorImageName").text(groupSelected.attributes.newHeader._name);
-
-	$("#ipadImageUpload").val("");
-
-	$("#ipadHeaderPreview").attr(
-		"src",
-		groupSelected.attributes.newIpadHeader.url()
-	);
-
-	$("#ipadHeaderEditorImageName").text(
-		groupSelected.attributes.newIpadHeader._name
-	);
-});
-
-*/
 
 export default categoryEditorView;
