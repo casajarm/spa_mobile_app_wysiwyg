@@ -533,9 +533,9 @@ $('#addCategoriesModal').on('show.bs.modal',
                 modal.find("#disableCat").prop("checked", false);
             }
             modal.find("#categoryPreview").hide();
-            modal.find("#categoryPreview").attr("src", groupSelected.attributes.newCategoryImage.url());
+            modal.find("#categoryPreview").attr("src", (groupSelected.attributes.newCategoryImage || mockObject).url() || '');
             modal.find("#categoryPreview").fadeIn(650);
-            modal.find("#categoryImageName").text(groupSelected.attributes.newCategoryImage._name);
+            modal.find("#categoryImageName").text((groupSelected.attributes.newCategoryImage || mockObject)._name);
         }
     }
 )
