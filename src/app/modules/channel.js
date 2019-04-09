@@ -83,6 +83,7 @@ const Channel =  {
         category.set('organizationID', this.channel.id);
         category.set('organizationName', this.channel.get('name'));
         await category.save();
+        return category;
     },
 
     addLikemoji: async function(likemoji) {
