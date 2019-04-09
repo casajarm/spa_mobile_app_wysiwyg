@@ -572,19 +572,17 @@ $("#saveCategory").click(function(event) {
 	let categoryTextEN = {
 		en: categoryText
 	};
-
+    let Group = Parse.Object.extend('Group');
     let disabled = $("#disableCat").is(":checked") ? 1 : 0;
     let groupSelected = Channel.selectedCategory;
 
 	if (groupSelected == undefined) {
-		groupSelected = new Group();
-		groupSelected.set("organizationID", returnedOrg.id);
-
-		groupSelected.set("order", groups.length + 1);
-		groupSelected.set("newHeader", groups[0].attributes.newHeader);
+		groupSelected = new Group(); //Parse.Object.createWithoutData('Group');
+		groupSelected.set("organizationID", Channel.channelID);
+		groupSelected.set("order", Channel.categories.length + 1);
+		groupSelected.set("newHeader", Channel.mainCategory.attributes.newHeader);
 		groupSelected.set("callOuts", { en: "Connect with us!" });
 		groupSelected.set("likemojis", []);
-	    Channel.addCategory(groupSelected);
 	}
 
 	groupSelected.set("name", categoryNameInternal);
@@ -603,10 +601,13 @@ $("#saveCategory").click(function(event) {
 
 	groupSelected.save().then(
 		async group => {
-			console.log("category image saved");
-			parseFile = undefined;
-            page.redirect('/channel/' + channelID + '/view/' + groupSelected.id);
-			//document.getElementById("categoriesInEditor").innerHTML = "";
+            Channel.addCategory(groupSelected)
+            .then( () => {
+                console.log("category saved");
+                parseFile = undefined;
+                page.redirect('/channel/' + channelID + '/view/' + groupSelected.id);
+                //document.getElementById("categoriesInEditor").innerHTML = "";
+            })
 		},
 		error => {
 			//  error is a Parse.Error with an error code and message.
