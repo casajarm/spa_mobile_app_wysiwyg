@@ -111,7 +111,7 @@ function displayCategories() {
 			if (categoriesSorted[i].attributes.main == 1) {
 				// console.log ("skipped");
 			} else {
-				if (categoriesSorted[i].attributes.disable !== 1) {
+				if (categoriesSorted[i].attributes.disabled !== 1) {
 					var div = document.createElement("div");
 					var img = document.createElement("img");
 					var txt = document.createElement("p");
@@ -145,7 +145,7 @@ function displayCategories() {
 // TODO can we replace this with an accordion?
 $("#categories").on("click", ".category", function() {
 	let mojicollection = document.getElementById('likemojiGroupCollection');
-	//mojicollection 
+	//mojicollection
 	$("#likemojiGroupCollection").removeClass("likemojiGroupCollectionNone");
 	$("#likemojiGroupCollection").addClass("likemojiGroupCollection-area");
 	$("#likemojiGroupCollection").addClass("categoryLikemojis");

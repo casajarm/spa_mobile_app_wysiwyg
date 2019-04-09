@@ -17,7 +17,7 @@ const categoriesEditorView = (Channel) => {
 								data-i="${cat.id}"
 								data-toggle="modal"
 								data-target="#addCategoriesModal"
-								class="${cat.attributes.disable == 1 ? 'disable' : ''}"
+								class="${cat.attributes.disabled == 1 ? 'disable' : ''}"
 								draggable="true"
 								ondrag="${handleDrag}"
 								ondragend="${handleDrop}"
