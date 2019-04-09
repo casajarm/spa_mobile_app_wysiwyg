@@ -10,8 +10,8 @@ viewControl.add = function (target, source) {
     }
     else {
         let viewDef = {target: target, source: source};
-        viewControl.views.push(viewDef);  
-    }  
+        viewControl.views.push(viewDef);
+    }
     console.log(`added key ${target}`);
     render(target, source);
 }
