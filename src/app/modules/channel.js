@@ -73,16 +73,20 @@ const Channel =  {
 
     },
     addCategory: async function (category) {
-        this.categories.push(category);
-        //add to the channel object too
-        let channelGroups = this.channel.get('groups');
-        channelGroups.push(category.id);
-        this.channel.set('groups', channelGroups);
-        this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
-        this.channel.save();
-        category.set('organizationID', this.channel.id);
-        category.set('organizationName', this.channel.get('name'));
-        await category.save();
+        // test if this is already in the channel
+        let ind = this.categories.findIndex(x => x.id === category.id);
+        if (ind < 0) {
+            this.categories.push(category);
+            //add to the channel object too
+            let channelGroups = this.channel.get('groups');
+            channelGroups.push(category.id);
+            this.channel.set('groups', channelGroups);
+            this.channel.set("groupPointer", arrayToPointers(channelGroups, "Group"));
+            this.channel.save();
+            category.set('organizationID', this.channel.id);
+            category.set('organizationName', this.channel.get('name'));
+            await category.save();
+        }
         return category;
     },
 
