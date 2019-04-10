@@ -13,14 +13,13 @@ function styleEditorView(Channel) {
                 <h4 style="display:inline">Edit Theme (Color / Font):</h4>
                 <br>
                 <br>
-                <div class="form-group jscolor">
-                    <label for="backgroundColor">
-                        <input id="backgroundColor" class="${jscolor}"
-                            data-attr="generalColor"
-                            value="${style.get("generalColor")}"
-                            onchange=${setTemp}
-                        >
-                        - Background</label>
+                <div class="form-group">
+                    <input id="backgroundColor" class="${jscolor}"
+                        data-attr="generalColor"
+                        value="${style.get("generalColor")}"
+                        onchange=${setTemp}
+                    >
+                    <label for="backgroundColor">&nbsp;-&nbsp;Background</label>
                 </div>
                 <div class="form-group">
                     <input id="textColor" class="${jscolor}"
@@ -32,7 +31,7 @@ function styleEditorView(Channel) {
                 </div>
                 <div class="form-group">
                     <input id="catTextColor" class="${jscolor}"
-                        data-attr="catTextColor"
+                        data-attr="categoryTextColor"
                         value="${style.get("categoryTextColor")}"
                         onchange=${setTemp}
                     >
@@ -96,7 +95,7 @@ function styleEditorView(Channel) {
             style => {
                 // Execute any logic that should take place after the object is saved.
                 // alert('Saved objectId: ' + style.id);
-                Channel.updateViewss();
+                Channel.updateViews();
             }, error => {
                 // Execute any logic that should take place if the save fails. error is a
                 // Parse.Error with an error code and message.
