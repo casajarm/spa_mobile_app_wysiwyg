@@ -1,5 +1,3 @@
-//import {phoneView} from './phoneView.js';
-
 const {render, html, svg} = lighterhtml;
 
 //const categoryEditorView = (category) => {
@@ -10,6 +8,7 @@ const categoryEditorView = (Channel) => {
 	let description;
 	try { description = category.attributes.descriptions.en;}
 	  catch {description = '';}
+	console.info(`description = ${description}`);
 	async function saveCallToAction (e) {
 		var callOutText = document.getElementById("editorCallOut").value;
 		var callOutsObject = {
@@ -31,7 +30,7 @@ const categoryEditorView = (Channel) => {
 	};
 
 	async function saveExtendedInfo (e) {
-		let extendedInfoText = $("#categoryExtendedInfo").value;
+		let extendedInfoText = document.getElementById('categoryExtendedInfo').value;
 		let extenedInfoObject = {en: extendedInfoText};
 		category.set("descriptions", extenedInfoObject);
 		category.save().then(
@@ -150,8 +149,8 @@ const categoryEditorView = (Channel) => {
 					class="form-control infoTextField"
 					rows="5"
 					placeholder="Here at XYZ Corp, We know that want to put your experience first..."
-					>
-					${description}
+					value="${description}"
+				>
 				</textarea>
 			</div>
 		</div>
