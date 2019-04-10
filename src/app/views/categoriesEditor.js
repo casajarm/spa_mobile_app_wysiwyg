@@ -17,7 +17,7 @@ const categoriesEditorView = (Channel) => {
 								data-i="${cat.id}"
 								data-toggle="modal"
 								data-target="#addCategoriesModal"
-								class="${cat.attributes.disabled == 1 ? 'disable' : ''}"
+								class="${cat.attributes.disable == 1 ? 'disabledCategory' : 'test'}"
 								draggable="true"
 								ondrag="${handleDrag}"
 								ondragend="${handleDrop}"
@@ -72,8 +72,7 @@ const categoriesEditorView = (Channel) => {
 		let elem = document.getElementById('panel-categories');
 		render(elem, () => html``);
 		Channel.updateViews();
-	};
-
+	}
 
 	//sets group order to order that was set in the dragable editor
 	async function setNewGroupOrder() {
@@ -91,7 +90,7 @@ const categoriesEditorView = (Channel) => {
 					return a.get('order') - b.get('order');
 				});
 		return;
-		}
+	}
 
 	console.log(categoriesEditorViewHTML);
 	return categoriesEditorViewHTML;
