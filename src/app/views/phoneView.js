@@ -154,7 +154,7 @@ const phoneNavBarView =  (Channel) => {
     }
 
     let likemojiViewHTML = html`<div
-        class="likemojis ui-draggable ui-draggable-handle"
+        class="containerLikemojis likemojis ui-draggable ui-draggable-handle"
         draggable="true"
         id="${likemoji.id}"
         draggable="true"
@@ -224,7 +224,13 @@ const categoryView = (category, skipMain) => {
 const categoriesSubView = (cats) => {
     console.log('composing categoriesSubView');
     return html`<div id="categories" class="categories">
-            ${cats.map(cat => categoryView(cat, true))}
+            ${cats.map(cat => {
+                    if (cat.attributes.disable !== 1) {
+                        return categoryView(cat, true)
+                    }
+                    else {return html`<span></span>`}
+                })
+            }
       </div>`;
 }
 
