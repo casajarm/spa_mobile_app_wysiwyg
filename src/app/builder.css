@@ -5,7 +5,7 @@
 }
 
 h1, h2, h3, .modalUpdateMessage{
-	
+
 	text-align: center;
 	color: #176691;
 
@@ -46,7 +46,7 @@ h1, h2, h3, .modalUpdateMessage{
 .phoneDisplayDynamicArea {
 	width: 100%;
 	height: 233px;
-	
+
 }
 
 .dynamicAreaOverflow {
@@ -194,6 +194,9 @@ h1, h2, h3, .modalUpdateMessage{
 	padding-top: 0px;
 	padding-bottom: 0px;
 	width: 240px;
+	/* overflow: auto; */
+	display: table;
+
 }
 
 .categorytxt {
@@ -235,7 +238,7 @@ h1, h2, h3, .modalUpdateMessage{
 	overflow: overlay;
 	padding: 10px;
 	padding-bottom: 0px;
-	
+
 }
 
 
@@ -315,7 +318,7 @@ hr {
 }
 
 .healthSelector {
-	background-color: #F6511D;	
+	background-color: #F6511D;
 }
 
 .communitySelector {
@@ -405,12 +408,12 @@ hr {
 	height: 50px;
 }
 
-.btn{	
+.btn{
 	border-radius: 10px;
 	height: 40px;
 }
 
-.btn-unsplash{	
+.btn-unsplash{
 	border-radius: 10px;
 	height: 34px;
 	font-family: 'Prompt', sans-serif;
@@ -420,7 +423,7 @@ hr {
 	margin-bottom: 15px;
 }
 
-.btn-callToAction{	
+.btn-callToAction{
 	border-radius: 10px;
 	height: 34px;
 	font-family: 'Prompt', sans-serif;
@@ -534,7 +537,7 @@ background-color: #00b6ff;
 
 .startBuild {
 	margin-top: 40px;
-	max-width: 150px; 
+	max-width: 150px;
 }
 
 .shadowed {
@@ -551,7 +554,7 @@ background-color: #00b6ff;
 	border: 5px solid #00ACF1;
 	height: 100%;
 	transition: .3s;
-	
+
 }
 
 .jscolor {
@@ -714,7 +717,7 @@ background-color: #00b6ff;
 }
 
 .headerPreview {
-	
+
 	/*height: 200px;*/
 	width: 40%;
 	margin-left: 2%;
@@ -760,6 +763,7 @@ background-color: #00b6ff;
  	border-radius: 10px;
  	border: 2px solid #176691;
  	text-align: center;
+  list-style: none;
 }
 
 .channelList:hover {
@@ -770,7 +774,7 @@ background-color: #00b6ff;
 
 .phone-frame {
 	min-width: 310px;
-	min-height: 684px; 
+	min-height: 684px;
 }
 
 li.drag-sort-active {
