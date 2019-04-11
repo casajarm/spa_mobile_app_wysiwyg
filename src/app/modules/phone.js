@@ -111,7 +111,7 @@ function displayCategories() {
 			if (categoriesSorted[i].attributes.main == 1) {
 				// console.log ("skipped");
 			} else {
-				if (categoriesSorted[i].attributes.disabled !== 1) {
+				if (categoriesSorted[i].attributes.disable !== 1) {
 					var div = document.createElement("div");
 					var img = document.createElement("img");
 					var txt = document.createElement("p");
