@@ -72,25 +72,26 @@ page.start({hashbang: false, dispatch: true});
 //page.base("/src/app/page_router_example.html");
 page.base('/src/app');
 page("/", function (ctx, next) {
+    viewControl.deleteAll();
     viewControl.add(panel1
     , () => html`
         <ul>
             <li><a href="signup">Create New Account</a></li>
             <li><a href="login">Login</a></li>
         </ul>`);
-
-    viewControl.deleteView(panel2);
-    viewControl.deleteView(panel3);
+    viewControl.add(panel2, () => html`<span />`);
+    viewControl.add(panel3, () => html`<span />`);
 });
 
 page("/home", function (ctx, next) {
-    page("/");
+    page.redirect("/");
 });
 
 page("/signup", function (ctx, next) {
     //panel 2
     viewControl.deleteView(panel2);
-    renderForm(panel2, signUpForm);
+    viewControl.add(panel3, () => html`<span />`);
+    viewControl.add(panel2, () => signUpForm());
     //not sure if this is the best place to wire up event handlers...
     let signupUser2 = document.querySelector("#signUpUser2");
     signupUser2.addEventListener("click", async function (e) {
@@ -135,18 +136,15 @@ page("/signup", function (ctx, next) {
         }
     });
 
-    //panel 3
-    viewControl.deleteView(panel3);
-    let productImage = document.createElement("img");
-    productImage.src = "../assets/screenshots/IMG_0971.png";
-    panel3.appendChild(productImage);
+    let imageSource = "../assets/screenshots/IMG_0971.png";
+    viewControl.add(panel3, html`<img src="${imageSource}" />`);
 });
 
 
 page("/login", function (ctx, next) {
-    viewControl.deleteView(panel1);
-    viewControl.add(panel2, loginForm);
-    viewControl.deleteView(panel3);
+    console.info('login route');
+    viewControl.deleteAll();
+    viewControl.add(panel2, () => loginForm());
 
     //not sure if this is the best place to wire up event handlers...
     let loginButton = document.querySelector("#loginUser");
@@ -165,6 +163,17 @@ page("/login", function (ctx, next) {
         });
     });
 }); // login page
+
+page("/logout", function (ctx, next) {
+    viewControl.deleteAll();
+    Parse.User.logOut().then(() => {
+        console.info('user logged out');
+        user = Parse.User.current();
+        page.redirect('/home');
+        });
+    }
+); // logout
+
 
 page("/distribute", function (ctx, next) {
     panel1.innerHTML = "About your Likemoji Channel";
@@ -367,8 +376,8 @@ function showRightLink(ctx, next, custom) {
 }
 
 function signUpForm() {
-    let form = document.createElement("div");
-    let form2 = `<form id="signUpForm" class="form">
+    let form = html`<div>
+    <form id="signUpForm" class="form">
 		<h2>Create Your Account</h2>
 		<div class="form-group" id="emaildiv">
 			<label for="emailSignup">email</label>
@@ -381,9 +390,10 @@ function signUpForm() {
 		<div class="form-group" id="organizationdiv">
 				<label for="organizationSignup">Orgnization Name</label>
 				<input type="text" class="form-control" id="inputOrganization" placeholder="organization name">
-			</div>
-        <button id="signUpUser2" type="button" class="btn btn-default">submit</button>`;
-    form.innerHTML = form2;
+		</div>
+        <button id="signUpUser2" type="button" class="btn btn-default">submit</button>
+    </form>
+    </div>`;
 
     return form;
 }
