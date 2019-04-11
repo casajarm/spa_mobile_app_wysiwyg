@@ -20,13 +20,14 @@ viewControl.deleteView = function (target) {
     let key = viewControl.views.find( x => x.target === target);
     if (key) {
         let deleted = viewControl.views.splice(key);
-        console.log('deleted view' + deleted);
+        console.log('deleted view' + target.id);
     }
     render(target, () => html`<span />`);
 }
 
 viewControl.deleteAll = function () {
-    viewControl.views = [];
+    viewControl.views.forEach(x => viewControl.deleteView(x.target));
+    //viewControl.views = [];
 }
 
 viewControl.update = function () {
