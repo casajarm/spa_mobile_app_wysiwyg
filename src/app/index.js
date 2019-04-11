@@ -2,17 +2,12 @@
 import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import {Organization} from "./modules/organizations.js";
-//import Likemoji from './modules/likemojis.js';
-//import {getStyle} from "./modules/styles.js";
-//import {Group, getMainCategory} from "./modules/groups.js";
-//import {render, html} from 'https://unpkg.com/lighterhtml?module';
-import {phone, phoneView, getCategoryLikemojis} from './views/phoneView.js';
+import {phoneView} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
 import likemojisListView from './views/likemojisListView.js';
 import styleEditorView from './views/styleEditorView.js';
-
 
 import {Channel, viewControl} from './modules/channel.js';
 
@@ -45,9 +40,9 @@ var ipadParseFile;
 // used to deal with errors on undefined attributes where parse wants you to chain a call to something like URL to the attribute
 // for example groupSelected.attributes.newCategoryImage.url()
 let mockObject = {};
-        mockObject.url = function () {
-            return '';
-        };
+mockObject.url = function () {
+    return '';
+};
 
 channelName = "You Beautiful Person You";
 document.onreadystatechange = function () {
@@ -542,7 +537,7 @@ $('#addCategoriesModal').on('show.bs.modal',
 
 //uploads a category image from category editor modal
 $("#categoryImageButton").click(function() {
-	var fileUploadControl = $("#categoryImageInput")[0];
+	let fileUploadControl = $("#categoryImageInput")[0];
 	if (fileUploadControl.files.length > 0) {
 		var file = fileUploadControl.files[0];
 		var name = fileUploadControl.files[0].name;
@@ -668,10 +663,10 @@ $("#saveEditedHeader").click(function() {
 
 // uploads mobile header image to parse and sets the preview image src
 $("#headerEditorImageButton").click(function() {
-	var fileUploadControl = $("#imageUpload")[0];
+	let fileUploadControl = $("#imageUpload")[0];
 	if (fileUploadControl.files.length > 0) {
-		var file = fileUploadControl.files[0];
-		var name = fileUploadControl.files[0].name;
+		let file = fileUploadControl.files[0];
+		let name = fileUploadControl.files[0].name;
 		headerParseFile = new Parse.File(name, file);
 
 		headerParseFile.save().then(
@@ -694,10 +689,10 @@ $("#headerEditorImageButton").click(function() {
 $("#ipadHeaderEditorImageButton").click(function() {
 	console.log("ipad upload clicked");
 
-	var fileUploadControl = $("#ipadImageUpload")[0];
+	let fileUploadControl = $("#ipadImageUpload")[0];
 	if (fileUploadControl.files.length > 0) {
-		var file = fileUploadControl.files[0];
-		var name = fileUploadControl.files[0].name;
+		let file = fileUploadControl.files[0];
+		let name = fileUploadControl.files[0].name;
 		ipadParseFile = new Parse.File(name, file);
 
 		ipadParseFile.save().then(
@@ -731,10 +726,10 @@ $('#editLikemojisModal').on('show.bs.modal',
         modal.find("#likemojiPreview").fadeIn(650);
         modal.find("#LikemojiEditorImageName").text(likemoji.attributes.x3._name);
         modal.find("#likemojiEditorImageButton").click(function() {
-        var fileUploadControl = $("#likemojiEditorImageInput")[0];
+        let fileUploadControl = $("#likemojiEditorImageInput")[0];
         if (fileUploadControl.files.length > 0) {
-            var file = fileUploadControl.files[0];
-            var name = fileUploadControl.files[0].name;
+            let file = fileUploadControl.files[0];
+            let name = fileUploadControl.files[0].name;
             parseFile = new Parse.File(name, file);
 
             parseFile.save().then(
@@ -781,3 +776,50 @@ $('#editLikemojisModal').on('show.bs.modal',
 });
 
 
+//creates a new likemoji from file uploader
+async function createLikemoji(file) {
+    let name = file.name;
+	let parseFile = new Parse.File(name, file);
+	let likemojiNamesEN = name.slice(0, -4);
+    let Likemoji = Parse.Object.extend('Likemoji');
+    console.info('saving file named ' + name);
+    await parseFile.save()
+    let newLikemoji = new Likemoji();
+    console.info(`file ${name} saved now add likemojis`);
+    newLikemoji.set("x3", parseFile);
+    newLikemoji.set("name", name.slice(0, -4));
+    newLikemoji.set("names", { en: likemojiNamesEN });
+    newLikemoji.set("organizationID", Channel.channelID);
+    newLikemoji.set("organizationName", Channel.channelName);
+    await newLikemoji.save()
+    .catch(error => {
+        // error is a Parse.Error with an error code and message.
+        alert("Failed to create new object, with error code: " + error.message);
+    });
+    console.info(`likemoji ${name} saved now add to channel`);
+    Channel.likemojis.push(newLikemoji);
+    $("#uploadComplete").fadeIn(1650);
+    // The file has been saved to Parse.
+    return newLikemoji;
+}
+
+$("#addLikemojisModalButton").change(function() {
+	$("#uploadComplete").hide();
+});
+
+$("#likemojisImageButton").click(async function() {
+	let fileUploadControl = document.getElementById("likemojisImageInput").files;
+	if (fileUploadControl.length > 0) {
+        let promiseChain = [];
+        for (var i = 0; i < fileUploadControl.length; i++) {
+            console.info('adding upload promise for file number' + i);
+            promiseChain.push (createLikemoji(fileUploadControl[i]));
+        }
+        await Promise.all(promiseChain)
+            .then( () =>  {
+                console.info('likemojis saved..now refresh views');
+                Channel.updateViews();
+                $("#likemojisImageInput")[0].value = "";
+            });
+	}
+});
