@@ -3,6 +3,7 @@ const {render, html, svg} = lighterhtml;
 
 //const likemojisListView = (likemojis) => {
 const likemojisListView = (Channel) => {
+	console.info('rendering likemojisListView');
     let panel2 = document.getElementById("panel2");
     function dragMoji(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',add' );
@@ -25,12 +26,12 @@ const likemojisListView = (Channel) => {
     function dragover(e) {
         e.preventDefault()
     }
-      
+
     function dragenter(e) {
         e.preventDefault()
     }
 
-    
+
     const likemojiView = (likemoji) => {
         let likemojiViewHTML = html`<div
             class="likemojis containerLikemojis ui-draggable ui-draggable-handle"
@@ -46,11 +47,11 @@ const likemojisListView = (Channel) => {
             />
             <div class="likemojiNames">${likemoji.attributes.names.en}</div>
         </div>`;
-    
+
         //console.log(likemojiViewHTML);
         return likemojiViewHTML;
     };
-    
+
     let likemojisListViewHTML = html`<div id="likemojisEditor" class="editorWindow" style="display: block;">
         <h3>Edit Likemojis</h3>
         <hr/>
@@ -62,6 +63,9 @@ const likemojisListView = (Channel) => {
             ondrop="${handleDrop}"
         >
             ${Channel.likemojis.map(moji => likemojiView(moji))}
+        </div>
+        <div class="selectDiv text-center" data-toggle="modal" data-target="#addLikemojisModal">
+			<button type="button"  id="addLikemojisModalButton" class="btn btn-default addLikemojis containerLikemojis"><i style="font-size: 1.3em; color: white; margin-top: 4px;" class="far fa-plus-square grow"></i> Add Likemojis</button>
         </div>
     </div>`;
 
