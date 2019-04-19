@@ -3,13 +3,17 @@ const {render, html, svg} = lighterhtml;
 //const categoriesEditorView = categories => {
 const categoriesEditorView = (Channel) => {
 	console.info('rendering categoriesEditorView');
+	let selectedItem;
 	let categoriesEditorViewHTML = html`
-	<div id="categoriesEditor" class="editorWindow">
+	<div id="categoriesEditor"
+		class="editorWindow"
+		ondragover="${handleDrag}"
+	>
 		<h3>Edit Categories</h3>
 		<hr />
 		<div id="editorContainer" class="image upload">
 			<h4 style="display:inline">Click to edit / Drag to reorder:</h4>
-			<ol id="categoriesInEditor">
+			<ul id="categoriesInEditor">
 				${Channel.categories.map((cat, index) =>
 					cat.attributes.main != 1
 					? html`<li
@@ -19,8 +23,8 @@ const categoriesEditorView = (Channel) => {
 								data-target="#addCategoriesModal"
 								class="${cat.attributes.disable == 1 ? 'disabledCategory' : 'test'}"
 								draggable="true"
-								ondrag="${handleDrag}"
 								ondragend="${handleDrop}"
+								ondragstart="${handleDragStart}"
 								>
 								<i class="fas fa-sort"></i>
 								<i class="fas fa-edit floatRight"></i>
@@ -29,7 +33,7 @@ const categoriesEditorView = (Channel) => {
 							</li>`
 					: html``
 			)}
-			</ol>
+			</ul>
 		</div>
 		<div class="selectDiv text-center">
 			<button
@@ -48,11 +52,19 @@ const categoriesEditorView = (Channel) => {
 		</div>
 	</div>`;
 
+	function handleDragStart(event) {
+		console.info('drag starting');
+		event.dataTransfer.setData("text/plain", "Text to drag");
+		selectedItem = event.target;
+		// set target on start so the dragover listener can handle the swapping
+		// firsfox won't give us clientX and clientY on the drag event..just dragover
+	}
+
 	function handleDrag(event) {
-		const selectedItem = event.target,
-		list = selectedItem.parentNode,
-		x = event.clientX,
-		y = event.clientY;
+		console.info('drag happening');
+		const list = selectedItem.parentNode,
+			x = event.clientX,
+			y = event.clientY;
 
 		selectedItem.classList.add('drag-sort-active');
 		let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
