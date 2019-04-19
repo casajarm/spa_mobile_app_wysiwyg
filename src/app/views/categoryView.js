@@ -82,6 +82,7 @@ const categoryEditorView = (Channel) => {
 				</button>
 			</div>
 			<br />
+			<p>Name: ${category.attributes.name}</p>
 			<label for="editorCallOut">Call to Action:</label>
 			<div class="input-group">
 				<input
