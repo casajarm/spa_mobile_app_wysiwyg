@@ -61,6 +61,11 @@ const Channel =  {
         let ind2 = this.categories.findIndex(x => x.id === category.id);
         this.categories.splice(ind2, 1);
         await this.channel.save();
+
+        //search parse to see if category has connected data
+        // if not then delete it
+
+        category.save();
         // destroy means delete...
         await category.destroy().then((cat) => {
             // The object was deleted from the Parse Cloud.
@@ -166,7 +171,10 @@ const Channel =  {
             // TODO move to button action to "save" await category.save();
         }
     },
-    setCategoryOrder: function(ids, orders)  {},
+    setCategoryOrder: function(ids, orders)  {
+        // TODO run category ordering through here to ensure the
+        // array and order attributes are in synch
+    },
 
     get mainCategory()  {
         let mainCat = this.categories.filter(isMainCategory);
@@ -204,7 +212,6 @@ function isMainCategory(category) {
     return category.attributes.main == 1;
 }
 
-
 async function getOrgCategories(orgId) {
     const query = new Parse.Query("Group");
     query.equalTo("organizationID", orgId);
@@ -220,7 +227,6 @@ async function getOrgCategories(orgId) {
 async function getLikemojis(orgId) {
     const query = new Parse.Query(Likemoji);
     query.equalTo("organizationID", orgId);
-
     try {
       return await query.find();
     } catch (err) {
@@ -228,7 +234,6 @@ async function getLikemojis(orgId) {
       alert(err);
     }
   }
-
 
 function arrayToPointers(arr, pointerClass) {
     const pointers = arr.map(id => {

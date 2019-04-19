@@ -14,7 +14,10 @@ async function cloneChannel(req) {
 	// when no request.targetOrgId is provided
 	targetOrg = await getOrganization(req.targetOrgId);
 	sourceOrg = await getOrganization(req.sourceOrgId);
+
+	//TODO check if name exists before we overwrite it
 	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
+
 	// too many paramters needed for the steps in this
 	// await saveChannelToOrg(groupIDs);
 	// TODO can we make this into a separate block?
