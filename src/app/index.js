@@ -2,16 +2,16 @@
 import {getUserChannels, newUser} from "./modules/users.js";
 import cloneChannel from "./modules/clonechannel.js";
 import {Organization} from "./modules/organizations.js";
+import {Channel, viewControl} from './modules/channel.js';
 import {phoneView} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
 import likemojisListView from './views/likemojisListView.js';
 import styleEditorView from './views/styleEditorView.js';
-
-import {Channel, viewControl} from './modules/channel.js';
-
-const {render, html, svg} = lighterhtml;
+import signUpForm from './views/signupForm.js';
+import loginForm from './views/signupForm.js';
+const {render, html, svg} = lighterhtml;// this is loaded in the index.html file
 
 var panel1,
     panel2,
@@ -36,6 +36,10 @@ var unsplashResults = []; //array of images returned from unsplash search
 var parseFile;
 var headerParseFile;
 var ipadParseFile;
+
+const emptySpan = function() {
+    return html`<span />`;
+};
 
 // used to deal with errors on undefined attributes where parse wants you to chain a call to something like URL to the attribute
 // for example groupSelected.attributes.newCategoryImage.url()
@@ -79,8 +83,8 @@ page("/", function (ctx, next) {
             <li><a href="signup">Create New Account</a></li>
             <li><a href="login">Login</a></li>
         </ul>`);
-    viewControl.add(panel2, () => html`<span />`);
-    viewControl.add(panel3, () => html`<span />`);
+    viewControl.add(panel2, () => emptySpan());
+    viewControl.add(panel3, () => emptySpan());
 });
 
 page("/home", function (ctx, next) {
@@ -90,7 +94,7 @@ page("/home", function (ctx, next) {
 page("/signup", function (ctx, next) {
     //panel 2
     viewControl.deleteView(panel2);
-    viewControl.add(panel3, () => html`<span />`);
+    viewControl.add(panel3, () => emptySpan());
     viewControl.add(panel2, () => signUpForm());
     //not sure if this is the best place to wire up event handlers...
     let signupUser2 = document.querySelector("#signUpUser2");
@@ -121,23 +125,25 @@ page("/signup", function (ctx, next) {
             // channel for them start by cloning channel xGO7Pdu71w
             const targetOrg = new Organization();
             const channelID = "xGO7Pdu71w"; //TODO make this dynamic based on how they enter
+            //TODO if the name is not unique???
             targetOrg.set("name", channelName);
             targetOrg
                 .save()
                 .then(async function (org) {
                     console.log("New org saved .. now clone");
                     await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
-                    //hide login link
+                    //TODO update header image with fabric built image
+                    Channel.mainCategory().set('headerimage', '')
+
                     document.getElementById('login').classList.add('active');
-
                     page(`/viewnew/${org.id}`);
-
-                });
+                    }
+                );
         }
     });
 
     let imageSource = "../assets/screenshots/IMG_0971.png";
-    viewControl.add(panel3, html`<img src="${imageSource}" />`);
+    viewControl.add(panel3, () => html`<img src="${imageSource}" />`);
 });
 
 
@@ -176,45 +182,50 @@ page("/logout", function (ctx, next) {
 
 
 page("/distribute", function (ctx, next) {
-    panel1.innerHTML = "About your Likemoji Channel";
-    panel2.innerHTML = "A list of links for channel";
+    viewControl.add(panel1, () => html`<h1>About your Likemoji Channel</h1>`);
+    viewControl.add(panel3, () => {
+        function shareChannel(e) {
+            e.preventDefault();
+            alert("emails are on the way");
+        }
 
-    //TODO this would be better as a template
-    viewControl.deleteView(panel3);
-    let shareForm = document.createElement("form");
-    let shareEmails = document.createElement("textarea");
-    shareEmails.value = "Enter emails to share channel";
+        let form = html`<h2>A list of links for channel</h2>
+        <ul>
+            <li>Link1</li>
+            <li>Link2</li>
+            <li>Link3</li>
+        </ul>
+        <form>
+            <textarea id="email-list" placeholder="enter emails to share your channel">
+            </textarea>
+            <button id="share-channel-button"
+                class="btn btn-default"
+                onclick="${shareChannel}"
+            >Share Channel
+            </button>
+        </form>`;
+        return form;
+        }
+    );
 
-    let shareButton = document.createElement("button");
-    shareButton.innerHTML = "Send Emails";
-    shareButton.className = "btn btn-default";
-    shareButton.addEventListener("click", function (e) {
-        alert("emails are on the way");
-        e.preventDefault();
-    });
-    shareForm.appendChild(shareEmails);
-    shareForm.appendChild(shareButton);
-    panel3.appendChild(shareForm);
 }); // distribute page
 
-page("/viewnew/:orgID", function (ctx, next) {
-    Channel.populateAll(ctx.params.orgID);
-    panel1.innerHTML = "About your Likemoji Channel";
-    viewControl.deleteView(panel2);
-    panel3.innerHTML = `Congratulations ${channelName}! Here's your new Likemoji channel`;
-
-    let nextButton = document.createElement("button");
-    nextButton.className = "btn btn-default";
-    nextButton.innerHTML = "Next";
-    nextButton.addEventListener("click", function (e) {
-        page("/distribute");
-        e.preventDefault();
-    });
-    panel3.appendChild(nextButton);
-
+page("/viewnew/:orgID", async function (ctx, next) {
+    await Channel.populateAll(ctx.params.orgID);
+    viewControl.add(panel1, () => html`<h1>About your Likemoji Channel</h1>`);
     //showLink(ctx, next, boilerplate);
     Channel.selectedCategory = Channel.mainCategory;
     viewControl.add(panel2, () => phoneView(Channel));
+
+    viewControl.add(panel3, () => {
+        let form = html`<h2>Congratulations ${Channel.channelName}!</h2>
+        <h3>Here's your new Likemoji channel</h3>
+        <button id="next-step-button"
+            onclick="${() => page('/distribute')}"
+            class="btn btn-default">Next</button>`;
+        return form;
+    });
+
 }); // viewnew/orgID page
 
 page("/channels", async function (ctx, next) {
@@ -222,10 +233,13 @@ page("/channels", async function (ctx, next) {
     if (user.isCurrent()) {
     channels = await getUserChannels(user.id)
     console.log(`getUserChannels returned count: ${channels.length}`);
+
+
     viewControl.add(panel1, () => displayChannelList(channels));
     viewControl.deleteView(panel2);
     viewControl.deleteView(panel3);
-    }
+
+}
 
 }); //channels page
 
@@ -352,68 +366,6 @@ function showform(formID, panel) {
     panel.appendChild(form);
 }
 
-function showLink(ctx, next, custom) {
-    console.log(`Show ${custom}`);
-    viewControl.deleteView(panel3);
-    var newElement = document.createElement("P");
-    newElement.onclick = function (e) {
-        page("/right/link10");
-        e.preventDefault();
-    };
-    var newElementContents = document.createTextNode(custom);
-    newElement.appendChild(newElementContents);
-    panel3.appendChild(newElement);
-}
-
-function showRightLink(ctx, next, custom) {
-    console.log(`Show ${custom}`);
-    panel3 = document.getElementById("targetDiv");
-    console.log(panel3);
-    var newElement = document.createElement("P");
-    var newElementContents = document.createTextNode(custom);
-    newElement.appendChild(newElementContents);
-    panel3.appendChild(newElement);
-}
-
-function signUpForm() {
-    let form = html`<div>
-    <form id="signUpForm" class="form">
-		<h2>Create Your Account</h2>
-		<div class="form-group" id="emaildiv">
-			<label for="emailSignup">email</label>
-			<input type="email" class="form-control" id="inputEmail" placeholder="enter your email here">
-		</div>
-		<div class="form-group" id="passworddiv">
-			<label for="passwordSignup">password</label>
-			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
-		</div>
-		<div class="form-group" id="organizationdiv">
-				<label for="organizationSignup">Orgnization Name</label>
-				<input type="text" class="form-control" id="inputOrganization" placeholder="organization name">
-		</div>
-        <button id="signUpUser2" type="button" class="btn btn-default">submit</button>
-    </form>
-    </div>`;
-
-    return form;
-}
-
-function loginForm() {
-    let form = html`<h2>Login to your account</h2>
-    <form id="loginForm" class="form">
-        <div class="form-group" id="emaildiv">
-            <label for="emailSignup">email</label>
-            <input type="email" class="form-control" id="loginEmail" placeholder="enter your email here">
-        </div>
-        <div class="form-group" id="passworddiv">
-            <label for="passwordSignup">password</label>
-            <input type="password" class="form-control" id="loginPassword" placeholder="enter your password here"></div>
-        <button id="loginUser" type="button" class="btn btn-default">
-            submit
-        </button>
-    </form>`;
-    return form;
-}
 
 
 //<a href="channel/${i.id}/clone">${i.attributes.name}</a>
