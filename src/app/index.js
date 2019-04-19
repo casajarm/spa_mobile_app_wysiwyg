@@ -70,7 +70,7 @@ function initApplication() {
 
 page.start({hashbang: false, dispatch: true});
 //page.base("/src/app/page_router_example.html");
-page.base('/app');
+page.base('/src/app');
 page("/", function (ctx, next) {
     viewControl.deleteAll();
     viewControl.add(panel1
