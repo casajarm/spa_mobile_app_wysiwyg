@@ -10,7 +10,7 @@ import catLeftView from './views/catLeftView.js';
 import likemojisListView from './views/likemojisListView.js';
 import styleEditorView from './views/styleEditorView.js';
 import signUpForm from './views/signupForm.js';
-import loginForm from './views/signupForm.js';
+import loginForm from './views/loginForm.js';
 const {render, html, svg} = lighterhtml;// this is loaded in the index.html file
 
 var panel1,
