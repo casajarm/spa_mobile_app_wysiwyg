@@ -1,16 +1,18 @@
 const path = require('path');
 module.exports = {
   mode: 'development',
-  entry: path.join(__dirname, 'src', 'index'),
+  entry: path.join(__dirname, './src/app', 'index.html'),
   output: {
-    filename: 'bundle.js',
+    filename: 'main.js',
     path: path.resolve(__dirname, 'dist')
-  },
+  }
+  /*
+  ,
   module: {
     rules: [{
       test: /.jsx?$/,
       include: [
-        path.resolve(__dirname, 'src')
+        path.resolve(__dirname, 'src/app')
       ],
       exclude: [
         path.resolve(__dirname, 'node_modules'),
@@ -29,4 +31,6 @@ module.exports = {
   devServer: {
     publicPath: path.join('/dist/')
   }
-};
+*/
+}
+;
