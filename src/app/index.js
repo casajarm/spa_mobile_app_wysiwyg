@@ -70,7 +70,7 @@ function initApplication() {
 
 page.start({hashbang: false, dispatch: true});
 //page.base("/src/app/page_router_example.html");
-page.base('/src/app');
+page.base('/app');
 page("/", function (ctx, next) {
     viewControl.deleteAll();
     viewControl.add(panel1
@@ -118,9 +118,9 @@ page("/signup", function (ctx, next) {
                 .value;
 
             // TODO see if we can just give it a route for clone and then a "next" clone a
-            // channel for them start by cloning channel 0rUmexIHBw
+            // channel for them start by cloning channel xGO7Pdu71w
             const targetOrg = new Organization();
-            const channelID = "0rUmexIHBw"; //TODO make this dynamic based on how they enter
+            const channelID = "xGO7Pdu71w"; //TODO make this dynamic based on how they enter
             targetOrg.set("name", channelName);
             targetOrg
                 .save()
