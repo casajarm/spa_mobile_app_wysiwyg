@@ -1,3 +1,4 @@
+const {render, html, svg} = lighterhtml;
 function signUpForm() {
     let form = html`<div>
     <form id="signUpForm" class="form">
@@ -11,7 +12,7 @@ function signUpForm() {
 			<input type="password" class="form-control" id="inputPassword" placeholder="create your password here">
 		</div>
 		<div class="form-group" id="organizationdiv">
-				<label for="organizationSignup">Orgnization Name</label>
+				<label for="organizationSignup">Organization Name</label>
                 <input type="text"
                     class="form-control"
                     id="inputOrganization"
