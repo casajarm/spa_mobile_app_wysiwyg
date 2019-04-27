@@ -7,8 +7,9 @@ const categoryEditorView = (Channel) => {
 	let callOut = category.attributes.callOuts.en;
 	let description;
 	try { description = category.attributes.descriptions.en;}
-	  catch {description = '';}
-	console.info(`description = ${description}`);
+	  catch (e) {description = '';}
+
+	  console.info(`description = ${description}`);
 	async function saveCallToAction (e) {
 		var callOutText = document.getElementById("editorCallOut").value;
 		var callOutsObject = {

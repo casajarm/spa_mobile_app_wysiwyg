@@ -130,7 +130,7 @@ const Channel =  {
             try {
                 likemojiObj = this.likemojis.find(x => x.id === likemojiID);
             }
-            catch {
+            catch (e){
                 alert (`${likemoji} is an invalid ID for likemojis`);
             }
 
