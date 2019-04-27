@@ -1,12 +1,12 @@
 const path = require('path');
 module.exports = {
   mode: 'development',
-  entry: path.join(__dirname, './src/app', 'index.html'),
+  entry: path.join(__dirname, './src/app', 'index.js'),
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist')
   }
-  /*
+
   ,
   module: {
     rules: [{
@@ -23,7 +23,9 @@ module.exports = {
         presets: ['es2015']
       }
     }]
-  },
+  }
+ ,
+
   resolve: {
     extensions: ['.json', '.js', '.jsx', '.css']
   },
@@ -31,6 +33,6 @@ module.exports = {
   devServer: {
     publicPath: path.join('/dist/')
   }
-*/
+
 }
 ;
