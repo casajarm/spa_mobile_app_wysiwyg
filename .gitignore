@@ -78,3 +78,9 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# scratch HTML outputs for comparison and styling
+scratchHTML/
+
+# some config junk
+.idea/
