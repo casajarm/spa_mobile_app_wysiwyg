@@ -177,7 +177,7 @@
 177                 "title": "The Url Schema",
 178                 "default": "",
 179                 "examples": [
-180                   "https://badge-main-stage.s3.amazonaws.com/7553afbe59d0423ad3bcfda0cb4e0816_support.png"
+180                   "src/app/assets/badges/support.png"
 181                 ],
 182                 "pattern": "^(.*)$"
 183               }

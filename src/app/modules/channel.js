@@ -47,7 +47,7 @@ const Channel =  {
     catBadges: function(category) {
         let catBadges = category.get('badges');
         // return the badges that match array in category
-        return this.badges.filter((moji) => catBadges.find(x => x === moji.id));
+        return this.badges.filter((badge) => catBadges.find(x => x === badge.id));
     },
 
     deleteCategory: async function(category) {
@@ -113,7 +113,7 @@ const Channel =  {
         let ind = this.badges.findIndex(x => x.id === badge.id);
         this.badges.splice(ind, 1);
         await Parse.Object.saveAll(this.categories);
-        await badge.destroy().then((moji) => {
+        await badge.destroy().then((badge) => {
             // The object was deleted from the Parse Cloud.
         }, (error) => {
             // The delete failed.

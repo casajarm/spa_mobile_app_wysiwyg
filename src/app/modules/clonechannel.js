@@ -1,6 +1,8 @@
 import { Organization } from "./organizations.js";
 //Parse.Cloud.define("CloneChannel", async request => {
 var currentUser;
+var cloneableID; // the default key for the data we clone on new account creation
+
 
 async function cloneChannel(req) {
 	console.log(`cloneChannel ${req.sourceOrgId} to ${req.targetOrgId}`);
@@ -30,40 +32,39 @@ async function cloneChannel(req) {
 	// get all the badges for the channel copying from
 	//var badges, badgeIDs, groups;
 	var groupIDs = [];
-	getBadges(req.sourceOrgId).then(_badges => {
-		let badges = _badges;
-		let badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
-			.then(_badgeIDs => {
-				badgeIDs = _bagedIDs;
+	let badges = await getBadges(req.sourceOrgId);
+	//.then(_badges => {
+		//let badges = _badges;
+	let badgeIDs = await cloneBadges(badges, targetOrg);
+//			.then(_badgeIDs => {
+//				badgeIDs = _bagdeIDs;
 				// TODO we can probably just keep passing the then return down and not pas back up to outer block scoped variables
-				getGroups(sourceOrg.id).then(_groups => {
-					let groups = _groups;
-					cloneGroups(groups, targetOrg, badgeIDs).then(_groupIDS => {
+	let groups = await getGroups(sourceOrg.id); 
+	//.then(_groups => {
+					//let groups = _groups;
+	groupIDs = await cloneGroups(groups, targetOrg, badgeIDs);
+	//.then(_groupIDS => {
 						// now that we have groupids we can pass that back up into the org record
-						groupIDs = _groupIDS;
-						targetOrg.set("groups", groupIDs);
-						targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
-						targetOrg.save().then(
-							org => {
-								console.log(`org id ${org.id} saved`);
-							},
-							error => {
-								alert(`Failed to create new object, with error code: ${error.message}`);
-							}
-						);
-					});
-				});
-			});
-	});
+	//					groupIDs = _groupIDS;
+	targetOrg.set("groups", groupIDs);
+	targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+	await targetOrg.save().then(
+		org => {
+			console.log(`org id ${org.id} saved`);
+		},
+		error => {
+			alert(`Failed to create new object, with error code: ${error.message}`);
+		}
+	);
+
 	// cloning badges returns a mapping of oldID to newID array
 	//.then( (badgeIDs) => {groups = getGroups(sourceOrg.id)})
 	// cloning groups returns a mapping of oldID to newID array
 
-	//TODO fix this thenable mess. We can call cloneBadges and getGroups at the same time
-
-	copyStyleToOrg(sourceOrg.id, targetOrg.id);
+	await copyStyleToOrg(sourceOrg.id, targetOrg.id);
 
 	console.log("done");
+	return targetOrg;
 }
 //);
 
@@ -81,7 +82,7 @@ async function getOrganization(orgId) {
 //copies given array of Badge objects to new organization object
 async function cloneBadges(badges, organization) {
 	console.log(
-		`cloning ${badges.length} badgees to ord id ${organization.id}`
+		`cloning ${badges.length} badgees to org id ${organization.id}`
 	);
 	// map each badge to a function that will clone it
 	let badgeSaveArray = badges.map(async badge => {
@@ -141,7 +142,7 @@ async function cloneGroups(groups, organization, badgeIDs) {
 }
 
 //clone style
-function copyStyleToOrg(fromOrgID, toOrgID) {
+async function copyStyleToOrg(fromOrgID, toOrgID) {
 	const ChannelStyle = Parse.Object.extend("ChannelStyle");
 	var newStyle = new ChannelStyle(); // new channel for new organization being created
 	var styles = new ChannelStyle();
@@ -246,25 +247,127 @@ function test() {
 }
 
 
-function createBaseOrg() {
-	let json = {
-		__type: 'Object',
-		objectId: 'j7Upfb6fEo',
-		name: 'BaseOrg',
-		className: 'Organization',
-		
-	};
-	json.organization = "BaseOrg";
-    json.organizationID = "j7Upfb6fEo";
-	let obj = Parse.Object.fromJSON(json);
-	obj.save();
+
+
+
+async function getDefaultGroups() {
+	let data = await (await fetch("../app/assets/group.json")).json();
+	let groups = [];
+	data.results.forEach(groupJSON => {
+		groupJSON.className = 'Group';
+		let group = Parse.Object.fromJSON(groupJSON);
+		groups.push(group);
+	});
+    return groups;
 }
 
 
+async function fetchAsync () {
+    let data = await (await fetch('https://api.github.com')).json();
+    return data.results;
+    }
 
 
+async function getDefaultBadges() {
+    let data = await(await fetch("../app/assets/badges.json")).json();
+	let badges = [];
+	data.results.forEach(badgeJSON => {
+		badgeJSON.className = 'Badge';
+		let badge = Parse.Object.fromJSON(badgeJSON);
+		badges.push(badge);
+	});
+    return badges;
+}
 
 
+async function getDefaultStyles() {
+	let data = await(await fetch("../app/assets/channel_style.json")).json();
+	
+	var style;
+	await data.results.forEach(styleJSON => {
+		styleJSON.className = 'ChannelStyle';
+		style = Parse.Object.fromJSON(styleJSON);
+		
+	});
+    return style; // we should only have one style but in case there are muitlpes this returns the past one
+	
+}
 
 
-export default cloneChannel;
+async function createBaseOrg() {
+    const baseID = "xGO7Pdu71w";
+    var sourceOrg = new Organization();
+    sourceOrg.organization = "BaseOrg";
+    sourceOrg.organizationID = baseID;////j7Upfb6fEo
+	sourceOrg.id = baseID;
+	sourceOrg.name = "Default";
+	//let obj = Parse.Object.fromJSON(orgJson);
+    //obj.save();
+    //targetOrg.save()
+    //.then (org => console.log('saved base org to parse db with id ' + org.id));
+
+
+    // load the json for groups and badges
+    var groups = await getDefaultGroups();
+    var badges = await getDefaultBadges();
+
+	var targetOrg = new Organization();
+	
+// fix  	currentUser = Parse.User.current();
+	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
+
+	// too many paramters needed for the steps in this
+	// await saveChannelToOrg(groupIDs);
+	// TODO can we make this into a separate block?
+	let editors = []; //users ids able to edit the channel to populate channel list
+	//editors.push(currentUser.id);
+	targetOrg.set("editors", editors);
+	targetOrg.set("header", sourceOrg.attributes.header);
+	targetOrg.set("callOut", sourceOrg.attributes.callOut);
+	await targetOrg.save();
+	console.log('working on new base org with organizationID: ' + targetOrg.organizationID);
+	console.log('working on new base org with object id: ' + targetOrg.objectId);
+	
+	// get all the badges for the channel copying from
+	//var badges, badgeIDs, groups;
+	var groupIDs = [];
+    let badgeIDs = await cloneBadges(badges, targetOrg);
+    groupIDs = await cloneGroups(groups, targetOrg, badgeIDs);
+	targetOrg.set("groups", groupIDs);
+	targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+	await targetOrg.save().then(
+		org => {
+			console.log(`org id ${org.id} saved`);
+		},
+		error => {
+			alert(`Failed to create new object, with error code: ${error.message}`);
+		}
+	);
+          
+	//const ChannelStyle = Parse.Object.extend("ChannelStyle");
+	var newStyle;// = new ChannelStyle(); // new channel for new organization being created
+	newStyle = await getDefaultStyles();
+	console.log('retrieved default style');
+	newStyle.id  = null;//treat it like a new record
+	newStyle.set("organizationID", targetOrg.id);
+	await newStyle.save().then(
+		style => {
+			// Execute any logic that should take place after the object is saved.
+			console.log(`New style object created with objectId:${style.id}`);
+		},
+		error => {
+			// Execute any logic that should take place if the save fails. error is a
+			// Parse.Error with an error code and message.
+			alert(`Failed to create new object, with error code: ${error.message}`);
+		}
+	);
+	// set this id for the base object for cloning
+	cloneableID = targetOrg.id;
+	console.log("done");
+}
+
+function getCloneableID() {
+	return cloneableID;
+}
+
+export {cloneChannel, createBaseOrg, getCloneableID};

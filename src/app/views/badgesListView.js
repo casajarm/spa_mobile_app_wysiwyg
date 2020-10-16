@@ -5,15 +5,15 @@ const {render, html, svg} = lighterhtml;
 const badgesListView = (Channel) => {
 	console.info('rendering badgesListView');
     let panel2 = document.getElementById("panel2");
-    function dragMoji(e) {
+    function dragBadge(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',add' );
     }
 
     function handleDrop(e) {
         e.preventDefault();
         // find object dropped..get the id
-        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
-        let mojiID = e.dataTransfer.getData('Text');
+        //alert('droped badge with id: ' + e.dataTransfer.getData('Text'));
+        let badgeID = e.dataTransfer.getData('Text');
         // storing data in drag event as "ID,add" or "ID,remove"
         let dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'remove') {
@@ -39,7 +39,7 @@ const badgesListView = (Channel) => {
             data-toggle="modal"
             data-target="#editBadgesModal"
             draggable="true"
-            ondragstart="${dragMoji}"
+            ondragstart="${dragBadge}"
         >
             <img
                 src="${badge.attributes.x3.url()}"
@@ -62,7 +62,7 @@ const badgesListView = (Channel) => {
             ondragover="${dragover}"
             ondrop="${handleDrop}"
         >
-            ${Channel.badges.map(moji => badgeView(moji))}
+            ${Channel.badges.map(badge => badgeView(badge))}
         </div>
         <div class="selectDiv text-center" data-toggle="modal" data-target="#addBadgesModal">
 			<button type="button"  id="addBadgesModalButton" class="btn btn-default addBadges containerBadges"><i style="font-size: 1.3em; color: white; margin-top: 4px;" class="far fa-plus-square grow"></i> Add Badges</button>

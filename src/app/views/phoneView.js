@@ -36,14 +36,14 @@ const phoneView = (Channel) => {
         if(category.attributes.main == 1) {
             mainPageClass = mainPageClass + ' mainpageBadges';
         }
-        let mojiHtml = html`<div id="badgeGroupCollection"
+        let badgeHtml = html`<div id="badgeGroupCollection"
                 class="${mainPageClass}">
                   ${badges
-                    ? badges.map(moji => badgeView(moji))
+                    ? badges.map(badge => badgeView(badge))
                     : html`<h4 id="dragBadgesPrompt" class="dragBadgesPrompt" style="display:none">Add Badges Here!</h4>`}
             </div>`;
 
-        return mojiHtml;
+        return badgeHtml;
     }
 
     let phoneHTML =
@@ -76,7 +76,7 @@ const phoneView = (Channel) => {
     function handleDrop(e) {
         e.preventDefault();
         // find object dropped..get the id
-        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
+        //alert('droped badge with id: ' + e.dataTransfer.getData('Text'));
         // storing data in drag event as "ID,add" or "ID,remove"
         let dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'add') {
@@ -149,7 +149,7 @@ const phoneNavBarView =  (Channel) => {
 
   const badgeView = (badge) => {
 
-    function dragMoji(e) {
+    function dragBadge(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',remove');
     }
 
@@ -158,7 +158,7 @@ const phoneNavBarView =  (Channel) => {
         draggable="true"
         id="${badge.id}"
         draggable="true"
-        ondragstart="${dragMoji}"
+        ondragstart="${dragBadge}"
     >
         <img
             src="${badge.attributes.x3.url()}"

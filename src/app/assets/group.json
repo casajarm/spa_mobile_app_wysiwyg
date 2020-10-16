@@ -30,8 +30,8 @@
             "order": 0,
             "newHeader": {
                 "__type": "File",
-                "name": "3500972b0009c8c7127e65445106bf89_header.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/3500972b0009c8c7127e65445106bf89_header.jpg"
+                "name": "9_header.jpg",
+                "url": "/src/app/assets/badges/9_header.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.474Z",
             "updatedAt": "2019-01-20T23:13:51.083Z"
@@ -76,13 +76,13 @@
             "order": 4,
             "newHeader": {
                 "__type": "File",
-                "name": "9376d49a5991f7cfad1570dd1b5d9e73_header.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/9376d49a5991f7cfad1570dd1b5d9e73_header.jpg"
+                "name": "3_header.jpg",
+                "url": "/src/app/assets/badges/3_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
-                "name": "b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg"
+                "name": "pre-k-8th-grade-category.jpg",
+                "url": "/src/app/assets/badges/pre-k-8th-grade-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.475Z",
             "updatedAt": "2019-01-20T23:13:51.086Z"
@@ -133,13 +133,13 @@
             "order": 2,
             "newHeader": {
                 "__type": "File",
-                "name": "28f61e11293ee2779bac1da9fd5a33c8_header.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/28f61e11293ee2779bac1da9fd5a33c8_header.jpg"
+                "name": "8_header.jpg",
+                "url": "/src/app/assets/badges/8_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
-                "name": "75bf2bc682605d0d5e90212b56942917_high-school-category.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/75bf2bc682605d0d5e90212b56942917_high-school-category.jpg"
+                "name": "high-school-category.jpg",
+                "url": "/src/app/assets/badges/high-school-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.476Z",
             "updatedAt": "2019-01-20T23:13:51.094Z"
@@ -180,13 +180,13 @@
             "order": 1,
             "newHeader": {
                 "__type": "File",
-                "name": "f8f773290587ed4e9175f005355631ed_header.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/f8f773290587ed4e9175f005355631ed_header.jpg"
+                "name": "ed_header.jpg",
+                "url": "/src/app/assets/badges/ed_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
-                "name": "1dce67c95341345a715384ba783f875b_co-curricular-category.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/1dce67c95341345a715384ba783f875b_co-curricular-category.jpg"
+                "name": "co-curricular-category.jpg",
+                "url": "/src/app/assets/badges/co-curricular-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.478Z",
             "updatedAt": "2019-01-20T23:13:51.092Z"
@@ -232,13 +232,13 @@
             "order": 3,
             "newHeader": {
                 "__type": "File",
-                "name": "80585703ed6bb91d34773dd39c86bf4a_header.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/80585703ed6bb91d34773dd39c86bf4a_header.jpg"
+                "name": "a_header.jpg",
+                "url": "/src/app/assets/badges/a_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
-                "name": "31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg",
-                "url": "https://badge-main-stage.s3.amazonaws.com/31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg"
+                "name": "3operations-category.jpg",
+                "url": "/src/app/assets/badges/operations-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.478Z",
             "updatedAt": "2019-01-20T23:13:51.096Z"

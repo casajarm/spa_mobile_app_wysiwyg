@@ -15,13 +15,13 @@ var MyClass = Parse.Object.extend("MyClass", {
  */
 
 var Badge = Parse.Object.extend("Badge", {
-      cloneMojies:  (badges) => {return cloneBadges(badges)}
-    , getBadges: (orgId)  => {return getBadges(orgId)}
-    , sortName:     (badges)  => {return sortBadgesByName(badges)}
+    cloneBadges:  (badges)  => {return cloneBadges(badges)}
+    , getBadges:  (orgId)   => {return getBadges(orgId)}
+    , sortName:   (badges)  => {return sortBadgesByName(badges)}
 });
 
 //copies given Badges to current Badge set
-async function cloneBadges(mojies) {
+async function cloneBadges(badges) {
     let newBadgesArray = [];
     let intermediateBadgesArray = [];
     for (var i = 0; i < badges.length; i++) {

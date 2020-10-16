@@ -1,0 +1,5 @@
+http://likemoji-main-stage.s3.amazonaws.com/3500972b0009c8c7127e65445106bf89_header.jpg
+http://likemoji-main-stage.s3.amazonaws.com/9376d49a5991f7cfad1570dd1b5d9e73_header.jpg
+http://likemoji-main-stage.s3.amazonaws.com/28f61e11293ee2779bac1da9fd5a33c8_header.jpg
+http://likemoji-main-stage.s3.amazonaws.com/f8f773290587ed4e9175f005355631ed_header.jpg
+http://likemoji-main-stage.s3.amazonaws.com/80585703ed6bb91d34773dd39c86bf4a_header.jpg

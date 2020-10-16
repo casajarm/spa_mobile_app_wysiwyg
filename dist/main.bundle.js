@@ -72721,8 +72721,6 @@ var _users = __webpack_require__(/*! ./modules/users.js */ "./src/app/modules/us
 
 var _clonechannel = __webpack_require__(/*! ./modules/clonechannel.js */ "./src/app/modules/clonechannel.js");
 
-var _clonechannel2 = _interopRequireDefault(_clonechannel);
-
 var _organizations = __webpack_require__(/*! ./modules/organizations.js */ "./src/app/modules/organizations.js");
 
 var _channel = __webpack_require__(/*! ./modules/channel.js */ "./src/app/modules/channel.js");
@@ -72818,74 +72816,6 @@ function saveGroups(json, orgID) {
     console.log('saved group to parse db');
 }
 
-async function getGroups() {
-    var data = await (await fetch("../app/assets/group.json")).json();
-    return data.results;
-}
-
-async function fetchAsync() {
-    var data = await (await fetch('https://api.github.com')).json();
-    return data.results;
-}
-
-async function getBadges() {
-    var data = await (await fetch("../app/assets/badges.json")).json();
-    return data.results;
-}
-
-async function createBaseOrg() {
-    var baseID = "xGO7Pdu71w";
-    var sourceOrg = new _organizations.Organization();
-    sourceOrg.organization = "BaseOrg";
-    sourceOrg.organizationID = baseID; ////j7Upfb6fEo
-    sourceOrg.id = baseID;
-    //let obj = Parse.Object.fromJSON(orgJson);
-    //obj.save();
-    //targetOrg.save()
-    //.then (org => console.log('saved base org to parse db with id ' + org.id));
-
-    // load the json for groups
-    var groups = await getGroups();
-    var badges = await getBadges();
-
-    var targetOrg = new _organizations.Organization();
-
-    // fix  	currentUser = Parse.User.current();
-    targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
-
-    // too many paramters needed for the steps in this
-    // await saveChannelToOrg(groupIDs);
-    // TODO can we make this into a separate block?
-    var editors = []; //users ids able to edit the channel to populate channel list
-    //editors.push(currentUser.id);
-    targetOrg.set("editors", editors);
-    targetOrg.set("header", sourceOrg.attributes.header);
-    targetOrg.set("callOut", sourceOrg.attributes.callOut);
-
-    // get all the badges for the channel copying from
-    //var badges, badgeIDs, groups;
-    var groupIDs = [];
-    var badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
-    .then(function (_badgeIDs) {
-        badgeIDs = _bagedIDs;
-        cloneGroups(groups, targetOrg, badgeIDs).then(function (_groupIDS) {
-            // now that we have groupids we can pass that back up into the org record
-            groupIDs = _groupIDS;
-            targetOrg.set("groups", groupIDs);
-            targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
-            targetOrg.save().then(function (org) {
-                console.log("org id " + org.id + " saved");
-            }, function (error) {
-                alert("Failed to create new object, with error code: " + error.message);
-            });
-        });
-    });
-
-    copyStyleToOrg(sourceOrg.id, targetOrg.id);
-
-    console.log("done");
-}
-
 function initApplication() {
     panel1 = document.getElementById("panel1");
     panel2 = document.getElementById("panel2");
@@ -72901,7 +72831,7 @@ function initApplication() {
     //Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
     Parse.enableLocalDatastore();
     user = new Parse.User();
-    createBaseOrg();
+    (0, _clonechannel.createBaseOrg)();
 }
 
 page.start({ hashbang: false, dispatch: true });
@@ -72955,14 +72885,14 @@ page("/signup", function (ctx, next) {
             // TODO see if we can just give it a route for clone and then a "next" clone a
             // channel for them start by cloning channel xGO7Pdu71w
             var targetOrg = new _organizations.Organization();
-            var _channelID = "xGO7Pdu71w"; //TODO make this dynamic based on how they enter
+            var channelID = (0, _clonechannel.getCloneableID)(); //"xGO7Pdu71w"; //
             //TODO if the name is not unique???
             targetOrg.set("name", channelName);
             targetOrg.save().then(async function (org) {
                 console.log("New org saved .. now clone");
-                await (0, _clonechannel2.default)({ targetOrgId: org.id, sourceOrgId: _channelID });
+                await (0, _clonechannel.cloneChannel)({ targetOrgId: org.id, sourceOrgId: channelID });
                 //TODO update header image with fabric built image
-                _channel.Channel.mainCategory().set('headerimage', '');
+                //Channel.mainCategory().set('headerimage', '')
 
                 document.getElementById('login').classList.add('active');
                 page("/viewnew/" + org.id);
@@ -73060,14 +72990,14 @@ page("/channels", async function (ctx, next) {
 }); //channels page
 
 page("/channel/:channelID/clone", function (ctx, next) {
-    channelID = ctx.params.channelID;
+    channelID = ctx.params.channelID || (0, _clonechannel.getCloneableID)();
     console.log("entering clone for channel id " + channelID);
     channelName = "Clone of " + channelID;
     var targetOrg = new _organizations.Organization();
     targetOrg.set("name", channelName);
     targetOrg.save().then(async function (org) {
         console.log("New org saved .. now clone");
-        await (0, _clonechannel2.default)({ targetOrgId: org.id, sourceOrgId: channelID });
+        await (0, _clonechannel.cloneChannel)({ targetOrgId: org.id, sourceOrgId: channelID });
         //redirect to the view now
         page.redirect("/viewnew/" + org.id);
     });
@@ -73590,8 +73520,8 @@ var MyClass = Parse.Object.extend("MyClass", {
  */
 
 var Badge = Parse.Object.extend("Badge", {
-  cloneMojies: function cloneMojies(badges) {
-    return cloneBadges(badges);
+  cloneBadges: function cloneBadges(badges) {
+    return _cloneBadges(badges);
   },
   getBadges: function getBadges(orgId) {
     return _getBadges(orgId);
@@ -73602,7 +73532,7 @@ var Badge = Parse.Object.extend("Badge", {
 });
 
 //copies given Badges to current Badge set
-async function cloneBadges(mojies) {
+async function _cloneBadges(badges) {
   var newBadgesArray = [];
   var intermediateBadgesArray = [];
   for (var i = 0; i < badges.length; i++) {
@@ -73758,9 +73688,9 @@ var Channel = {
     catBadges: function catBadges(category) {
         var catBadges = category.get('badges');
         // return the badges that match array in category
-        return this.badges.filter(function (moji) {
+        return this.badges.filter(function (badge) {
             return catBadges.find(function (x) {
-                return x === moji.id;
+                return x === badge.id;
             });
         });
     },
@@ -73833,7 +73763,7 @@ var Channel = {
         });
         this.badges.splice(ind, 1);
         await Parse.Object.saveAll(this.categories);
-        await badge.destroy().then(function (moji) {
+        await badge.destroy().then(function (badge) {
             // The object was deleted from the Parse Cloud.
         }, function (error) {
             // The delete failed.
@@ -73987,11 +73917,14 @@ exports.viewControl = _viewcontrol2.default;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.getCloneableID = exports.createBaseOrg = exports.cloneChannel = undefined;
 
 var _organizations = __webpack_require__(/*! ./organizations.js */ "./src/app/modules/organizations.js");
 
 //Parse.Cloud.define("CloneChannel", async request => {
 var currentUser;
+var cloneableID; // the default key for the data we clone on new account creation
+
 
 async function cloneChannel(req) {
 	console.log("cloneChannel " + req.sourceOrgId + " to " + req.targetOrgId);
@@ -74021,37 +73954,36 @@ async function cloneChannel(req) {
 	// get all the badges for the channel copying from
 	//var badges, badgeIDs, groups;
 	var groupIDs = [];
-	getBadges(req.sourceOrgId).then(function (_badges) {
-		var badges = _badges;
-		var badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
-		.then(function (_badgeIDs) {
-			badgeIDs = _bagedIDs;
-			// TODO we can probably just keep passing the then return down and not pas back up to outer block scoped variables
-			getGroups(sourceOrg.id).then(function (_groups) {
-				var groups = _groups;
-				cloneGroups(groups, targetOrg, badgeIDs).then(function (_groupIDS) {
-					// now that we have groupids we can pass that back up into the org record
-					groupIDs = _groupIDS;
-					targetOrg.set("groups", groupIDs);
-					targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
-					targetOrg.save().then(function (org) {
-						console.log("org id " + org.id + " saved");
-					}, function (error) {
-						alert("Failed to create new object, with error code: " + error.message);
-					});
-				});
-			});
-		});
+	var badges = await getBadges(req.sourceOrgId);
+	//.then(_badges => {
+	//let badges = _badges;
+	var badgeIDs = await cloneBadges(badges, targetOrg);
+	//			.then(_badgeIDs => {
+	//				badgeIDs = _bagdeIDs;
+	// TODO we can probably just keep passing the then return down and not pas back up to outer block scoped variables
+	var groups = await getGroups(sourceOrg.id);
+	//.then(_groups => {
+	//let groups = _groups;
+	groupIDs = await cloneGroups(groups, targetOrg, badgeIDs);
+	//.then(_groupIDS => {
+	// now that we have groupids we can pass that back up into the org record
+	//					groupIDs = _groupIDS;
+	targetOrg.set("groups", groupIDs);
+	targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+	await targetOrg.save().then(function (org) {
+		console.log("org id " + org.id + " saved");
+	}, function (error) {
+		alert("Failed to create new object, with error code: " + error.message);
 	});
+
 	// cloning badges returns a mapping of oldID to newID array
 	//.then( (badgeIDs) => {groups = getGroups(sourceOrg.id)})
 	// cloning groups returns a mapping of oldID to newID array
 
-	//TODO fix this thenable mess. We can call cloneBadges and getGroups at the same time
-
-	copyStyleToOrg(sourceOrg.id, targetOrg.id);
+	await copyStyleToOrg(sourceOrg.id, targetOrg.id);
 
 	console.log("done");
+	return targetOrg;
 }
 //);
 
@@ -74068,7 +74000,7 @@ async function getOrganization(orgId) {
 
 //copies given array of Badge objects to new organization object
 async function cloneBadges(badges, organization) {
-	console.log("cloning " + badges.length + " badgees to ord id " + organization.id);
+	console.log("cloning " + badges.length + " badgees to org id " + organization.id);
 	// map each badge to a function that will clone it
 	var badgeSaveArray = badges.map(async function (badge) {
 		var result = await copyBadgeToOrg(badge, organization);
@@ -74127,7 +74059,7 @@ async function cloneGroups(groups, organization, badgeIDs) {
 }
 
 //clone style
-function copyStyleToOrg(fromOrgID, toOrgID) {
+async function copyStyleToOrg(fromOrgID, toOrgID) {
 	var ChannelStyle = Parse.Object.extend("ChannelStyle");
 	var newStyle = new ChannelStyle(); // new channel for new organization being created
 	var styles = new ChannelStyle();
@@ -74227,21 +74159,117 @@ function test() {
 	obj.save();
 }
 
-function createBaseOrg() {
-	var json = {
-		__type: 'Object',
-		objectId: 'j7Upfb6fEo',
-		name: 'BaseOrg',
-		className: 'Organization'
-
-	};
-	json.organization = "BaseOrg";
-	json.organizationID = "j7Upfb6fEo";
-	var obj = Parse.Object.fromJSON(json);
-	obj.save();
+async function getDefaultGroups() {
+	var data = await (await fetch("../app/assets/group.json")).json();
+	var groups = [];
+	data.results.forEach(function (groupJSON) {
+		groupJSON.className = 'Group';
+		var group = Parse.Object.fromJSON(groupJSON);
+		groups.push(group);
+	});
+	return groups;
 }
 
-exports.default = cloneChannel;
+async function fetchAsync() {
+	var data = await (await fetch('https://api.github.com')).json();
+	return data.results;
+}
+
+async function getDefaultBadges() {
+	var data = await (await fetch("../app/assets/badges.json")).json();
+	var badges = [];
+	data.results.forEach(function (badgeJSON) {
+		badgeJSON.className = 'Badge';
+		var badge = Parse.Object.fromJSON(badgeJSON);
+		badges.push(badge);
+	});
+	return badges;
+}
+
+async function getDefaultStyles() {
+	var data = await (await fetch("../app/assets/channel_style.json")).json();
+
+	var style;
+	await data.results.forEach(function (styleJSON) {
+		styleJSON.className = 'ChannelStyle';
+		style = Parse.Object.fromJSON(styleJSON);
+	});
+	return style; // we should only have one style but in case there are muitlpes this returns the past one
+}
+
+async function createBaseOrg() {
+	var baseID = "xGO7Pdu71w";
+	var sourceOrg = new _organizations.Organization();
+	sourceOrg.organization = "BaseOrg";
+	sourceOrg.organizationID = baseID; ////j7Upfb6fEo
+	sourceOrg.id = baseID;
+	sourceOrg.name = "Default";
+	//let obj = Parse.Object.fromJSON(orgJson);
+	//obj.save();
+	//targetOrg.save()
+	//.then (org => console.log('saved base org to parse db with id ' + org.id));
+
+
+	// load the json for groups and badges
+	var groups = await getDefaultGroups();
+	var badges = await getDefaultBadges();
+
+	var targetOrg = new _organizations.Organization();
+
+	// fix  	currentUser = Parse.User.current();
+	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
+
+	// too many paramters needed for the steps in this
+	// await saveChannelToOrg(groupIDs);
+	// TODO can we make this into a separate block?
+	var editors = []; //users ids able to edit the channel to populate channel list
+	//editors.push(currentUser.id);
+	targetOrg.set("editors", editors);
+	targetOrg.set("header", sourceOrg.attributes.header);
+	targetOrg.set("callOut", sourceOrg.attributes.callOut);
+	await targetOrg.save();
+	console.log('working on new base org with organizationID: ' + targetOrg.organizationID);
+	console.log('working on new base org with object id: ' + targetOrg.objectId);
+
+	// get all the badges for the channel copying from
+	//var badges, badgeIDs, groups;
+	var groupIDs = [];
+	var badgeIDs = await cloneBadges(badges, targetOrg);
+	groupIDs = await cloneGroups(groups, targetOrg, badgeIDs);
+	targetOrg.set("groups", groupIDs);
+	targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+	await targetOrg.save().then(function (org) {
+		console.log("org id " + org.id + " saved");
+	}, function (error) {
+		alert("Failed to create new object, with error code: " + error.message);
+	});
+
+	//const ChannelStyle = Parse.Object.extend("ChannelStyle");
+	var newStyle; // = new ChannelStyle(); // new channel for new organization being created
+	newStyle = await getDefaultStyles();
+	console.log('retrieved default style');
+	newStyle.id = null; //treat it like a new record
+	newStyle.set("organizationID", targetOrg.id);
+	await newStyle.save().then(function (style) {
+		// Execute any logic that should take place after the object is saved.
+		console.log("New style object created with objectId:" + style.id);
+	}, function (error) {
+		// Execute any logic that should take place if the save fails. error is a
+		// Parse.Error with an error code and message.
+		alert("Failed to create new object, with error code: " + error.message);
+	});
+	// set this id for the base object for cloning
+	cloneableID = targetOrg.id;
+	console.log("done");
+}
+
+function getCloneableID() {
+	return cloneableID;
+}
+
+exports.cloneChannel = cloneChannel;
+exports.createBaseOrg = createBaseOrg;
+exports.getCloneableID = getCloneableID;
 
 /***/ }),
 
@@ -74588,15 +74616,15 @@ var _lighterhtml = lighterhtml,
 var badgesListView = function badgesListView(Channel) {
     console.info('rendering badgesListView');
     var panel2 = document.getElementById("panel2");
-    function dragMoji(e) {
+    function dragBadge(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',add');
     }
 
     function handleDrop(e) {
         e.preventDefault();
         // find object dropped..get the id
-        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
-        var mojiID = e.dataTransfer.getData('Text');
+        //alert('droped badge with id: ' + e.dataTransfer.getData('Text'));
+        var badgeID = e.dataTransfer.getData('Text');
         // storing data in drag event as "ID,add" or "ID,remove"
         var dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'remove') {
@@ -74616,14 +74644,14 @@ var badgesListView = function badgesListView(Channel) {
     }
 
     var badgeView = function badgeView(badge) {
-        var badgeViewHTML = html(_templateObject, badge.id, dragMoji, badge.attributes.x3.url(), badge.attributes.names.en);
+        var badgeViewHTML = html(_templateObject, badge.id, dragBadge, badge.attributes.x3.url(), badge.attributes.names.en);
 
         //console.log(badgeViewHTML);
         return badgeViewHTML;
     };
 
-    var badgesListViewHTML = html(_templateObject2, dragenter, dragover, handleDrop, Channel.badges.map(function (moji) {
-        return badgeView(moji);
+    var badgesListViewHTML = html(_templateObject2, dragenter, dragover, handleDrop, Channel.badges.map(function (badge) {
+        return badgeView(badge);
     }));
 
     return badgesListViewHTML;
@@ -75004,18 +75032,18 @@ var phoneView = function phoneView(Channel) {
         if (category.attributes.main == 1) {
             mainPageClass = mainPageClass + ' mainpageBadges';
         }
-        var mojiHtml = html(_templateObject, mainPageClass, badges ? badges.map(function (moji) {
-            return badgeView(moji);
+        var badgeHtml = html(_templateObject, mainPageClass, badges ? badges.map(function (badge) {
+            return badgeView(badge);
         }) : html(_templateObject2));
 
-        return mojiHtml;
+        return badgeHtml;
     };
 
     var phoneHTML = html(_templateObject3, category.attributes.newHeader.url(), category.attributes.callOuts.en, dragenter, dragover, handleDrop, badgesView(Channel.catBadges(category)), category.attributes.main == 1 ? categoriesSubView(Channel.categories) : html(_templateObject4), phoneNavBarView(Channel));
     function handleDrop(e) {
         e.preventDefault();
         // find object dropped..get the id
-        //alert('droped moji with id: ' + e.dataTransfer.getData('Text'));
+        //alert('droped badge with id: ' + e.dataTransfer.getData('Text'));
         // storing data in drag event as "ID,add" or "ID,remove"
         var dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'add') {
@@ -75066,11 +75094,11 @@ var phoneNavBarView = function phoneNavBarView(Channel) {
 
 var badgeView = function badgeView(badge) {
 
-    function dragMoji(e) {
+    function dragBadge(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',remove');
     }
 
-    var badgeViewHTML = html(_templateObject6, badge.id, dragMoji, badge.attributes.x3.url(), badge.attributes.names.en);
+    var badgeViewHTML = html(_templateObject6, badge.id, dragBadge, badge.attributes.x3.url(), badge.attributes.names.en);
 
     //console.log(badgeViewHTML);
     return badgeViewHTML;

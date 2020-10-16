@@ -1,6 +1,6 @@
 "use strict";
 import {getUserChannels, newUser} from "./modules/users.js";
-import cloneChannel from "./modules/clonechannel.js";
+import {cloneChannel, createBaseOrg, getCloneableID} from "./modules/clonechannel.js";
 import {Organization} from "./modules/organizations.js";
 import {Channel, viewControl} from './modules/channel.js';
 import {phoneView} from './views/phoneView.js';
@@ -81,79 +81,7 @@ function saveGroups(json, orgID) {
 }
 
 
-async function getGroups() {
-    let data = await (await fetch("../app/assets/group.json")).json();
-    return data.results;
-}
 
-
-async function fetchAsync () {
-    let data = await (await fetch('https://api.github.com')).json();
-    return data.results;
-    }
-
-
-async function getBadges() {
-    let data = await(await fetch("../app/assets/badges.json")).json();
-    return data.results;
-}
-
-
-async function createBaseOrg() {
-    const baseID = "xGO7Pdu71w";
-    var sourceOrg = new Organization();
-    sourceOrg.organization = "BaseOrg";
-    sourceOrg.organizationID = baseID;////j7Upfb6fEo
-    sourceOrg.id = baseID;
-	//let obj = Parse.Object.fromJSON(orgJson);
-    //obj.save();
-    //targetOrg.save()
-    //.then (org => console.log('saved base org to parse db with id ' + org.id));
-
-    // load the json for groups
-    var groups = await getGroups();
-    var badges = await getBadges();
-
-	var targetOrg = new Organization();
-	
-// fix  	currentUser = Parse.User.current();
-	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
-
-	// too many paramters needed for the steps in this
-	// await saveChannelToOrg(groupIDs);
-	// TODO can we make this into a separate block?
-	let editors = []; //users ids able to edit the channel to populate channel list
-	//editors.push(currentUser.id);
-	targetOrg.set("editors", editors);
-	targetOrg.set("header", sourceOrg.attributes.header);
-	targetOrg.set("callOut", sourceOrg.attributes.callOut);
-
-	// get all the badges for the channel copying from
-	//var badges, badgeIDs, groups;
-	var groupIDs = [];
-    let badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
-        .then(_badgeIDs => {
-            badgeIDs = _bagedIDs;
-            cloneGroups(groups, targetOrg, badgeIDs).then(_groupIDS => {
-                // now that we have groupids we can pass that back up into the org record
-                groupIDs = _groupIDS;
-                targetOrg.set("groups", groupIDs);
-                targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
-                targetOrg.save().then(
-                    org => {
-                        console.log(`org id ${org.id} saved`);
-                    },
-                    error => {
-                        alert(`Failed to create new object, with error code: ${error.message}`);
-                    }
-                );
-            });
-        });
-
-	copyStyleToOrg(sourceOrg.id, targetOrg.id);
-
-	console.log("done");
-}
 
 
 
@@ -227,7 +155,7 @@ page("/signup", function (ctx, next) {
             // TODO see if we can just give it a route for clone and then a "next" clone a
             // channel for them start by cloning channel xGO7Pdu71w
             const targetOrg = new Organization();
-            const channelID = "xGO7Pdu71w"; //TODO make this dynamic based on how they enter
+            var channelID = getCloneableID();  //"xGO7Pdu71w"; //
             //TODO if the name is not unique???
             targetOrg.set("name", channelName);
             targetOrg
@@ -236,7 +164,7 @@ page("/signup", function (ctx, next) {
                     console.log("New org saved .. now clone");
                     await cloneChannel({targetOrgId: org.id, sourceOrgId: channelID});
                     //TODO update header image with fabric built image
-                    Channel.mainCategory().set('headerimage', '')
+                    //Channel.mainCategory().set('headerimage', '')
 
                     document.getElementById('login').classList.add('active');
                     page(`/viewnew/${org.id}`);
@@ -347,7 +275,7 @@ page("/channels", async function (ctx, next) {
 }); //channels page
 
 page("/channel/:channelID/clone", function (ctx, next) {
-    channelID = ctx.params.channelID;
+    channelID = ctx.params.channelID || getCloneableID();
     console.log(`entering clone for channel id ${channelID}`);
     channelName = "Clone of " + channelID;
     const targetOrg = new Organization();
