@@ -1,18 +1,18 @@
 {
-  "name": "likemoji_20",
+  "name": "badge_20",
   "version": "1.0.0",
-  "description": "likemoji builder app",
+  "description": "badge builder app",
   "main": "app.js",
   "scripts": {
     "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://casajarm@bitbucket.org/likemoji20/likemoji_20.git"
+    "url": "git+https://casajarm@bitbucket.org/badge20/badge_20.git"
   },
   "author": "",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/likemoji20/likemoji_20#readme",
+  "homepage": "https://bitbucket.org/badge20/badge_20#readme",
   "dependencies": {
     "parse": "^2.1.0"
   },
@@ -20,7 +20,11 @@
     "babel-core": "^6.21.0",
     "babel-loader": "^7.1.4",
     "babel-preset-es2015": "^6.18.0",
-    "webpack": "^4.29",
-    "webpack-cli": "^3.2.1"
-  }
+    "clean-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^4.4.1",
+    "parse-mockdb": "^0.4.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  },
+  "keywords": []
 }

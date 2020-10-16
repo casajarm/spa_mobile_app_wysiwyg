@@ -2,7 +2,7 @@
     "results": [
         {
             "objectId": "vDYmIGwEYx",
-            "likemojis": [
+            "badges": [
                 "Z3gX6gVqp9",
                 "d9CZxHEWh2",
                 "GjtuPH5WG4"
@@ -16,7 +16,7 @@
             },
             "name": "Main Category",
             "type": "school",
-            "organization": "Greg3",
+            "organization": "BaseOrg",
             "organizationID": "j7Upfb6fEo",
             "groupImage": null,
             "headerImage": null,
@@ -31,14 +31,14 @@
             "newHeader": {
                 "__type": "File",
                 "name": "3500972b0009c8c7127e65445106bf89_header.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/3500972b0009c8c7127e65445106bf89_header.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/3500972b0009c8c7127e65445106bf89_header.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.474Z",
             "updatedAt": "2019-01-20T23:13:51.083Z"
         },
         {
             "objectId": "T8lWX4jJMF",
-            "likemojis": [
+            "badges": [
                 "7vs9EaXe2m",
                 "TGed7qUvwQ",
                 "LHxOBdi66s",
@@ -62,7 +62,7 @@
             },
             "name": "Pre-K to 8th",
             "type": "school",
-            "organization": "Greg3",
+            "organization": "BaseOrg",
             "organizationID": "j7Upfb6fEo",
             "groupImage": "organizations/tahoe-expedition-academy/pre-k-8th-grade-category.jpg",
             "headerImage": "organizations/tahoe-expedition-academy/pre-k-8th-grade-category-header.jpg",
@@ -77,19 +77,19 @@
             "newHeader": {
                 "__type": "File",
                 "name": "9376d49a5991f7cfad1570dd1b5d9e73_header.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/9376d49a5991f7cfad1570dd1b5d9e73_header.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/9376d49a5991f7cfad1570dd1b5d9e73_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
                 "name": "b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/b6266b1da6354dc86187f31e17746738_pre-k-8th-grade-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.475Z",
             "updatedAt": "2019-01-20T23:13:51.086Z"
         },
         {
             "objectId": "JrG4u3FQP2",
-            "likemojis": [
+            "badges": [
                 "p2075BDAmG",
                 "TGed7qUvwQ",
                 "332qWpEOWo",
@@ -119,7 +119,7 @@
             },
             "name": "High School",
             "type": "school",
-            "organization": "Greg3",
+            "organization": "BaseOrg",
             "organizationID": "j7Upfb6fEo",
             "groupImage": "organizations/tahoe-expedition-academy/high-school-category.jpg",
             "headerImage": "organizations/tahoe-expedition-academy/high-school-category-header.jpg",
@@ -134,19 +134,19 @@
             "newHeader": {
                 "__type": "File",
                 "name": "28f61e11293ee2779bac1da9fd5a33c8_header.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/28f61e11293ee2779bac1da9fd5a33c8_header.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/28f61e11293ee2779bac1da9fd5a33c8_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
                 "name": "75bf2bc682605d0d5e90212b56942917_high-school-category.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/75bf2bc682605d0d5e90212b56942917_high-school-category.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/75bf2bc682605d0d5e90212b56942917_high-school-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.476Z",
             "updatedAt": "2019-01-20T23:13:51.094Z"
         },
         {
             "objectId": "xw7v2Vwfxo",
-            "likemojis": [
+            "badges": [
                 "332qWpEOWo",
                 "ZlNJAXlrmr",
                 "ts4GcStYm1",
@@ -166,7 +166,7 @@
             },
             "name": "Co-Curricular",
             "type": "school",
-            "organization": "Greg3",
+            "organization": "BaseOrg",
             "organizationID": "j7Upfb6fEo",
             "groupImage": "organizations/tahoe-expedition-academy/co-curricular-category.jpg",
             "headerImage": "organizations/tahoe-expedition-academy/co-curricular-category-header.jpg",
@@ -181,19 +181,19 @@
             "newHeader": {
                 "__type": "File",
                 "name": "f8f773290587ed4e9175f005355631ed_header.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/f8f773290587ed4e9175f005355631ed_header.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/f8f773290587ed4e9175f005355631ed_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
                 "name": "1dce67c95341345a715384ba783f875b_co-curricular-category.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/1dce67c95341345a715384ba783f875b_co-curricular-category.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/1dce67c95341345a715384ba783f875b_co-curricular-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.478Z",
             "updatedAt": "2019-01-20T23:13:51.092Z"
         },
         {
             "objectId": "iThZua0A3b",
-            "likemojis": [
+            "badges": [
                 "dvrOi5AE0y",
                 "0SXglMNWCq",
                 "RxoJlKn4GS",
@@ -218,7 +218,7 @@
             },
             "name": "Operations",
             "type": "school",
-            "organization": "Greg3",
+            "organization": "BaseOrg",
             "organizationID": "j7Upfb6fEo",
             "groupImage": "organizations/tahoe-expedition-academy/operations-category.jpg",
             "headerImage": "organizations/tahoe-expedition-academy/operations-category-header.jpg",
@@ -233,12 +233,12 @@
             "newHeader": {
                 "__type": "File",
                 "name": "80585703ed6bb91d34773dd39c86bf4a_header.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/80585703ed6bb91d34773dd39c86bf4a_header.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/80585703ed6bb91d34773dd39c86bf4a_header.jpg"
             },
             "newCategoryImage": {
                 "__type": "File",
                 "name": "31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg",
-                "url": "https://likemoji-main-stage.s3.amazonaws.com/31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg"
+                "url": "https://badge-main-stage.s3.amazonaws.com/31dfe3875d6b3a85a864874a6384d9ff_operations-category.jpg"
             },
             "createdAt": "2019-01-09T23:42:13.478Z",
             "updatedAt": "2019-01-20T23:13:51.096Z"

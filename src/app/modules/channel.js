@@ -1,5 +1,5 @@
 import {Organization, getOrganization} from "./organizations.js";
-import Likemoji from './likemojis.js';
+import Badge from './badges.js';
 import {ChannelStyle, saveNewStyle, getStyle} from "./styles.js";
 import viewControl from './viewcontrol.js';
 
@@ -9,8 +9,8 @@ var org = Parse.Object.extend("Organization");
 const Channel =  {
     channel:    new org(),
     categories: [], //Object.create(Group)]
-    likemojis:  [], //[Object.create(Likemoji)],
-    //TODO how to define function getCategoryLikemojis on each array element
+    badges:  [], //[Object.create(Badge)],
+    //TODO how to define function getCategoryBadges on each array element
     styles:     [],// [Object.create(ChannelStyle)],
     _selectedCategory: '',
 
@@ -32,10 +32,10 @@ const Channel =  {
       // setting a new channel refresh all the related data
         this.channel    = await getOrganization(popID);
         this.categories = await getOrgCategories(popID);
-        this.likemojis  = await getLikemojis(popID);
+        this.badges  = await getBadges(popID);
         this.styles     = await getStyle(popID);
         console.log(`populated channel for ${popID}`);
-        console.log(`populated likemojis with ${this.likemojis.length}`);
+        console.log(`populated badges with ${this.badges.length}`);
     },
 
     async resetStyle() {
@@ -44,10 +44,10 @@ const Channel =  {
         return this.styles[0];
     },
 
-    catLikemojis: function(category) {
-        let catLikemojis = category.get('likemojis');
-        // return the likemojis that match array in category
-        return this.likemojis.filter((moji) => catLikemojis.find(x => x === moji.id));
+    catBadges: function(category) {
+        let catBadges = category.get('badges');
+        // return the badges that match array in category
+        return this.badges.filter((moji) => catBadges.find(x => x === moji.id));
     },
 
     deleteCategory: async function(category) {
@@ -95,25 +95,25 @@ const Channel =  {
         return category;
     },
 
-    addLikemoji: async function(likemoji) {
-        likemoji.set("Organization", this.channel.id);
-        await likemoji.save();
-        this.likemojis.push(likemoji);
+    addBadge: async function(badge) {
+        badge.set("Organization", this.channel.id);
+        await badge.save();
+        this.badges.push(badge);
     },
-    deleteLikemoji: async function(likemoji) {
+    deleteBadge: async function(badge) {
         // remove from group(s)
-        let rem = this.removeCategoryLikemoji;
-//        let {removeCategoryLikemoji: rem} = this;
+        let rem = this.removeCategoryBadge;
+//        let {removeCategoryBadge: rem} = this;
 
         this.categories.forEach(function(cat) {
-            rem(cat, likemoji);
+            rem(cat, badge);
             }
         )
-        // find the exact likemoji in our collection
-        let ind = this.likemojis.findIndex(x => x.id === likemoji.id);
-        this.likemojis.splice(ind, 1);
+        // find the exact badge in our collection
+        let ind = this.badges.findIndex(x => x.id === badge.id);
+        this.badges.splice(ind, 1);
         await Parse.Object.saveAll(this.categories);
-        await likemoji.destroy().then((moji) => {
+        await badge.destroy().then((moji) => {
             // The object was deleted from the Parse Cloud.
         }, (error) => {
             // The delete failed.
@@ -122,52 +122,52 @@ const Channel =  {
             }
         );
     },
-    addCategoryLikemoji: async function(category, likemoji) {
-        //if likemoji is an id find the actual object
-        let likemojiID, likemojiObj, maxCount = 20;
-        if (typeof(likemoji) === "string" || typeof(likemoji) === "number") {
-            likemojiID = likemoji;
+    addCategoryBadge: async function(category, badge) {
+        //if badge is an id find the actual object
+        let badgeID, badgeObj, maxCount = 20;
+        if (typeof(badge) === "string" || typeof(badge) === "number") {
+            badgeID = badge;
             try {
-                likemojiObj = this.likemojis.find(x => x.id === likemojiID);
+                badgeObj = this.badges.find(x => x.id === badgeID);
             }
             catch (e){
-                alert (`${likemoji} is an invalid ID for likemojis`);
+                alert (`${badge} is an invalid ID for badges`);
             }
 
         }
         else {
-            likemojiObj = likemoji;
-            likemojiID = likemojiObj.id;
+            badgeObj = badge;
+            badgeID = badgeObj.id;
         }
-        // limit main category to 3 likemojis
+        // limit main category to 3 badges
         if (isMainCategory(category)) {
             maxCount = 3;
         }
 
-        let catLikemojiIDs = category.get('likemojis');
-        if (catLikemojiIDs.length >= maxCount) {
-           alert('This section only allows 3 Likemojis');
+        let catBadgeIDs = category.get('badges');
+        if (catBadgeIDs.length >= maxCount) {
+           alert('This section only allows 3 Badges');
         }
         else {
         // don't add if it is already in the list
-            if (!catLikemojiIDs.find(x => x == likemojiID)) {
-                catLikemojiIDs.push(likemojiID);
-                category.set('likemojis', catLikemojiIDs);
-                likemojiObj.set('OrganizationId', this.channel.id);
-                likemojiObj.set('organizationName', this.channel.get('name'));
-                await likemojiObj.save();
+            if (!catBadgeIDs.find(x => x == badgeID)) {
+                catBadgeIDs.push(badgeID);
+                category.set('badges', catBadgeIDs);
+                badgeObj.set('OrganizationId', this.channel.id);
+                badgeObj.set('organizationName', this.channel.get('name'));
+                await badgeObj.save();
                 // TODO move to button action to "save" await category.save();
             }
         }
     },
-    removeCategoryLikemoji: async function(category, likemojiID)  {
-        // get the array of likemoji pointer from group
-        let catLikemojiIDs = category.get('likemojis');
-        // find the array index of the given likemoji
-        let ind = catLikemojiIDs.findIndex(x => x === likemojiID);
+    removeCategoryBadge: async function(category, badgeID)  {
+        // get the array of badge pointer from group
+        let catBadgeIDs = category.get('badges');
+        // find the array index of the given badge
+        let ind = catBadgeIDs.findIndex(x => x === badgeID);
         if(ind > -1) {
-            catLikemojiIDs.splice(ind, 1);
-            category.set('likemojis', catLikemojiIDs);
+            catBadgeIDs.splice(ind, 1);
+            category.set('badges', catBadgeIDs);
             // TODO move to button action to "save" await category.save();
         }
     },
@@ -188,7 +188,7 @@ const Channel =  {
         Promise.all([
             this.styles.saveAll(),
             this.categories.saveAll(),
-            this.likemojis.saveAll(),
+            this.badges.saveAll(),
             this.channel.save()])
             .then( () => {return})
             .catch(error => {
@@ -224,8 +224,8 @@ async function getOrgCategories(orgId) {
     }
 }
 
-async function getLikemojis(orgId) {
-    const query = new Parse.Query(Likemoji);
+async function getBadges(orgId) {
+    const query = new Parse.Query(Badge);
     query.equalTo("organizationID", orgId);
     try {
       return await query.find();

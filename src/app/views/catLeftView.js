@@ -33,9 +33,9 @@ const catLeftView = (categories) => {
         togglePanelWithin('panel-editor', 'panel3');
     }
 
-    function callLikemojiEditor (e) {
+    function callBadgeEditor (e) {
         e.preventDefault();
-        togglePanelWithin('panel-likemojis', 'panel3');
+        togglePanelWithin('panel-badges', 'panel3');
     }
 
     return html`<div>
@@ -44,7 +44,7 @@ const catLeftView = (categories) => {
         <div>
             <ul>
                 <li><h4>Customize the look and feel</h4></li>
-                <li><h4>Drag Likemojis in or out</h4></li>
+                <li><h4>Drag Badges in or out</h4></li>
                 <li><h4>Sort or disable Categories</h4></li>
             </ul>
         </div>
@@ -62,10 +62,10 @@ const catLeftView = (categories) => {
             <!-- 	<p>Upload header image - (1242px × 704px)</p></center> -->
         </div>
         <div class="selectDiv text-center">
-            <button id="addLikemojis" type="button" class="btn btn-default editor"  onclick="${callLikemojiEditor}">
-                Add/Edit Likemojis
+            <button id="addBadges" type="button" class="btn btn-default editor"  onclick="${callBadgeEditor}">
+                Add/Edit Badges
             </button>
-            <!-- <p>Upload likemojis - (324px × 324px)</p></center> -->
+            <!-- <p>Upload badges - (324px × 324px)</p></center> -->
         </div>
         <div id="categoryEditorButton" class="selectDiv text-center">
             <button id="addCategories" type="button" class="btn btn-default editor" onclick="${callCategoriesEditor}">
@@ -82,18 +82,18 @@ const catLeftView = (categories) => {
         <div id="cancelSaveGroup" class="selectDiv text-center" style="display:none">
             <div class="btn-group " role="group" aria-label="...">
                 <button
-                    id="cancelLikemojiAdd"
+                    id="cancelBadgeAdd"
                     type="button"
                     class="btn btn-danger"
                     aria-pressed="true"
                 >
                     cancel
                 </button>
-                <button id="saveLikemojiAdd" type="button" class="btn btn-success active">
+                <button id="saveBadgeAdd" type="button" class="btn btn-success active">
                     save
                 </button>
             </div>
-            <p>(Save Likemojis to Current View)</p>
+            <p>(Save Badges to Current View)</p>
         </div>
         <div
             id="phoneDisplayBackButton"

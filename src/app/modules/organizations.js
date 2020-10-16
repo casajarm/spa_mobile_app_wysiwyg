@@ -13,6 +13,7 @@ var MyClass = Parse.Object.extend("MyClass", {
     });
  */
 
+
 var Organization = Parse.Object.extend("Organization", {
 	saveChannelToOrg: () => {saveChannelToOrg()}
   , getOrganization: (orgId) => {getOrganization(orgId)} 
@@ -61,8 +62,7 @@ function saveChannelToOrg() {
         .save()
         .then((org) => {
             // Execute any logic that should take place after the object is saved.
-            // console.log("org saved"); alert('Organization updated with channel: ' +
-            // org.id);
+            console.log("org saved"); alert('Organization updated with channel: ' + org.id);
         }, (error) => {
             // Execute any logic that should take place if the save fails. error is a
             // Parse.Error with an error code and message.

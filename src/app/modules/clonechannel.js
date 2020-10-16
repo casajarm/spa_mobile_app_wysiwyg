@@ -1,4 +1,4 @@
-import {Organization} from "./organizations.js";
+import { Organization } from "./organizations.js";
 //Parse.Cloud.define("CloneChannel", async request => {
 var currentUser;
 
@@ -27,18 +27,18 @@ async function cloneChannel(req) {
 	targetOrg.set("header", sourceOrg.attributes.header);
 	targetOrg.set("callOut", sourceOrg.attributes.callOut);
 
-	// get all the likemojis for the channel copying from
-	//var likemojis, likemojiIDs, groups;
+	// get all the badges for the channel copying from
+	//var badges, badgeIDs, groups;
 	var groupIDs = [];
-	getLikemojis(req.sourceOrgId).then(_likemojis => {
-		let likemojis = _likemojis;
-		let likemojiIDs = cloneLikemojis(likemojis, targetOrg) //async .. does it matter
-			.then(_likemojIDs => {
-				likemojiIDs = _likemojIDs;
+	getBadges(req.sourceOrgId).then(_badges => {
+		let badges = _badges;
+		let badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
+			.then(_badgeIDs => {
+				badgeIDs = _bagedIDs;
 				// TODO we can probably just keep passing the then return down and not pas back up to outer block scoped variables
 				getGroups(sourceOrg.id).then(_groups => {
 					let groups = _groups;
-					cloneGroups(groups, targetOrg, likemojiIDs).then(_groupIDS => {
+					cloneGroups(groups, targetOrg, badgeIDs).then(_groupIDS => {
 						// now that we have groupids we can pass that back up into the org record
 						groupIDs = _groupIDS;
 						targetOrg.set("groups", groupIDs);
@@ -55,11 +55,11 @@ async function cloneChannel(req) {
 				});
 			});
 	});
-	// cloning likemojis returns a mapping of oldID to newID array
-	//.then( (likemojiIDs) => {groups = getGroups(sourceOrg.id)})
+	// cloning badges returns a mapping of oldID to newID array
+	//.then( (badgeIDs) => {groups = getGroups(sourceOrg.id)})
 	// cloning groups returns a mapping of oldID to newID array
 
-	//TODO fix this thenable mess. We can call cloneLikemojis and getGroups at the same time
+	//TODO fix this thenable mess. We can call cloneBadges and getGroups at the same time
 
 	copyStyleToOrg(sourceOrg.id, targetOrg.id);
 
@@ -78,38 +78,38 @@ async function getOrganization(orgId) {
 	}
 }
 
-//copies given array of Likemoji objects to new organization object
-async function cloneLikemojis(mojis, organization) {
+//copies given array of Badge objects to new organization object
+async function cloneBadges(badges, organization) {
 	console.log(
-		`cloning ${mojis.length} likemojies to ord id ${organization.id}`
+		`cloning ${badges.length} badgees to ord id ${organization.id}`
 	);
-	// map each moji to a function that will clone it
-	let mojiSaveArray = mojis.map(async moji => {
-		const result = await copyMojiToOrg(moji, organization);
+	// map each badge to a function that will clone it
+	let badgeSaveArray = badges.map(async badge => {
+		const result = await copyBadgeToOrg(badge, organization);
 		//console.log(result.id);
-		return { oldID: moji.id, newID: result.id };
+		return { oldID: badge.id, newID: result.id };
 	});
 	// execute the entire array of clone calls and return the array of returned values
-	const resolvedmojiSaveArray = await Promise.all(mojiSaveArray); // resolving all promises
-	return resolvedmojiSaveArray;
+	const resolvedbadgeSaveArray = await Promise.all(badgeSaveArray); // resolving all promises
+	return resolvedbadgeSaveArray;
 }
 
-async function copyMojiToOrg(likemoji, org) {
-	let newLikemoji = likemoji.clone();
-	newLikemoji.set("organizationID", org.id);
-	newLikemoji.set("organizationName", org.get("name"));
+async function copyBadgeToOrg(badge, org) {
+	let newBadge = badge.clone();
+	newBadge.set("organizationID", org.id);
+	newBadge.set("organizationName", org.get("name"));
 	// TODO this ACL setting could be handled in cloud code beforesave trigger
-	newLikemoji.setACL(org.getACL());
-	delete newLikemoji.objectId;
-	return await newLikemoji.save(); /*.then(function(newLikemoji) {
-    return newLikemoji;
-      { oldID: newLikemojiID, newID: newLikemoji.id }; //objectId;
+	newBadge.setACL(org.getACL());
+	delete newBadge.objectId;
+	return await newBadge.save(); /*.then(function(newBadge) {
+    return newBadge;
+      { oldID: newBadgeID, newID: newBadge.id }; //objectId;
   })*/
 }
 
-// return likemojis associated with an org
-async function getLikemojis(orgId) {
-	const query = new Parse.Query("Likemoji");
+// return badges associated with an org
+async function getBadges(orgId) {
+	const query = new Parse.Query("Badge");
 	query.equalTo("organizationID", orgId);
 	try {
 		return await query.find();
@@ -119,19 +119,19 @@ async function getLikemojis(orgId) {
 	}
 }
 
-async function cloneGroup (group, organization, likemojiIDs) {
+async function cloneGroup(group, organization, badgeIDs) {
 	let newGroup = group.clone();
 	newGroup.set("organizationID", organization.id);
 	newGroup.set("organization", organization.get("name"));
 	//newGroup.set("order", i);
-	newGroup.set("likemojis", remapIDs(newGroup.get("likemojis"), likemojiIDs));
+	newGroup.set("badges", remapIDs(newGroup.get("badges"), badgeIDs));
 	return await newGroup.save();
 }
 
 //clone groups
-async function cloneGroups(groups, organization, likemojiIDs) {
+async function cloneGroups(groups, organization, badgeIDs) {
 	let groupSaveArray = groups.map(async group => {
-		const result = await cloneGroup(group, organization, likemojiIDs);
+		const result = await cloneGroup(group, organization, badgeIDs);
 		console.log(result.id);
 		return result.id;
 	});
@@ -194,8 +194,8 @@ async function getGroups(orgId) {
 // attempts to find the x value and return the y
 // not found returns a null which is then filtered out of te returned array
 function remapIDs(sourceArray, mappingArray) {
-  var mapp = mappingArray;
-	const lookup = function(findID){
+	var mapp = mappingArray;
+	const lookup = function (findID) {
 		return mapp.find(x => x.oldID === findID).newID;
 	}
 
@@ -208,7 +208,7 @@ function remapIDs(sourceArray, mappingArray) {
 				return null;
 			}
 		})
-		.filter(function(el) {
+		.filter(function (el) {
 			return el != null;
 		});
 	return remappedIDs;
@@ -224,5 +224,47 @@ function arrayToPointers(arr, pointerClass) {
 	});
 	return pointers;
 }
+
+
+function test() {
+	let json = {
+		__type: 'Object',
+		objectId: 'myid',
+		name: 'John',
+		className: 'Item',
+		a: {
+			__type: 'Object',
+			className: 'Inner',
+			b: 'somekey'
+		}
+	};
+
+	json.name = 'haha';
+
+	let obj = Parse.Object.fromJSON(json);
+	obj.save();
+}
+
+
+function createBaseOrg() {
+	let json = {
+		__type: 'Object',
+		objectId: 'j7Upfb6fEo',
+		name: 'BaseOrg',
+		className: 'Organization',
+		
+	};
+	json.organization = "BaseOrg";
+    json.organizationID = "j7Upfb6fEo";
+	let obj = Parse.Object.fromJSON(json);
+	obj.save();
+}
+
+
+
+
+
+
+
 
 export default cloneChannel;

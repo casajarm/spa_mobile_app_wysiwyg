@@ -118,7 +118,7 @@
 118             "title": "The Organizationname Schema",
 119             "default": "",
 120             "examples": [
-121               "Greg3"
+121               "BaseOrg"
 122             ],
 123             "pattern": "^(.*)$"
 124           },
@@ -177,7 +177,7 @@
 177                 "title": "The Url Schema",
 178                 "default": "",
 179                 "examples": [
-180                   "https://likemoji-main-stage.s3.amazonaws.com/7553afbe59d0423ad3bcfda0cb4e0816_support.png"
+180                   "https://badge-main-stage.s3.amazonaws.com/7553afbe59d0423ad3bcfda0cb4e0816_support.png"
 181                 ],
 182                 "pattern": "^(.*)$"
 183               }

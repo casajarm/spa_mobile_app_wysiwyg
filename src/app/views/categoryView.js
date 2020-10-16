@@ -110,16 +110,16 @@ const categoryEditorView = (Channel) => {
 				<button
 					id=""
 					type="button"
-					class="btn btn-likemojiSwitch"
+					class="btn btn-badgeSwitch"
 					aria-pressed="true"
 				>
 					Off
 				</button>
-				<button id="" type="button" class="btn btn-likemojiSwitch active">
+				<button id="" type="button" class="btn btn-badgeSwitch active">
 					On
 				</button>
 			</div>
-			<label> - Likemojis Outline Stroke</label> <br />
+			<label> - Badges Outline Stroke</label> <br />
 			<br />
 			<button id="editTheme" class="btn btn-editTheme" onclick="${callStyleEditor}">
 				<label>

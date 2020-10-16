@@ -73,8 +73,7 @@ async function logout() {
             } else {
                 console.log("loggedout")
 
-                window.location.href = 'file:///Users/alexbarrett/Desktop/likemoji%20website%20and%20builder/likemoji%20' +
-                        'builder/buildChannel.html';
+                window.location.href = 'index.html';
             }
         });
 }

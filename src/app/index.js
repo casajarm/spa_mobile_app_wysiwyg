@@ -7,10 +7,18 @@ import {phoneView} from './views/phoneView.js';
 import categoryEditorView from './views/categoryView.js';
 import categoriesEditorView from './views/categoriesEditor.js';
 import catLeftView from './views/catLeftView.js';
-import likemojisListView from './views/likemojisListView.js';
+import badgesListView from './views/badgesListView.js';
 import styleEditorView from './views/styleEditorView.js';
 import signUpForm from './views/signupForm.js';
 import loginForm from './views/loginForm.js';
+
+
+
+//this is to local test the parse server without the actual server
+var ParseMockDB =  require('parse-mockdb');
+ParseMockDB.mockDB(Parse); // Mock the Parse RESTController
+
+
 const {render, html, svg} = lighterhtml;// this is loaded in the index.html file
 
 var panel1,
@@ -22,7 +30,7 @@ var panel1,
     channelID,              // currently selected channel ID
     selectedCategoryID,     // currently selected category ID
     panelCategories,
-    panelLikemojis,
+    panelBadges,
     panelEditor,
     panelStyleEditor;             //styles editor
 var channels = []           // list of users channels
@@ -56,20 +64,115 @@ document.onreadystatechange = function () {
     }
 };
 
+
+function saveGroups(json, orgID) {
+    let groups = json.results;
+    groups.forEach(element => {
+        console.log('step');
+        let group = element;
+        group.className = 'Group';
+        let obj = Parse.Object.fromJSON(group);
+        obj.organizationID = orgID;
+        obj.save();
+        
+    }); 
+    console.log('saved group to parse db');
+    
+}
+
+
+async function getGroups() {
+    let data = await (await fetch("../app/assets/group.json")).json();
+    return data.results;
+}
+
+
+async function fetchAsync () {
+    let data = await (await fetch('https://api.github.com')).json();
+    return data.results;
+    }
+
+
+async function getBadges() {
+    let data = await(await fetch("../app/assets/badges.json")).json();
+    return data.results;
+}
+
+
+async function createBaseOrg() {
+    const baseID = "xGO7Pdu71w";
+    var sourceOrg = new Organization();
+    sourceOrg.organization = "BaseOrg";
+    sourceOrg.organizationID = baseID;////j7Upfb6fEo
+    sourceOrg.id = baseID;
+	//let obj = Parse.Object.fromJSON(orgJson);
+    //obj.save();
+    //targetOrg.save()
+    //.then (org => console.log('saved base org to parse db with id ' + org.id));
+
+    // load the json for groups
+    var groups = await getGroups();
+    var badges = await getBadges();
+
+	var targetOrg = new Organization();
+	
+// fix  	currentUser = Parse.User.current();
+	targetOrg.set("name", "Clone of " + sourceOrg.get("name"));
+
+	// too many paramters needed for the steps in this
+	// await saveChannelToOrg(groupIDs);
+	// TODO can we make this into a separate block?
+	let editors = []; //users ids able to edit the channel to populate channel list
+	//editors.push(currentUser.id);
+	targetOrg.set("editors", editors);
+	targetOrg.set("header", sourceOrg.attributes.header);
+	targetOrg.set("callOut", sourceOrg.attributes.callOut);
+
+	// get all the badges for the channel copying from
+	//var badges, badgeIDs, groups;
+	var groupIDs = [];
+    let badgeIDs = cloneBadges(badges, targetOrg) //async .. does it matter
+        .then(_badgeIDs => {
+            badgeIDs = _bagedIDs;
+            cloneGroups(groups, targetOrg, badgeIDs).then(_groupIDS => {
+                // now that we have groupids we can pass that back up into the org record
+                groupIDs = _groupIDS;
+                targetOrg.set("groups", groupIDs);
+                targetOrg.set("groupPointer", arrayToPointers(groupIDs, "Group"));
+                targetOrg.save().then(
+                    org => {
+                        console.log(`org id ${org.id} saved`);
+                    },
+                    error => {
+                        alert(`Failed to create new object, with error code: ${error.message}`);
+                    }
+                );
+            });
+        });
+
+	copyStyleToOrg(sourceOrg.id, targetOrg.id);
+
+	console.log("done");
+}
+
+
+
 function initApplication() {
     panel1 = document.getElementById("panel1");
     panel2 = document.getElementById("panel2");
     panel3 = document.getElementById("panel3");
     panelStyle = document.getElementById("panel-style");
     // not sure about having to add these elements like this
-    panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
+    panelBadges = getOrCreateDiv('panel-badges', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
     panelStyleEditor =  getOrCreateDiv('panel-style-editor', panel3);
 
     Parse.initialize("fg8ZXCHKfBOWme42LGPA");
-    Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
+    //Parse.serverURL = "https://lmx-stage-alex.herokuapp.com/parse";
+    Parse.enableLocalDatastore();
     user = new Parse.User();
+    createBaseOrg();
 }
 
 page.start({hashbang: false, dispatch: true});
@@ -182,7 +285,7 @@ page("/logout", function (ctx, next) {
 
 
 page("/distribute", function (ctx, next) {
-    viewControl.add(panel1, () => html`<h1>About your Likemoji Channel</h1>`);
+    viewControl.add(panel1, () => html`<h1>About your Badge Channel</h1>`);
     viewControl.add(panel3, () => {
         function shareChannel(e) {
             e.preventDefault();
@@ -212,14 +315,14 @@ page("/distribute", function (ctx, next) {
 
 page("/viewnew/:orgID", async function (ctx, next) {
     await Channel.populateAll(ctx.params.orgID);
-    viewControl.add(panel1, () => html`<h1>About your Likemoji Channel</h1>`);
+    viewControl.add(panel1, () => html`<h1>About your Badge Channel</h1>`);
     //showLink(ctx, next, boilerplate);
     Channel.selectedCategory = Channel.mainCategory;
     viewControl.add(panel2, () => phoneView(Channel));
 
     viewControl.add(panel3, () => {
         let form = html`<h2>Congratulations ${Channel.channelName}!</h2>
-        <h3>Here's your new Likemoji channel</h3>
+        <h3>Here's your new Badge channel</h3>
         <button id="next-step-button"
             onclick="${() => page('/distribute')}"
             class="btn btn-default">Next</button>`;
@@ -272,12 +375,12 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     viewControl.add(panel2, () => phoneView(Channel));
     viewControl.add(panel1, () => catLeftView(Channel.categories));
     // not sure about having to add these elements like this
-    panelLikemojis = getOrCreateDiv('panel-likemojis', panel3);
+    panelBadges = getOrCreateDiv('panel-badges', panel3);
     panelEditor =  getOrCreateDiv('panel-editor', panel3)
     panelCategories = getOrCreateDiv('panel-categories', panel3);
     panelStyleEditor =  getOrCreateDiv('panel-style-editor', panel3);
 
-    panelLikemojis.classList.add('hidden');
+    panelBadges.classList.add('hidden');
     panelCategories.classList.add('hidden');
     panelStyleEditor.classList.add('hidden');
     panelEditor.classList.remove('hidden');
@@ -285,7 +388,7 @@ page("/channel/:channelID/view",  async function (ctx, next) {
     // we could combine these 4 views into one view.js file
     viewControl.add(panelCategories, () => categoriesEditorView(Channel));
     viewControl.add(panelEditor, () => categoryEditorView(Channel));
-    viewControl.add(panelLikemojis, () => likemojisListView(Channel));
+    viewControl.add(panelBadges, () => badgesListView(Channel));
     viewControl.add(panelStyleEditor, () => styleEditorView(Channel));
 
     viewControl.add(panelStyle, () => inlineStyle(Channel.channelStyle));
@@ -307,12 +410,12 @@ page("/channel/:channelID/view/:groupID", async function (ctx, next) {
 
         viewControl.add(panelCategories, () => categoriesEditorView(Channel));
         viewControl.add(panelEditor, () => categoryEditorView(Channel));
-        viewControl.add(panelLikemojis, () => likemojisListView(Channel));
+        viewControl.add(panelBadges, () => badgesListView(Channel));
         viewControl.add(panelStyleEditor, () => styleEditorView(Channel));
 
         viewControl.add(panelStyle, () => inlineStyle(Channel.channelStyle));
         // TODO add the back button on the left panel
-        panelLikemojis.classList.add('hidden');
+        panelBadges.classList.add('hidden');
         panelCategories.classList.add('hidden');
         panelStyleEditor.classList.add('hidden');
         panelEditor.classList.remove('hidden');
@@ -473,7 +576,7 @@ $('#addCategoriesModal').on('show.bs.modal',
         let triggeringElement = event.relatedTarget; // Button/link/div that triggered the modal
         if (triggeringElement.id == 'addNewCategories') {
             Channel.selectedCategory = null;
-            document.getElementById('likemoji-edit-form').reset();
+            document.getElementById('badge-edit-form').reset();
             modal.find("#categoryPreview").attr("src", '');
             modal.find("#categoryImageName").text('');
         }
@@ -539,7 +642,7 @@ $("#saveCategory").click(function(event) {
 		groupSelected.set("order", Channel.categories.length + 1);
 		groupSelected.set("newHeader", Channel.mainCategory.attributes.newHeader);
 		groupSelected.set("callOuts", { en: "Connect with us!" });
-		groupSelected.set("likemojis", []);
+		groupSelected.set("badges", []);
 	}
 
 	groupSelected.set("name", categoryNameInternal);
@@ -673,22 +776,22 @@ $("#ipadHeaderEditorImageButton").click(function() {
 });
 
 
-// when likemoji editor modal is opened this fills data
-$('#editLikemojisModal').on('show.bs.modal',
+// when badge editor modal is opened this fills data
+$('#editBadgesModal').on('show.bs.modal',
     function (event) {
-        let thisLikemojiID = event.relatedTarget.id // id of calling likemoji icon
+        let thisBadgeID = event.relatedTarget.id // id of calling badge icon
         let modal = $(this);
         // alert("clicked");
-        let likemoji = Channel.likemojis.find(x => x.id === thisLikemojiID);
+        let badge = Channel.badges.find(x => x.id === thisBadgeID);
 
-        modal.find("#likemojiName").val(likemoji.attributes.names.en);
-        modal.find("#likemojiEditorImageInput").val("");
-        modal.find("#likemojiPreview").hide();
-        modal.find("#likemojiPreview").attr("src", likemoji.attributes.x3.url());
-        modal.find("#likemojiPreview").fadeIn(650);
-        modal.find("#LikemojiEditorImageName").text(likemoji.attributes.x3._name);
-        modal.find("#likemojiEditorImageButton").click(function() {
-        let fileUploadControl = $("#likemojiEditorImageInput")[0];
+        modal.find("#badgeName").val(badge.attributes.names.en);
+        modal.find("#badgeEditorImageInput").val("");
+        modal.find("#badgePreview").hide();
+        modal.find("#badgePreview").attr("src", badge.attributes.x3.url());
+        modal.find("#badgePreview").fadeIn(650);
+        modal.find("#BadgeEditorImageName").text(badge.attributes.x3._name);
+        modal.find("#badgeEditorImageButton").click(function() {
+        let fileUploadControl = $("#badgeEditorImageInput")[0];
         if (fileUploadControl.files.length > 0) {
             let file = fileUploadControl.files[0];
             let name = fileUploadControl.files[0].name;
@@ -696,9 +799,9 @@ $('#editLikemojisModal').on('show.bs.modal',
 
             parseFile.save().then(
                 function() {
-                    // $('#likemojiPreview').hide();
-                    $("#likemojiPreview").attr("src", parseFile._url);
-                    // $('#likemojiPreview').fadeIn(650);
+                    // $('#badgePreview').hide();
+                    $("#badgePreview").attr("src", parseFile._url);
+                    // $('#badgePreview').fadeIn(650);
                     console.log(parseFile._url);
 
                     // The file has been saved to Parse.
@@ -707,24 +810,24 @@ $('#editLikemojisModal').on('show.bs.modal',
                     // The file either could not be read, or could not be saved to Parse.
                 }
             );
-            $("#likemojiEditorImageInput")[0].value = "";
+            $("#badgeEditorImageInput")[0].value = "";
         }
     });
 
-    //saves edited likemoji when editor modal is closed with save button
-    modal.find("#saveEditedLikemoji").click(function(event) {
-            var likemojiNamesEN = $("#likemojiName").val();
+    //saves edited badge when editor modal is closed with save button
+    modal.find("#saveEditedBadge").click(function(event) {
+            var badgeNamesEN = $("#badgeName").val();
 
-            likemoji.set("names", { en: likemojiNamesEN });
+            badge.set("names", { en: badgeNamesEN });
 
             if (parseFile != undefined) {
-                likemoji.set("x3", parseFile);
+                badge.set("x3", parseFile);
             }
 
-            likemoji.save().then(
-                async returnedLikemoji => {
+            badge.save().then(
+                async returnedBadge => {
                     // Execute any logic that should take place after the object is saved.
-                    console.log("likemoji saved");
+                    console.log("badge saved");
                     Channel.updateViews();
                     parseFile = undefined;
                 },
@@ -738,50 +841,50 @@ $('#editLikemojisModal').on('show.bs.modal',
 });
 
 
-//creates a new likemoji from file uploader
-async function createLikemoji(file) {
+//creates a new badge from file uploader
+async function createBadge(file) {
     let name = file.name;
 	let parseFile = new Parse.File(name, file);
-	let likemojiNamesEN = name.slice(0, -4);
-    let Likemoji = Parse.Object.extend('Likemoji');
+	let badgeNamesEN = name.slice(0, -4);
+    let Badge = Parse.Object.extend('Badge');
     console.info('saving file named ' + name);
     await parseFile.save()
-    let newLikemoji = new Likemoji();
-    console.info(`file ${name} saved now add likemojis`);
-    newLikemoji.set("x3", parseFile);
-    newLikemoji.set("name", name.slice(0, -4));
-    newLikemoji.set("names", { en: likemojiNamesEN });
-    newLikemoji.set("organizationID", Channel.channelID);
-    newLikemoji.set("organizationName", Channel.channelName);
-    await newLikemoji.save()
+    let newBadge = new Badge();
+    console.info(`file ${name} saved now add badges`);
+    newBadge.set("x3", parseFile);
+    newBadge.set("name", name.slice(0, -4));
+    newBadge.set("names", { en: badgeNamesEN });
+    newBadge.set("organizationID", Channel.channelID);
+    newBadge.set("organizationName", Channel.channelName);
+    await newBadge.save()
     .catch(error => {
         // error is a Parse.Error with an error code and message.
         alert("Failed to create new object, with error code: " + error.message);
     });
-    console.info(`likemoji ${name} saved now add to channel`);
-    Channel.likemojis.push(newLikemoji);
+    console.info(`badge ${name} saved now add to channel`);
+    Channel.badges.push(newBadge);
     $("#uploadComplete").fadeIn(1650);
     // The file has been saved to Parse.
-    return newLikemoji;
+    return newBadge;
 }
 
-$("#addLikemojisModalButton").change(function() {
+$("#addBadgesModalButton").change(function() {
 	$("#uploadComplete").hide();
 });
 
-$("#likemojisImageButton").click(async function() {
-	let fileUploadControl = document.getElementById("likemojisImageInput").files;
+$("#badgesImageButton").click(async function() {
+	let fileUploadControl = document.getElementById("badgesImageInput").files;
 	if (fileUploadControl.length > 0) {
         let promiseChain = [];
         for (var i = 0; i < fileUploadControl.length; i++) {
             console.info('adding upload promise for file number' + i);
-            promiseChain.push (createLikemoji(fileUploadControl[i]));
+            promiseChain.push (createBadge(fileUploadControl[i]));
         }
         await Promise.all(promiseChain)
             .then( () =>  {
-                console.info('likemojis saved..now refresh views');
+                console.info('badges saved..now refresh views');
                 Channel.updateViews();
-                $("#likemojisImageInput")[0].value = "";
+                $("#badgesImageInput")[0].value = "";
             });
 	}
 });

@@ -43,7 +43,7 @@ async function saveNewGroups() {
 						newGroup.set("organizationID", organization.id);
 						newGroup.set("organization", organization.get("name"));
 						newGroup.set("order", i);
-						newGroup.set("likemojis", newGroupsLikemojis[i])
+						newGroup.set("badges", newGroupsBadges[i])
 						newGroups[i] = newGroup;
 				};
 

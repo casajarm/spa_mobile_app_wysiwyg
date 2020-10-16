@@ -5,14 +5,15 @@
 	<script src="https://unpkg.com/lighterhtml"></script>
 	<script src="jscolor.js"></script>
 
-	<!-- links for bootstrap, parse.js, builder.css, likemojibuilder.css, googlefonts -->
+	
+	<!-- links for bootstrap, parse.js, builder.css, badgebuilder.css, googlefonts -->
 	<link
 		rel="stylesheet"
 		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
 		crossorigin="anonymous"
 	/>
-	<!-- <link rel="stylesheet" type="text/css" href="likemojibuilder.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="badgebuilder.css"> -->
 	<link rel="stylesheet" type="text/css" href="builder.css" />
 	<link
 		href="https://fonts.googleapis.com/css?family=Prompt"
@@ -33,7 +34,7 @@
 	<div id="title" class="title container">
 		<img
 			id="logo"
-			src="https://likemoji.com/sites/default/files/likemoji.png"
+			src=""
 		/>
 	</div>
 	<!-- navbar -->
@@ -123,8 +124,8 @@
 								Add / Edit a Category
 							</h4>
 						</div>
-						<form id="likemoji-edit-form" class="modal-body">
-							<div class="createLikemojiModal">
+						<form id="badge-edit-form" class="modal-body">
+							<div class="createBadgeModal">
 								<div class="form-group">
 									<label for="categoryName">Category Name</label>
 									<input
@@ -198,10 +199,10 @@
 			</div>
 			<!-- end category modal -->
 
-			<!-- edit likemojis modal -->
+			<!-- edit badges modal -->
 			<div
 				class="modal fade"
-				id="editLikemojisModal"
+				id="editBadgesModal"
 				tabindex="-1"
 				role="dialog"
 				aria-labelledby="myModalLabel"
@@ -217,22 +218,22 @@
 							>
 								<span aria-hidden="true">&times;</span>
 							</button>
-							<h4 class="modal-title" id="likemojiEditLabel">Edit Likemoji</h4>
+							<h4 class="modal-title" id="badgeEditLabel">Edit Badge</h4>
 						</div>
 						<div class="modal-body">
-							<div class="editLikemojiModal">
+							<div class="editBadgeModal">
 								<div class="form-group">
-									<label for="likemojiName">Likemoji Name</label>
+									<label for="badgeName">Badge Name</label>
 									<input
 										type="string"
 										class="form-control"
-										id="likemojiName"
-										placeholder="Name your Likemoji - ie: \'cleanliness\'"
+										id="badgeName"
+										placeholder="Name your Badge - ie: \'cleanliness\'"
 									/>
 								</div>
 								<div class="input-group selectCategoryImage">
 									<input
-										id="likemojiEditorImageInput"
+										id="badgeEditorImageInput"
 										type="file"
 										multiple
 										class="form-control"
@@ -240,7 +241,7 @@
 									/>
 									<span class="input-group-btn">
 										<button
-											id="likemojiEditorImageButton"
+											id="badgeEditorImageButton"
 											class="btn btn-unsplash"
 											type="button"
 											data-i=""
@@ -250,17 +251,17 @@
 									</span>
 								</div>
 								<div>
-									<h4 style="display:inline">Likemoji Image:</h4>
-									<p id="LikemojiEditorImageName" style="display:inline">
+									<h4 style="display:inline">Badge Image:</h4>
+									<p id="BadgeEditorImageName" style="display:inline">
 										Template Image
 									</p>
 								</div>
-								<img class="mojiPreview" id="likemojiPreview" src="" />
+								<img class="mojiPreview" id="badgePreview" src="" />
 							</div>
 						</div>
 						<div class="modal-footer">
 							<button
-								id="saveEditedLikemoji"
+								id="saveEditedBadge"
 								type="button"
 								class="btn btn-default"
 								data-dismiss="modal"
@@ -271,12 +272,12 @@
 					</div>
 				</div>
 			</div>
-			<!-- end edit likemojis modal -->
+			<!-- end edit badges modal -->
 
-			<!-- add likemojis modal -->
+			<!-- add badges modal -->
 			<div
 				class="modal fade"
-				id="addLikemojisModal"
+				id="addBadgesModal"
 				tabindex="-1"
 				role="dialog"
 				aria-labelledby="myModalLabel"
@@ -292,21 +293,21 @@
 							>
 								<span aria-hidden="true">&times;</span>
 							</button>
-							<h4 class="modal-title" id="myModalLabel">Create a Likemoji!</h4>
+							<h4 class="modal-title" id="myModalLabel">Create a Badge!</h4>
 						</div>
 						<div class="modal-body">
-							<div class="createLikemojiModal">
-								<div class="input-group selectLikemojiFiles">
+							<div class="createBadgeModal">
+								<div class="input-group selectBadgeFiles">
 									<input
-										id="likemojisImageInput"
+										id="badgesImageInput"
 										type="file"
 										multiple
 										class="form-control"
-										placeholder="Select Likemoji .png files"
+										placeholder="Select Badge .png files"
 									/>
 									<span class="input-group-btn">
 										<button
-											id="likemojisImageButton"
+											id="badgesImageButton"
 											class="btn btn-unsplash"
 											type="button"
 										>
@@ -323,8 +324,8 @@
 									Upload Complete!
 								</h4>
 
-								<div id="likemojisThumbsContainer" class="grid">
-									<!-- add code to preview likemojis here prior to saving to parse-->
+								<div id="badgesThumbsContainer" class="grid">
+									<!-- add code to preview badges here prior to saving to parse-->
 								</div>
 							</div>
 						</div>
@@ -340,7 +341,7 @@
 					</div>
 				</div>
 			</div>
-			<!-- end add likemojis modal -->
+			<!-- end add badges modal -->
 
 			<!-- edit header modal -->
 			<div
@@ -515,21 +516,15 @@
 	<!--
 	<script type="text/javascript" src="https://npmcdn.com/parse/dist/parse.min.js">	</script>
 	-->
-
 	<script
 		type="text/javascript"
-		src="https://npmcdn.com/parse@2.1.0/dist/parse.js"
+		src="https://npmcdn.com/parse@2.2.1/dist/parse.js"
 	></script>
-
-	<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
-	<script type="module" src="index.js"></script>
-
 	<!--
-	<script type="module" src="page_router_example.js"></script>
-
-
-	<script type="application/javascript" src="views/phoneView.js"></script>
-	<script type="application/javascript" src="views/categoryView.js">
-	</script>
+		<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
 	-->
+	<!--
+		<script type="module" src="index.js"></script>
+	-->
+		<script src="../../dist/main.bundle.js"></script></body>
 </body>

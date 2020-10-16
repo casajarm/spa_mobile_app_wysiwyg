@@ -6,8 +6,8 @@ const {render, html, svg} = lighterhtml;
 |-category
 |--header
 |--callout
-|--likemojis
-|---likemoji list
+|--badges
+|---badge list
 |---other categories
 |-navbar
 */
@@ -23,7 +23,7 @@ const phone = async (Channel, selectedCategoryID) =>  {
 }
 
 
-//const phoneView = (category, categories, categoryLikemojis) => {
+//const phoneView = (category, categories, categoryBadges) => {
 //const phoneView = (props) => {
 const phoneView = (Channel) => {
     console.info('rendering phoneView');
@@ -31,16 +31,16 @@ const phoneView = (Channel) => {
     let panel2 = document.getElementById("panel2");
     let category = Channel.selectedCategory || Channel.mainCategory;
     console.info(`selected category id: ${category.id}`);
-    const likemojisView = (likemojis) => {
-        let mainPageClass = 'likemojiGroupCollection-area';
+    const badgesView = (badges) => {
+        let mainPageClass = 'badgeGroupCollection-area';
         if(category.attributes.main == 1) {
-            mainPageClass = mainPageClass + ' mainpageLikemojis';
+            mainPageClass = mainPageClass + ' mainpageBadges';
         }
-        let mojiHtml = html`<div id="likemojiGroupCollection"
+        let mojiHtml = html`<div id="badgeGroupCollection"
                 class="${mainPageClass}">
-                  ${likemojis
-                    ? likemojis.map(moji => likemojiView(moji))
-                    : html`<h4 id="dragLikemojisPrompt" class="dragLikemojisPrompt" style="display:none">Add Likemojis Here!</h4>`}
+                  ${badges
+                    ? badges.map(moji => badgeView(moji))
+                    : html`<h4 id="dragBadgesPrompt" class="dragBadgesPrompt" style="display:none">Add Badges Here!</h4>`}
             </div>`;
 
         return mojiHtml;
@@ -63,7 +63,7 @@ const phoneView = (Channel) => {
                     ondragover="${dragover}"
                     ondrop="${handleDrop}"
                 >
-                    ${likemojisView(Channel.catLikemojis(category))}
+                    ${badgesView(Channel.catBadges(category))}
                     ${category.attributes.main == 1 ?
                             categoriesSubView(Channel.categories)
                             : html`<span></span>`
@@ -81,7 +81,7 @@ const phoneView = (Channel) => {
         let dropEvent = e.dataTransfer.getData('Text').split(',');
         if (dropEvent[1] === 'add') {
             // add it
-            Channel.addCategoryLikemoji(category, dropEvent[0])
+            Channel.addCategoryBadge(category, dropEvent[0])
             .then (
                 render(panel2, function () { return phoneView(Channel)})
             )
@@ -107,7 +107,7 @@ const phoneNavBarView =  (Channel) => {
     async function phoneHome(Channel) {
         Channel.selectedCategory = Channel.mainCategory;
         //let category = getMainCategory(categories);
-        //let categoryLikemojis = await getCategoryLikemojis(category);
+        //let categoryBadges = await getCategoryBadges(category);
         //TODO decide to render our route here
         //TODO can we just refer to this views parent (<div id="phoneView">.parent)?
         let panel2 = document.getElementById("panel2");
@@ -147,31 +147,31 @@ const phoneNavBarView =  (Channel) => {
     return navHTML;
 }
 
-  const likemojiView = (likemoji) => {
+  const badgeView = (badge) => {
 
     function dragMoji(e) {
         e.dataTransfer.setData('Text', e.currentTarget.id + ',remove');
     }
 
-    let likemojiViewHTML = html`<div
-        class="containerLikemojis likemojis ui-draggable ui-draggable-handle"
+    let badgeViewHTML = html`<div
+        class="containerBadges badges ui-draggable ui-draggable-handle"
         draggable="true"
-        id="${likemoji.id}"
+        id="${badge.id}"
         draggable="true"
         ondragstart="${dragMoji}"
     >
         <img
-            src="${likemoji.attributes.x3.url()}"
-            class="likemojiImages"/>
+            src="${badge.attributes.x3.url()}"
+            class="badgeImages"/>
         <div
-            class="likemojiNames channelText"
+            class="badgeNames channelText"
             style="color: rgb(52, 255, 86);">
-            ${likemoji.attributes.names.en}
+            ${badge.attributes.names.en}
         </div>
     </div>`;
 
-    //console.log(likemojiViewHTML);
-    return likemojiViewHTML;
+    //console.log(badgeViewHTML);
+    return badgeViewHTML;
 };
 
 
@@ -234,20 +234,20 @@ const categoriesSubView = (cats) => {
       </div>`;
 }
 
-const getCategoryLikemojis = async (category) => {
-    let IDs = category.attributes.likemojis;
-    let likemojis = [];
+const getCategoryBadges = async (category) => {
+    let IDs = category.attributes.badges;
+    let badges = [];
     if (IDs.length > 0) {
-        likemojis = await getLikemojisByID(IDs);
+        badges = await getBadgesByID(IDs);
     }
-    return likemojis;
+    return badges;
 }
 
-// returns likemojis sorted by name from a list of ids useful for getting the
-// mojis of the given category (group)
-async function getLikemojisByID(likemojiIDs) {
-    const query = new Parse.Query("Likemoji");
-    query.containedIn("objectId", likemojiIDs);
+// returns badges sorted by name from a list of ids useful for getting the
+// badges of the given category (group)
+async function getBadgesByID(badgeIDs) {
+    const query = new Parse.Query("Badge");
+    query.containedIn("objectId", badgeIDs);
     query.ascending("name");
     try {
         return await query.find();
@@ -257,4 +257,4 @@ async function getLikemojisByID(likemojiIDs) {
     }
 }
 
-export {phone, phoneView, getCategoryLikemojis};
+export {phone, phoneView, getCategoryBadges};
