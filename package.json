@@ -1,14 +1,14 @@
 {
   "name": "badge_20",
-  "version": "1.0.0",
+  "version": "0.6",
   "description": "badge builder app",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://casajarm@bitbucket.org/badge20/badge_20.git"
+    "url": "git+https://casajarm@spa_mobile_app_wysiwyg"
   },
   "author": "",
   "license": "ISC",
