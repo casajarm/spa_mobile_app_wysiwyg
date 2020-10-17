@@ -8,11 +8,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://casajarm@spa_mobile_app_wysiwyg"
+    "url": "git+https://github.com/casajarm/spa_mobile_app_wysiwyg"
   },
   "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/badge20/badge_20#readme",
+  "license": "unlicense",
+  "homepage": "https://github.com/casajarm/spa_mobile_app_wysiwyg/readme",
   "dependencies": {
     "parse": "^2.1.0"
   },
