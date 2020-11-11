@@ -59,25 +59,25 @@ const catLeftView = (categories) => {
             >
                 Edit Page
             </button>
-            <!-- 	<p>Upload header image - (1242px × 704px)</p></center> -->
+            <!-- 	<p>Upload header image  (1242px × 704px)</p></center> -->
         </div>
         <div class="selectDiv text-center">
             <button id="addBadges" type="button" class="btn btn-default editor"  onclick="${callBadgeEditor}">
                 Add/Edit Badges
             </button>
-            <!-- <p>Upload badges - (324px × 324px)</p></center> -->
+            <!-- <p>Upload badges  (324px × 324px)</p></center> -->
         </div>
         <div id="categoryEditorButton" class="selectDiv text-center">
             <button id="addCategories" type="button" class="btn btn-default editor" onclick="${callCategoriesEditor}">
                 Add/Edit Categories
             </button>
-            <!-- <p>Upload category image - (1242px × 312px)</p></center> -->
+            <!-- <p>Upload category image  (1242px × 312px)</p></center> -->
         </div>
         <div id="afterEditorButton" class="selectDiv text-center">
             <button id="afterEditing" type="button" class="btn btn-default editor">
                 Next
             </button>
-            <!-- <p>Upload category image - (1242px × 312px)</p></center> -->
+            <!-- <p>Upload category image  (1242px × 312px)</p></center> -->
         </div>
         <div id="cancelSaveGroup" class="selectDiv text-center" style="display:none">
             <div class="btn-group " role="group" aria-label="...">
